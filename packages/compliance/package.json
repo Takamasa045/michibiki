@@ -1,0 +1,51 @@
+{
+  "name": "@video-router/compliance",
+  "version": "0.1.0",
+  "description": "License guard messages and execution decisions for Video Router Agent.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Takamasa Ito",
+  "keywords": [
+    "video",
+    "license",
+    "compliance",
+    "video-router"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Takamasa045/video-router-agent.git",
+    "directory": "packages/compliance"
+  },
+  "bugs": {
+    "url": "https://github.com/Takamasa045/video-router-agent/issues"
+  },
+  "homepage": "https://github.com/Takamasa045/video-router-agent#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.js.map",
+    "dist/**/*.d.ts",
+    "dist/**/*.d.ts.map",
+    "package.json"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "test": "vitest run src"
+  },
+  "dependencies": {
+    "@video-router/video-spec": "workspace:*"
+  }
+}

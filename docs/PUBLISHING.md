@@ -1,0 +1,34 @@
+# Publishing
+
+This project is ready for a CLI-first MVP release when the local release gate and CI both pass.
+
+## GitHub Release
+
+1. Use this directory as the repository root.
+2. Keep generated jobs under `outputs/jobs/`; they are ignored by git.
+3. Keep third-party engine checkouts under `engines/`; they are ignored by git.
+4. Run the release gate:
+
+```bash
+pnpm release:check
+pnpm video-router doctor
+pnpm video-router generate --engine hyperframes --duration 1 --render --prompt "$(cat examples/lp-trailer/prompt.txt)"
+pnpm video-router generate --engine editframe --duration 1 --asset examples/asset-short/input/clip.mp4 --asset examples/asset-short/input/voice.mp3 --render --prompt "$(cat examples/asset-short/prompt.txt)"
+pnpm video-router create --engine remotion --duration 3 --dry-run --prompt "$(cat examples/event-promo/prompt.txt)"
+```
+
+## npm Packages
+
+The repository is a pnpm workspace. The root package stays `private: true` to prevent accidental publication.
+
+Publish workspace packages only after confirming the package names and scope are available in the target npm organization:
+
+```bash
+pnpm -r publish --access public
+```
+
+Each publishable package includes only compiled `dist` files and `package.json`.
+
+## Third-party Engines
+
+The npm packages do not vendor Remotion, HyperFrames, or Editframe source code. Users remain responsible for each engine's current official license and terms.

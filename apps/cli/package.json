@@ -1,0 +1,56 @@
+{
+  "name": "@video-router/cli",
+  "version": "0.1.0",
+  "description": "Command line interface for Video Router Agent.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Takamasa Ito",
+  "keywords": [
+    "video",
+    "ai-video",
+    "video-router",
+    "cli",
+    "remotion"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Takamasa045/video-router-agent.git",
+    "directory": "apps/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/Takamasa045/video-router-agent/issues"
+  },
+  "homepage": "https://github.com/Takamasa045/video-router-agent#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.js.map",
+    "dist/**/*.d.ts",
+    "dist/**/*.d.ts.map",
+    "package.json"
+  ],
+  "bin": {
+    "video-router": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "test": "vitest run src"
+  },
+  "dependencies": {
+    "@video-router/browser-renderer": "workspace:*",
+    "@video-router/compliance": "workspace:*",
+    "@video-router/engine-editframe": "workspace:*",
+    "@video-router/engine-hyperframes": "workspace:*",
+    "@video-router/engine-remotion": "workspace:*",
+    "@video-router/render-jobs": "workspace:*",
+    "@video-router/router": "workspace:*",
+    "@video-router/video-spec": "workspace:*"
+  }
+}

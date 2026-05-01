@@ -1,0 +1,44 @@
+{
+  "name": "video-router-agent",
+  "version": "0.1.0",
+  "description": "CLI-first AI video production router for VideoSpec generation and engine selection.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "packageManager": "pnpm@10.32.1",
+  "author": "Takamasa Ito",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Takamasa045/video-router-agent.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Takamasa045/video-router-agent/issues"
+  },
+  "homepage": "https://github.com/Takamasa045/video-router-agent#readme",
+  "keywords": [
+    "video",
+    "ai-video",
+    "remotion",
+    "hyperframes",
+    "editframe",
+    "cli"
+  ],
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "scripts": {
+    "build": "tsc -b packages/video-spec packages/router packages/compliance packages/render-jobs packages/browser-renderer packages/engine-remotion packages/engine-hyperframes packages/engine-editframe apps/cli",
+    "test": "vitest run",
+    "typecheck": "pnpm build",
+    "pack:check": "for dir in packages/* apps/*; do (cd \"$dir\" && pnpm pack --dry-run); done",
+    "release:check": "pnpm build && pnpm test && pnpm audit --audit-level moderate && pnpm pack:check",
+    "clean": "find apps packages -name dist -type d -prune -exec rm -rf {} +",
+    "video-router": "node apps/cli/dist/index.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.2"
+  }
+}

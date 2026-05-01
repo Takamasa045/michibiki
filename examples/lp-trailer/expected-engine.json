@@ -1,0 +1,4 @@
+{
+  "engine": "hyperframes",
+  "reason": "LP, URL, and DOM-style motion should route to HyperFrames."
+}

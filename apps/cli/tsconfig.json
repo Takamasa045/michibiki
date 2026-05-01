@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/.tsbuildinfo"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.test.ts"],
+  "references": [
+    { "path": "../../packages/video-spec" },
+    { "path": "../../packages/router" },
+    { "path": "../../packages/compliance" },
+    { "path": "../../packages/render-jobs" },
+    { "path": "../../packages/browser-renderer" },
+    { "path": "../../packages/engine-remotion" },
+    { "path": "../../packages/engine-hyperframes" },
+    { "path": "../../packages/engine-editframe" }
+  ]
+}

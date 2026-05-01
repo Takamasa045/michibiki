@@ -1,0 +1,53 @@
+{
+  "name": "@video-router/engine-editframe",
+  "version": "0.1.0",
+  "description": "Editframe timeline handoff adapter for Video Router Agent.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Takamasa Ito",
+  "keywords": [
+    "video",
+    "editframe",
+    "timeline",
+    "video-router"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Takamasa045/video-router-agent.git",
+    "directory": "packages/engine-editframe"
+  },
+  "bugs": {
+    "url": "https://github.com/Takamasa045/video-router-agent/issues"
+  },
+  "homepage": "https://github.com/Takamasa045/video-router-agent#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.js.map",
+    "dist/**/*.d.ts",
+    "dist/**/*.d.ts.map",
+    "package.json"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "test": "vitest run src"
+  },
+  "dependencies": {
+    "@video-router/browser-renderer": "workspace:*",
+    "@video-router/compliance": "workspace:*",
+    "@video-router/video-spec": "workspace:*"
+  }
+}

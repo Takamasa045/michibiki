@@ -1,0 +1,52 @@
+import { describe, expect, it } from "vitest";
+import { createVideoSpecFromPrompt } from "@video-router/video-spec";
+import { selectEngine } from "./router.js";
+
+describe("selectEngine", () => {
+  it("honors explicit engine preference", () => {
+    const spec = createVideoSpecFromPrompt({
+      prompt: "テンプレート動画を作りたい",
+      enginePreference: "hyperframes"
+    });
+
+    expect(selectEngine(spec)).toMatchObject({
+      engine: "hyperframes",
+      confidence: 1
+    });
+  });
+
+  it("routes video/audio workflows to Editframe", () => {
+    const spec = createVideoSpecFromPrompt({
+      prompt: "素材フォルダから字幕付きショート動画を作りたい",
+      assetSources: ["./assets/talk.mp4", "./assets/bgm.mp3"]
+    });
+
+    expect(selectEngine(spec)).toMatchObject({
+      engine: "editframe",
+      fallback: "remotion"
+    });
+  });
+
+  it("routes URL/DOM workflows to HyperFrames", () => {
+    const spec = createVideoSpecFromPrompt({
+      prompt: "LPをGSAPっぽく動画化したい https://example.com"
+    });
+
+    expect(selectEngine(spec)).toMatchObject({
+      engine: "hyperframes",
+      licenseRisk: "low"
+    });
+  });
+
+  it("defaults to Remotion for template motion graphics", () => {
+    const spec = createVideoSpecFromPrompt({
+      prompt: "イベント告知動画を30秒で作りたい。縦型でタイトルを出したい。"
+    });
+
+    expect(selectEngine(spec)).toMatchObject({
+      engine: "remotion",
+      fallback: "hyperframes"
+    });
+  });
+});
+
