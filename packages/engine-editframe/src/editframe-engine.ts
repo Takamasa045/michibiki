@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { renderBrowserVideo } from "@video-router/browser-renderer";
-import { validateLicense } from "@video-router/compliance";
+import { renderBrowserVideo } from "@michibiki/browser-renderer";
+import { validateLicense } from "@michibiki/compliance";
 import type {
   AssetSpec,
   GeneratedProject,
@@ -13,7 +13,7 @@ import type {
   SceneSpec,
   VideoEngine,
   VideoSpec
-} from "@video-router/video-spec";
+} from "@michibiki/video-spec";
 
 export type TimelineClip = {
   id: string;

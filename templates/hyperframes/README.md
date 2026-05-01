@@ -6,7 +6,7 @@ Current draft output:
 - `styles.css`
 - `motion.js`
 - `video-spec.json`
-- `render/output.mp4` when `video-router generate --render` is used
+- `render/output.mp4` when `michibiki generate --render` is used
 
 Planned named templates:
 

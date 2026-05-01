@@ -5,7 +5,7 @@ Expected engine: `hyperframes`
 Use this to validate Web/DOM/URL based project generation and local MP4 rendering.
 
 ```bash
-pnpm video-router generate \
+pnpm michibiki generate \
   --engine hyperframes \
   --duration 1 \
   --render \

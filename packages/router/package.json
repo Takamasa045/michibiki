@@ -1,6 +1,6 @@
 {
-  "name": "@video-router/router",
-  "version": "0.1.0",
+  "name": "@michibiki/router",
+  "version": "0.1.1",
   "description": "Engine selection rules for Michibiki.",
   "type": "module",
   "license": "MIT",
@@ -46,6 +46,6 @@
     "test": "vitest run src"
   },
   "dependencies": {
-    "@video-router/video-spec": "workspace:*"
+    "@michibiki/video-spec": "workspace:*"
   }
 }

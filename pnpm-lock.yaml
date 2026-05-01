@@ -20,28 +20,28 @@ importers:
 
   apps/cli:
     dependencies:
-      '@video-router/browser-renderer':
+      '@michibiki/browser-renderer':
         specifier: workspace:*
         version: link:../../packages/browser-renderer
-      '@video-router/compliance':
+      '@michibiki/compliance':
         specifier: workspace:*
         version: link:../../packages/compliance
-      '@video-router/engine-editframe':
+      '@michibiki/engine-editframe':
         specifier: workspace:*
         version: link:../../packages/engine-editframe
-      '@video-router/engine-hyperframes':
+      '@michibiki/engine-hyperframes':
         specifier: workspace:*
         version: link:../../packages/engine-hyperframes
-      '@video-router/engine-remotion':
+      '@michibiki/engine-remotion':
         specifier: workspace:*
         version: link:../../packages/engine-remotion
-      '@video-router/render-jobs':
+      '@michibiki/render-jobs':
         specifier: workspace:*
         version: link:../../packages/render-jobs
-      '@video-router/router':
+      '@michibiki/router':
         specifier: workspace:*
         version: link:../../packages/router
-      '@video-router/video-spec':
+      '@michibiki/video-spec':
         specifier: workspace:*
         version: link:../../packages/video-spec
 
@@ -49,52 +49,52 @@ importers:
 
   packages/compliance:
     dependencies:
-      '@video-router/video-spec':
+      '@michibiki/video-spec':
         specifier: workspace:*
         version: link:../video-spec
 
   packages/engine-editframe:
     dependencies:
-      '@video-router/browser-renderer':
+      '@michibiki/browser-renderer':
         specifier: workspace:*
         version: link:../browser-renderer
-      '@video-router/compliance':
+      '@michibiki/compliance':
         specifier: workspace:*
         version: link:../compliance
-      '@video-router/video-spec':
+      '@michibiki/video-spec':
         specifier: workspace:*
         version: link:../video-spec
 
   packages/engine-hyperframes:
     dependencies:
-      '@video-router/browser-renderer':
+      '@michibiki/browser-renderer':
         specifier: workspace:*
         version: link:../browser-renderer
-      '@video-router/compliance':
+      '@michibiki/compliance':
         specifier: workspace:*
         version: link:../compliance
-      '@video-router/video-spec':
+      '@michibiki/video-spec':
         specifier: workspace:*
         version: link:../video-spec
 
   packages/engine-remotion:
     dependencies:
-      '@video-router/compliance':
+      '@michibiki/compliance':
         specifier: workspace:*
         version: link:../compliance
-      '@video-router/video-spec':
+      '@michibiki/video-spec':
         specifier: workspace:*
         version: link:../video-spec
 
   packages/render-jobs:
     dependencies:
-      '@video-router/video-spec':
+      '@michibiki/video-spec':
         specifier: workspace:*
         version: link:../video-spec
 
   packages/router:
     dependencies:
-      '@video-router/video-spec':
+      '@michibiki/video-spec':
         specifier: workspace:*
         version: link:../video-spec
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createVideoSpecFromPrompt } from "@video-router/video-spec";
+import { createVideoSpecFromPrompt } from "@michibiki/video-spec";
 import { canRemotionHandle, selectRemotionTemplate } from "./remotion-engine.js";
 
 describe("Remotion engine helpers", () => {

@@ -1,6 +1,6 @@
 {
-  "name": "@video-router/engine-hyperframes",
-  "version": "0.1.0",
+  "name": "@michibiki/engine-hyperframes",
+  "version": "0.1.1",
   "description": "HyperFrames-style browser motion adapter for Michibiki.",
   "type": "module",
   "license": "MIT",
@@ -47,8 +47,8 @@
     "test": "vitest run src"
   },
   "dependencies": {
-    "@video-router/browser-renderer": "workspace:*",
-    "@video-router/compliance": "workspace:*",
-    "@video-router/video-spec": "workspace:*"
+    "@michibiki/browser-renderer": "workspace:*",
+    "@michibiki/compliance": "workspace:*",
+    "@michibiki/video-spec": "workspace:*"
   }
 }

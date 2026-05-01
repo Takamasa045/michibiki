@@ -1,6 +1,6 @@
 {
-  "name": "@video-router/engine-remotion",
-  "version": "0.1.0",
+  "name": "@michibiki/engine-remotion",
+  "version": "0.1.1",
   "description": "Remotion Studio Monorepo adapter for Michibiki.",
   "type": "module",
   "license": "MIT",
@@ -46,7 +46,7 @@
     "test": "vitest run src"
   },
   "dependencies": {
-    "@video-router/compliance": "workspace:*",
-    "@video-router/video-spec": "workspace:*"
+    "@michibiki/compliance": "workspace:*",
+    "@michibiki/video-spec": "workspace:*"
   }
 }

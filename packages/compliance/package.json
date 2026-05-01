@@ -1,6 +1,6 @@
 {
-  "name": "@video-router/compliance",
-  "version": "0.1.0",
+  "name": "@michibiki/compliance",
+  "version": "0.1.1",
   "description": "License guard messages and execution decisions for Michibiki.",
   "type": "module",
   "license": "MIT",
@@ -46,6 +46,6 @@
     "test": "vitest run src"
   },
   "dependencies": {
-    "@video-router/video-spec": "workspace:*"
+    "@michibiki/video-spec": "workspace:*"
   }
 }

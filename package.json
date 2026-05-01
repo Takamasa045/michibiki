@@ -1,6 +1,6 @@
 {
   "name": "michibiki",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Michibiki is a CLI-first AI video production router for VideoSpec generation and engine selection.",
   "private": true,
   "type": "module",
@@ -35,6 +35,7 @@
     "pack:check": "for dir in packages/* apps/*; do (cd \"$dir\" && pnpm pack --dry-run); done",
     "release:check": "pnpm build && pnpm test && pnpm audit --audit-level moderate && pnpm pack:check",
     "clean": "find apps packages -name dist -type d -prune -exec rm -rf {} +",
+    "michibiki": "node apps/cli/dist/index.js",
     "video-router": "node apps/cli/dist/index.js"
   },
   "devDependencies": {

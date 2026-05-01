@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { validateLicense } from "@video-router/compliance";
+import { validateLicense } from "@michibiki/compliance";
 import type {
   GeneratedProject,
   GenerateProjectContext,
@@ -14,7 +14,7 @@ import type {
   RenderResult,
   VideoEngine,
   VideoSpec
-} from "@video-router/video-spec";
+} from "@michibiki/video-spec";
 import { resolveRemotionRepoPath } from "./paths.js";
 
 export type RemotionEngineOptions = {

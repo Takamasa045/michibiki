@@ -2,7 +2,7 @@ import type {
   EngineDecision,
   EngineName,
   VideoSpec
-} from "@video-router/video-spec";
+} from "@michibiki/video-spec";
 
 export function selectEngine(spec: VideoSpec): EngineDecision {
   const enginePreference = spec.constraints.enginePreference ?? "auto";

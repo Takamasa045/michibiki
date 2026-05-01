@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import type { EngineName } from "@video-router/video-spec";
+import type { EngineName } from "@michibiki/video-spec";
 
 const examples = [
   { slug: "event-promo", engine: "remotion" },

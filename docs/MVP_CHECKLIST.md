@@ -41,13 +41,13 @@ pnpm build
 pnpm test
 pnpm audit --audit-level moderate
 pnpm pack:check
-pnpm video-router doctor
-pnpm video-router generate --engine hyperframes --duration 1 --render --prompt "$(cat examples/lp-trailer/prompt.txt)"
-pnpm video-router generate --engine editframe --duration 1 --asset examples/asset-short/input/clip.mp4 --asset examples/asset-short/input/voice.mp3 --render --prompt "$(cat examples/asset-short/prompt.txt)"
+pnpm michibiki doctor
+pnpm michibiki generate --engine hyperframes --duration 1 --render --prompt "$(cat examples/lp-trailer/prompt.txt)"
+pnpm michibiki generate --engine editframe --duration 1 --asset examples/asset-short/input/clip.mp4 --asset examples/asset-short/input/voice.mp3 --render --prompt "$(cat examples/asset-short/prompt.txt)"
 ```
 
 For Remotion, use dry-run when the external monorepo is not installed:
 
 ```bash
-pnpm video-router create --engine remotion --duration 3 --dry-run --prompt "$(cat examples/event-promo/prompt.txt)"
+pnpm michibiki create --engine remotion --duration 3 --dry-run --prompt "$(cat examples/event-promo/prompt.txt)"
 ```

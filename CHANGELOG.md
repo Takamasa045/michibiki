@@ -4,6 +4,14 @@ All notable changes to Michibiki will be documented in this file.
 
 This project follows semantic versioning for public releases.
 
+## [0.1.1] - 2026-05-02
+
+### Changed
+
+- Renamed publishable workspace packages from the `@video-router/*` npm scope to the `@michibiki/*` npm scope.
+- Added `michibiki` as the primary CLI binary and root script.
+- Kept `video-router` as a compatibility alias.
+
 ## [0.1.0] - 2026-05-02
 
 ### Added
@@ -22,4 +30,4 @@ This project follows semantic versioning for public releases.
 
 - HyperFrames and Editframe adapters generate local draft projects and MP4 previews; they do not bundle the official SDKs.
 - Remotion support calls an external Remotion Studio Monorepo checkout.
-- The root workspace package is private; publishable workspace packages remain under the `@video-router/*` npm scope for now.
+- The root workspace package is private.

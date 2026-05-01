@@ -9,7 +9,7 @@ Run from the repository root after `pnpm build`.
 Best for template-driven motion graphics and the existing Remotion Studio Monorepo.
 
 ```bash
-pnpm video-router create \
+pnpm michibiki create \
   --engine remotion \
   --aspect-ratio 9:16 \
   --duration 3 \
@@ -24,7 +24,7 @@ Use `--render` instead of `--dry-run` when the Remotion Studio Monorepo is insta
 Best for Web, DOM, CSS, JavaScript, URL, and LP-style motion.
 
 ```bash
-pnpm video-router generate \
+pnpm michibiki generate \
   --engine hyperframes \
   --duration 1 \
   --render \
@@ -36,7 +36,7 @@ pnpm video-router generate \
 Best for media assets, timeline previews, captions, audio, and B-roll workflows.
 
 ```bash
-pnpm video-router generate \
+pnpm michibiki generate \
   --engine editframe \
   --duration 1 \
   --asset examples/asset-short/input/clip.mp4 \
@@ -52,7 +52,7 @@ The MVP timeline preview does not require these placeholder asset files to exist
 Best for data-driven Remotion templates and future CSV/JSON-driven variants.
 
 ```bash
-pnpm video-router create \
+pnpm michibiki create \
   --engine remotion \
   --duration 3 \
   --dry-run \

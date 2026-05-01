@@ -39,7 +39,7 @@ This is a CLI-first MVP. The HyperFrames and Editframe adapters generate local d
 - `packages/engine-remotion` - adapter for the existing Remotion Studio Monorepo
 - `packages/engine-hyperframes` - adapter for Web/DOM/CSS/JS motion projects and local MP4 rendering
 - `packages/engine-editframe` - adapter for timeline/media handoff projects and local MP4 timeline previews
-- `apps/cli` - `video-router` CLI
+- `apps/cli` - `michibiki` CLI (`video-router` remains available as an alias)
 
 ## Setup
 
@@ -68,32 +68,34 @@ pnpm --dir engines/remotion-studio-monorepo install
 After `pnpm build`:
 
 ```bash
-pnpm video-router generate \
+pnpm michibiki generate \
   --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。縦型、焚き火、星空、AIエージェント感を入れて。"
 ```
+
+The legacy `pnpm video-router` script and `video-router` binary remain available as aliases.
 
 Useful commands:
 
 ```bash
-pnpm video-router create --prompt "..."
-pnpm video-router preview --job outputs/jobs/<job-id>
-pnpm video-router doctor
-pnpm video-router engines
-pnpm video-router inspect --job outputs/jobs/<job-id>
-pnpm video-router render --job outputs/jobs/<job-id>
+pnpm michibiki create --prompt "..."
+pnpm michibiki preview --job outputs/jobs/<job-id>
+pnpm michibiki doctor
+pnpm michibiki engines
+pnpm michibiki inspect --job outputs/jobs/<job-id>
+pnpm michibiki render --job outputs/jobs/<job-id>
 ```
 
 Render during generation:
 
 ```bash
-pnpm video-router generate --prompt "..." --render
+pnpm michibiki generate --prompt "..." --render
 ```
 
 Force a specific engine:
 
 ```bash
-pnpm video-router generate --engine hyperframes --prompt "Turn this LP into a 15-second DOM motion video https://example.com"
-pnpm video-router generate --engine editframe --asset ./clip.mp4 --asset ./voice.mp3 --prompt "Create a captioned short from these assets."
+pnpm michibiki generate --engine hyperframes --prompt "Turn this LP into a 15-second DOM motion video https://example.com"
+pnpm michibiki generate --engine editframe --asset ./clip.mp4 --asset ./voice.mp3 --prompt "Create a captioned short from these assets."
 ```
 
 Generated jobs are written to:
@@ -114,9 +116,9 @@ outputs/jobs/<job-id>/
 Runnable MVP examples are in `examples/`.
 
 ```bash
-pnpm video-router generate --engine hyperframes --duration 1 --render --prompt "$(cat examples/lp-trailer/prompt.txt)"
-pnpm video-router generate --engine editframe --duration 1 --asset examples/asset-short/input/clip.mp4 --asset examples/asset-short/input/voice.mp3 --render --prompt "$(cat examples/asset-short/prompt.txt)"
-pnpm video-router create --engine remotion --duration 3 --dry-run --prompt "$(cat examples/event-promo/prompt.txt)"
+pnpm michibiki generate --engine hyperframes --duration 1 --render --prompt "$(cat examples/lp-trailer/prompt.txt)"
+pnpm michibiki generate --engine editframe --duration 1 --asset examples/asset-short/input/clip.mp4 --asset examples/asset-short/input/voice.mp3 --render --prompt "$(cat examples/asset-short/prompt.txt)"
+pnpm michibiki create --engine remotion --duration 3 --dry-run --prompt "$(cat examples/event-promo/prompt.txt)"
 ```
 
 Use `docs/MVP_CHECKLIST.md` as the release gate for the CLI-first MVP.
@@ -163,10 +165,10 @@ Michibiki は、自然言語の動画制作リクエストを `VideoSpec` に変
 pnpm install
 pnpm build
 pnpm test
-pnpm video-router create --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。"
-pnpm video-router doctor
-pnpm video-router preview --job outputs/jobs/<job-id>
-pnpm video-router generate --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。"
+pnpm michibiki create --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。"
+pnpm michibiki doctor
+pnpm michibiki preview --job outputs/jobs/<job-id>
+pnpm michibiki generate --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。"
 ```
 
 MVP用の実行例は `examples/` にあります。
@@ -207,10 +209,10 @@ Michibiki 是一个 AI 视频制作路由器。它会把自然语言视频需求
 pnpm install
 pnpm build
 pnpm test
-pnpm video-router create --prompt "Create a 30-second vertical event promo video."
-pnpm video-router doctor
-pnpm video-router preview --job outputs/jobs/<job-id>
-pnpm video-router generate --prompt "Create a 30-second vertical event promo video."
+pnpm michibiki create --prompt "Create a 30-second vertical event promo video."
+pnpm michibiki doctor
+pnpm michibiki preview --job outputs/jobs/<job-id>
+pnpm michibiki generate --prompt "Create a 30-second vertical event promo video."
 ```
 
 许可证说明:
@@ -245,10 +247,10 @@ Michibiki는 자연어 영상 제작 요청을 `VideoSpec`으로 변환하고, R
 pnpm install
 pnpm build
 pnpm test
-pnpm video-router create --prompt "Create a 30-second vertical event promo video."
-pnpm video-router doctor
-pnpm video-router preview --job outputs/jobs/<job-id>
-pnpm video-router generate --prompt "Create a 30-second vertical event promo video."
+pnpm michibiki create --prompt "Create a 30-second vertical event promo video."
+pnpm michibiki doctor
+pnpm michibiki preview --job outputs/jobs/<job-id>
+pnpm michibiki generate --prompt "Create a 30-second vertical event promo video."
 ```
 
 라이선스 안내:
@@ -283,10 +285,10 @@ Comandos básicos:
 pnpm install
 pnpm build
 pnpm test
-pnpm video-router create --prompt "Create a 30-second vertical event promo video."
-pnpm video-router doctor
-pnpm video-router preview --job outputs/jobs/<job-id>
-pnpm video-router generate --prompt "Create a 30-second vertical event promo video."
+pnpm michibiki create --prompt "Create a 30-second vertical event promo video."
+pnpm michibiki doctor
+pnpm michibiki preview --job outputs/jobs/<job-id>
+pnpm michibiki generate --prompt "Create a 30-second vertical event promo video."
 ```
 
 Licencia:
@@ -321,10 +323,10 @@ Commandes de base:
 pnpm install
 pnpm build
 pnpm test
-pnpm video-router create --prompt "Create a 30-second vertical event promo video."
-pnpm video-router doctor
-pnpm video-router preview --job outputs/jobs/<job-id>
-pnpm video-router generate --prompt "Create a 30-second vertical event promo video."
+pnpm michibiki create --prompt "Create a 30-second vertical event promo video."
+pnpm michibiki doctor
+pnpm michibiki preview --job outputs/jobs/<job-id>
+pnpm michibiki generate --prompt "Create a 30-second vertical event promo video."
 ```
 
 Licence:

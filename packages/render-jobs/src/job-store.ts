@@ -6,7 +6,7 @@ import type {
   EngineDecision,
   PreviewResult,
   VideoSpec
-} from "@video-router/video-spec";
+} from "@michibiki/video-spec";
 
 export type JobPaths = {
   jobId: string;

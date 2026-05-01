@@ -1,8 +1,8 @@
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { resolveChromePath } from "@video-router/browser-renderer";
-import { getRemotionRepoCandidates, resolveRemotionRepoPath } from "@video-router/engine-remotion";
+import { resolveChromePath } from "@michibiki/browser-renderer";
+import { getRemotionRepoCandidates, resolveRemotionRepoPath } from "@michibiki/engine-remotion";
 
 export type DoctorCheck = {
   name: string;

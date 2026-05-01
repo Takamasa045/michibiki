@@ -11,10 +11,10 @@ This project is ready for a CLI-first MVP release when the local release gate an
 
 ```bash
 pnpm release:check
-pnpm video-router doctor
-pnpm video-router generate --engine hyperframes --duration 1 --render --prompt "$(cat examples/lp-trailer/prompt.txt)"
-pnpm video-router generate --engine editframe --duration 1 --asset examples/asset-short/input/clip.mp4 --asset examples/asset-short/input/voice.mp3 --render --prompt "$(cat examples/asset-short/prompt.txt)"
-pnpm video-router create --engine remotion --duration 3 --dry-run --prompt "$(cat examples/event-promo/prompt.txt)"
+pnpm michibiki doctor
+pnpm michibiki generate --engine hyperframes --duration 1 --render --prompt "$(cat examples/lp-trailer/prompt.txt)"
+pnpm michibiki generate --engine editframe --duration 1 --asset examples/asset-short/input/clip.mp4 --asset examples/asset-short/input/voice.mp3 --render --prompt "$(cat examples/asset-short/prompt.txt)"
+pnpm michibiki create --engine remotion --duration 3 --dry-run --prompt "$(cat examples/event-promo/prompt.txt)"
 ```
 
 ## npm Packages

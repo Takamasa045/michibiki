@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 import path from "node:path";
-import { validateLicense } from "@video-router/compliance";
-import { createEditframeEngine } from "@video-router/engine-editframe";
-import { createHyperFramesEngine } from "@video-router/engine-hyperframes";
-import { createRemotionEngine } from "@video-router/engine-remotion";
+import { validateLicense } from "@michibiki/compliance";
+import { createEditframeEngine } from "@michibiki/engine-editframe";
+import { createHyperFramesEngine } from "@michibiki/engine-hyperframes";
+import { createRemotionEngine } from "@michibiki/engine-remotion";
 import {
   createJobPaths,
   readJobManifest,
   resolveJobDir,
   writeJobFiles,
   writePreviewResult
-} from "@video-router/render-jobs";
-import { selectEngine } from "@video-router/router";
+} from "@michibiki/render-jobs";
+import { selectEngine } from "@michibiki/router";
 import {
   createVideoSpecFromPrompt,
   type AspectRatio,
@@ -22,7 +22,7 @@ import {
   type OutputType,
   type PreviewResult,
   type VideoEngine
-} from "@video-router/video-spec";
+} from "@michibiki/video-spec";
 import { parseArgs, getValue, getValues, hasFlag } from "./args.js";
 import { printDoctor, runDoctor } from "./doctor.js";
 
@@ -151,7 +151,7 @@ async function generate(args: ReturnType<typeof parseArgs>): Promise<void> {
 async function render(args: ReturnType<typeof parseArgs>): Promise<void> {
   const job = getValue(args, "job") ?? args.positionals[0];
   if (!job) {
-    throw new Error("Missing job. Use video-router render --job outputs/jobs/<job-id>.");
+    throw new Error("Missing job. Use michibiki render --job outputs/jobs/<job-id>.");
   }
 
   const { jobDir, manifest, project } = await loadGeneratedProject(job);
@@ -176,7 +176,7 @@ async function render(args: ReturnType<typeof parseArgs>): Promise<void> {
 async function preview(args: ReturnType<typeof parseArgs>): Promise<void> {
   const job = getValue(args, "job") ?? args.positionals[0];
   if (!job) {
-    throw new Error("Missing job. Use video-router preview --job outputs/jobs/<job-id>.");
+    throw new Error("Missing job. Use michibiki preview --job outputs/jobs/<job-id>.");
   }
 
   const { jobDir, manifest, project } = await loadGeneratedProject(job);
@@ -202,7 +202,7 @@ async function preview(args: ReturnType<typeof parseArgs>): Promise<void> {
 async function inspect(args: ReturnType<typeof parseArgs>): Promise<void> {
   const job = getValue(args, "job") ?? args.positionals[0];
   if (!job) {
-    throw new Error("Missing job. Use video-router inspect --job outputs/jobs/<job-id>.");
+    throw new Error("Missing job. Use michibiki inspect --job outputs/jobs/<job-id>.");
   }
 
   const jobDir = resolveJobDir(job);
@@ -214,14 +214,14 @@ function printHelp(): void {
   console.log(`Michibiki
 
 Usage:
-  video-router create --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。縦型..."
-  video-router generate --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。縦型..."
-  video-router generate --prompt "..." --render
-  video-router preview --job outputs/jobs/<job-id>
-  video-router render --job outputs/jobs/<job-id>
-  video-router inspect --job outputs/jobs/<job-id>
-  video-router engines
-  video-router doctor
+  michibiki create --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。縦型..."
+  michibiki generate --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。縦型..."
+  michibiki generate --prompt "..." --render
+  michibiki preview --job outputs/jobs/<job-id>
+  michibiki render --job outputs/jobs/<job-id>
+  michibiki inspect --job outputs/jobs/<job-id>
+  michibiki engines
+  michibiki doctor
 
 Generate options:
   --prompt <text>             Natural language video request

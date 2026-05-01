@@ -1,6 +1,6 @@
 {
-  "name": "@video-router/cli",
-  "version": "0.1.0",
+  "name": "@michibiki/cli",
+  "version": "0.1.1",
   "description": "Command line interface for Michibiki.",
   "type": "module",
   "license": "MIT",
@@ -35,6 +35,7 @@
     "package.json"
   ],
   "bin": {
+    "michibiki": "./dist/index.js",
     "video-router": "./dist/index.js"
   },
   "main": "./dist/index.js",
@@ -44,13 +45,13 @@
     "test": "vitest run src"
   },
   "dependencies": {
-    "@video-router/browser-renderer": "workspace:*",
-    "@video-router/compliance": "workspace:*",
-    "@video-router/engine-editframe": "workspace:*",
-    "@video-router/engine-hyperframes": "workspace:*",
-    "@video-router/engine-remotion": "workspace:*",
-    "@video-router/render-jobs": "workspace:*",
-    "@video-router/router": "workspace:*",
-    "@video-router/video-spec": "workspace:*"
+    "@michibiki/browser-renderer": "workspace:*",
+    "@michibiki/compliance": "workspace:*",
+    "@michibiki/engine-editframe": "workspace:*",
+    "@michibiki/engine-hyperframes": "workspace:*",
+    "@michibiki/engine-remotion": "workspace:*",
+    "@michibiki/render-jobs": "workspace:*",
+    "@michibiki/router": "workspace:*",
+    "@michibiki/video-spec": "workspace:*"
   }
 }

@@ -5,7 +5,7 @@ Expected engine: `editframe`
 Use this to validate asset/timeline project generation and local MP4 timeline preview rendering.
 
 ```bash
-pnpm video-router generate \
+pnpm michibiki generate \
   --engine editframe \
   --duration 1 \
   --asset examples/asset-short/input/clip.mp4 \

@@ -1,6 +1,6 @@
 {
-  "name": "@video-router/render-jobs",
-  "version": "0.1.0",
+  "name": "@michibiki/render-jobs",
+  "version": "0.1.1",
   "description": "Render job manifest and filesystem helpers for Michibiki.",
   "type": "module",
   "license": "MIT",
@@ -46,6 +46,6 @@
     "test": "vitest run src"
   },
   "dependencies": {
-    "@video-router/video-spec": "workspace:*"
+    "@michibiki/video-spec": "workspace:*"
   }
 }

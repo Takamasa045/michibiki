@@ -2,7 +2,7 @@ import type {
   EngineName,
   LicenseContext,
   LicenseResult
-} from "@video-router/video-spec";
+} from "@michibiki/video-spec";
 
 export function validateLicense(
   engine: EngineName,

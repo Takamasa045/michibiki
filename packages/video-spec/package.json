@@ -1,6 +1,6 @@
 {
-  "name": "@video-router/video-spec",
-  "version": "0.1.0",
+  "name": "@michibiki/video-spec",
+  "version": "0.1.1",
   "description": "Shared VideoSpec types and prompt-to-spec heuristics for Michibiki.",
   "type": "module",
   "license": "MIT",
