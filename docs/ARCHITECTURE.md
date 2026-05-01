@@ -1,6 +1,6 @@
 # Architecture
 
-Video Router Agent uses `VideoSpec` as the central contract between natural-language input, routing, engine adapters, and output management.
+Michibiki uses `VideoSpec` as the central contract between natural-language input, routing, engine adapters, and output management.
 
 ```text
 User Prompt / CLI / Studio UI

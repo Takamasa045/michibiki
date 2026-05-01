@@ -1,7 +1,7 @@
 {
-  "name": "video-router-agent",
+  "name": "michibiki",
   "version": "0.1.0",
-  "description": "CLI-first AI video production router for VideoSpec generation and engine selection.",
+  "description": "Michibiki is a CLI-first AI video production router for VideoSpec generation and engine selection.",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -9,14 +9,15 @@
   "author": "Takamasa Ito",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Takamasa045/video-router-agent.git"
+    "url": "git+https://github.com/Takamasa045/michibiki.git"
   },
   "bugs": {
-    "url": "https://github.com/Takamasa045/video-router-agent/issues"
+    "url": "https://github.com/Takamasa045/michibiki/issues"
   },
-  "homepage": "https://github.com/Takamasa045/video-router-agent#readme",
+  "homepage": "https://github.com/Takamasa045/michibiki#readme",
   "keywords": [
     "video",
+    "michibiki",
     "ai-video",
     "remotion",
     "hyperframes",

@@ -1,7 +1,7 @@
 {
   "name": "@video-router/render-jobs",
   "version": "0.1.0",
-  "description": "Render job manifest and filesystem helpers for Video Router Agent.",
+  "description": "Render job manifest and filesystem helpers for Michibiki.",
   "type": "module",
   "license": "MIT",
   "author": "Takamasa Ito",
@@ -13,13 +13,13 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Takamasa045/video-router-agent.git",
+    "url": "git+https://github.com/Takamasa045/michibiki.git",
     "directory": "packages/render-jobs"
   },
   "bugs": {
-    "url": "https://github.com/Takamasa045/video-router-agent/issues"
+    "url": "https://github.com/Takamasa045/michibiki/issues"
   },
-  "homepage": "https://github.com/Takamasa045/video-router-agent#readme",
+  "homepage": "https://github.com/Takamasa045/michibiki#readme",
   "publishConfig": {
     "access": "public"
   },

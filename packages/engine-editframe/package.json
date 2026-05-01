@@ -1,7 +1,7 @@
 {
   "name": "@video-router/engine-editframe",
   "version": "0.1.0",
-  "description": "Editframe timeline handoff adapter for Video Router Agent.",
+  "description": "Editframe timeline handoff adapter for Michibiki.",
   "type": "module",
   "license": "MIT",
   "author": "Takamasa Ito",
@@ -13,13 +13,13 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Takamasa045/video-router-agent.git",
+    "url": "git+https://github.com/Takamasa045/michibiki.git",
     "directory": "packages/engine-editframe"
   },
   "bugs": {
-    "url": "https://github.com/Takamasa045/video-router-agent/issues"
+    "url": "https://github.com/Takamasa045/michibiki/issues"
   },
-  "homepage": "https://github.com/Takamasa045/video-router-agent#readme",
+  "homepage": "https://github.com/Takamasa045/michibiki#readme",
   "publishConfig": {
     "access": "public"
   },

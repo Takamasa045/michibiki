@@ -250,7 +250,7 @@ async function writeRemotionSpecFiles(
   const props = {
     videoSpec: spec,
     router: {
-      generatedBy: "video-router-agent",
+      generatedBy: "michibiki",
       generatedAt: new Date().toISOString()
     }
   };

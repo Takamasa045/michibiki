@@ -1,10 +1,12 @@
-# Video Router Agent
+# Michibiki
 
 [English](#english) | [日本語](#日本語) | [简体中文](#简体中文) | [한국어](#한국어) | [Español](#español) | [Français](#français)
 
 ## English
 
-Video Router Agent is an AI video production router. It turns a natural-language video request into a `VideoSpec`, selects the best video engine, and creates a generated project or render output.
+Michibiki is an AI video production router. It turns a natural-language video request into a `VideoSpec`, selects the best video engine, and creates a generated project or render output.
+
+The name comes from the Japanese word "導き" (michibiki), meaning guidance. It reflects the agent's role: guiding each video request toward the most suitable path by choosing the right engine, workflow, and output shape.
 
 Current MVP execution supports Remotion project generation/rendering, HyperFrames HTML/CSS/JS project generation with local MP4 rendering, and Editframe timeline handoff project generation with local MP4 timeline previews. Remotion uses the existing Remotion Studio Monorepo; HyperFrames renders through headless Chrome plus ffmpeg; Editframe renders timeline previews through the same local browser/ffmpeg path.
 
@@ -132,7 +134,9 @@ Please review and comply with each license before using this project commerciall
 
 ## 日本語
 
-Video Router Agent は、自然言語の動画制作リクエストを `VideoSpec` に変換し、Remotion / HyperFrames / Editframe の中から最適な動画制作エンジンを選択するAI動画制作ルーターです。
+Michibiki は、自然言語の動画制作リクエストを `VideoSpec` に変換し、Remotion / HyperFrames / Editframe の中から最適な動画制作エンジンを選択するAI動画制作ルーターです。
+
+名前は日本語の「導き」に由来します。Agent が動画制作リクエストを読み取り、最適なエンジン・ワークフロー・出力形式へ導く存在であることを表しています。
 
 現在のMVPでは、Remotionのプロジェクト生成・レンダリングに加え、HyperFrames の HTML/CSS/JS 生成とローカルMP4レンダー、Editframe の `timeline.json` 生成とローカルMP4タイムラインプレビューに対応しています。Remotion は既存の Remotion Studio Monorepo を利用し、HyperFrames/Editframe は headless Chrome と ffmpeg でMP4化します。
 
@@ -181,7 +185,7 @@ CLI-first MVP の公開前チェックは `docs/MVP_CHECKLIST.md` を確認し�
 
 ## 简体中文
 
-Video Router Agent 是一个 AI 视频制作路由器。它会把自然语言视频需求转换为 `VideoSpec`，然后在 Remotion / HyperFrames / Editframe 中选择最合适的视频生成或编辑引擎。
+Michibiki 是一个 AI 视频制作路由器。它会把自然语言视频需求转换为 `VideoSpec`，然后在 Remotion / HyperFrames / Editframe 中选择最合适的视频生成或编辑引擎。
 
 当前 MVP 支持 Remotion 项目生成和渲染，也支持 HyperFrames 的 HTML/CSS/JS 生成与本地 MP4 渲染，以及 Editframe 的 `timeline.json` 生成与本地 MP4 时间线预览。Remotion 使用现有的 Remotion Studio Monorepo；HyperFrames/Editframe 通过 headless Chrome 和 ffmpeg 渲染。
 
@@ -219,7 +223,7 @@ pnpm video-router generate --prompt "Create a 30-second vertical event promo vid
 
 ## 한국어
 
-Video Router Agent는 자연어 영상 제작 요청을 `VideoSpec`으로 변환하고, Remotion / HyperFrames / Editframe 중 가장 적합한 영상 제작 엔진을 선택하는 AI 영상 제작 라우터입니다.
+Michibiki는 자연어 영상 제작 요청을 `VideoSpec`으로 변환하고, Remotion / HyperFrames / Editframe 중 가장 적합한 영상 제작 엔진을 선택하는 AI 영상 제작 라우터입니다.
 
 현재 MVP는 Remotion 프로젝트 생성/렌더링, HyperFrames HTML/CSS/JS 생성과 로컬 MP4 렌더링, Editframe `timeline.json` 생성과 로컬 MP4 타임라인 프리뷰를 지원합니다. Remotion은 기존 Remotion Studio Monorepo를 사용하고, HyperFrames/Editframe은 headless Chrome과 ffmpeg로 렌더링합니다.
 
@@ -257,7 +261,7 @@ pnpm video-router generate --prompt "Create a 30-second vertical event promo vid
 
 ## Español
 
-Video Router Agent es un enrutador de producción de video con IA. Convierte una solicitud en lenguaje natural en un `VideoSpec`, selecciona el motor de video más adecuado y crea un proyecto generado o una salida de render.
+Michibiki es un enrutador de producción de video con IA. Convierte una solicitud en lenguaje natural en un `VideoSpec`, selecciona el motor de video más adecuado y crea un proyecto generado o una salida de render.
 
 El MVP actual admite generación y renderizado con Remotion, generación HTML/CSS/JS y renderizado MP4 local para HyperFrames, y generación `timeline.json` con previsualización MP4 local para Editframe. Remotion usa el Remotion Studio Monorepo existente; HyperFrames/Editframe renderizan con headless Chrome y ffmpeg.
 
@@ -295,7 +299,7 @@ Antes de usarlo con fines comerciales, en equipo o como SaaS, revisa las condici
 
 ## Français
 
-Video Router Agent est un routeur de production vidéo basé sur l'IA. Il transforme une demande en langage naturel en `VideoSpec`, choisit le moteur vidéo le plus adapté, puis crée un projet généré ou une sortie de rendu.
+Michibiki est un routeur de production vidéo basé sur l'IA. Il transforme une demande en langage naturel en `VideoSpec`, choisit le moteur vidéo le plus adapté, puis crée un projet généré ou une sortie de rendu.
 
 Le MVP actuel prend en charge la génération et le rendu Remotion, la génération HTML/CSS/JS et le rendu MP4 local pour HyperFrames, ainsi que la génération `timeline.json` avec aperçu MP4 local pour Editframe. Remotion utilise le Remotion Studio Monorepo existant; HyperFrames/Editframe rendent via headless Chrome et ffmpeg.
 

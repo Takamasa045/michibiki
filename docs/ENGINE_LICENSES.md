@@ -1,6 +1,6 @@
 # Engine Licenses
 
-Video Router Agent separates original router code from third-party video engines.
+Michibiki separates original router code from third-party video engines.
 
 ## Original Code
 

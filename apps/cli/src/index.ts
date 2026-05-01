@@ -211,7 +211,7 @@ async function inspect(args: ReturnType<typeof parseArgs>): Promise<void> {
 }
 
 function printHelp(): void {
-  console.log(`Video Router Agent
+  console.log(`Michibiki
 
 Usage:
   video-router create --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。縦型..."
