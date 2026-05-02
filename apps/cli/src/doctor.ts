@@ -12,6 +12,7 @@ export type DoctorCheck = {
 
 export function runDoctor(cwd = process.cwd()): DoctorCheck[] {
   const remotionRepoPath = resolveRemotionRepoPath(undefined, cwd);
+  const hasRemotionRepo = existsSync(path.join(remotionRepoPath, "package.json"));
   const pnpm = commandVersion("pnpm", ["-v"]);
   const ffmpeg = commandVersion("ffmpeg", ["-version"]);
   const chromePath = resolveChromePath();
@@ -53,21 +54,32 @@ export function runDoctor(cwd = process.cwd()): DoctorCheck[] {
       detail: path.resolve(cwd, "docs", "THIRD_PARTY_NOTICES.md")
     },
     {
-      name: "Remotion monorepo",
-      ok: existsSync(path.join(remotionRepoPath, "package.json")),
-      detail: existsSync(path.join(remotionRepoPath, "package.json"))
+      name: "Remotion monorepo (optional)",
+      ok: true,
+      detail: hasRemotionRepo
         ? remotionRepoPath
-        : `not found; checked ${getRemotionRepoCandidates(cwd).join(", ")}`
+        : `not found; standalone Remotion fallback will be used. Checked ${getRemotionRepoCandidates(cwd).join(", ")}`
+    },
+    {
+      name: "Remotion standalone fallback",
+      ok: pnpm.ok,
+      detail: pnpm.ok
+        ? "available through generated official Remotion package.json"
+        : "requires pnpm to install generated Remotion dependencies"
     },
     {
       name: "Remotion default template",
-      ok: existsSync(path.join(remotionRepoPath, "apps", "_template")),
-      detail: path.join(remotionRepoPath, "apps", "_template")
+      ok: !hasRemotionRepo || existsSync(path.join(remotionRepoPath, "apps", "_template")),
+      detail: hasRemotionRepo
+        ? path.join(remotionRepoPath, "apps", "_template")
+        : "skipped; monorepo not installed"
     },
     {
       name: "Remotion 3D template",
-      ok: existsSync(path.join(remotionRepoPath, "apps", "3D-template")),
-      detail: path.join(remotionRepoPath, "apps", "3D-template")
+      ok: !hasRemotionRepo || existsSync(path.join(remotionRepoPath, "apps", "3D-template")),
+      detail: hasRemotionRepo
+        ? path.join(remotionRepoPath, "apps", "3D-template")
+        : "skipped; monorepo not installed"
     }
   ];
 }

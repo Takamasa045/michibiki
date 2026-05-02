@@ -46,8 +46,9 @@ pnpm michibiki generate --engine hyperframes --duration 1 --render --prompt "$(c
 pnpm michibiki generate --engine editframe --duration 1 --asset examples/asset-short/input/clip.mp4 --asset examples/asset-short/input/voice.mp3 --render --prompt "$(cat examples/asset-short/prompt.txt)"
 ```
 
-For Remotion, use dry-run when the external monorepo is not installed:
+For Remotion, the default `auto` mode uses the external monorepo when it is installed and otherwise generates a standalone official Remotion project:
 
 ```bash
-pnpm michibiki create --engine remotion --duration 3 --dry-run --prompt "$(cat examples/event-promo/prompt.txt)"
+pnpm michibiki create --engine remotion --duration 3 --prompt "$(cat examples/event-promo/prompt.txt)"
+pnpm michibiki create --engine remotion --remotion-mode standalone --duration 3 --prompt "$(cat examples/event-promo/prompt.txt)"
 ```

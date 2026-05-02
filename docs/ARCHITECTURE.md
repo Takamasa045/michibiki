@@ -38,6 +38,8 @@ Selects the best engine from a `VideoSpec`.
 
 The router intentionally does not call engine internals. It returns only an `EngineDecision`.
 
+`EngineDecision` includes the selected engine plus `engineFits`, a three-engine relative fit comparison whose percentages sum to 100. Each fit includes the reason, best use for this specific video, and the engine-specific recommendation. `selectionGuide` is a natural-language summary intended for CLI output and agent responses in Claude Code or Codex.
+
 ### `packages/compliance`
 
 Returns license guard results before execution.
@@ -58,19 +60,34 @@ It resolves a Chrome-compatible executable, captures deterministic PNG frames fr
 
 ### `packages/engine-remotion`
 
-Calls the existing Remotion Studio Monorepo as an external engine.
+Runs Remotion in one of two modes:
 
-It creates Remotion apps via:
+- `monorepo`: calls the existing Remotion Studio Monorepo as an external engine.
+- `standalone`: generates a minimal official Remotion project inside the job directory when the monorepo is not available.
+
+In monorepo mode, it creates Remotion apps via:
 
 ```bash
 pnpm create:project <app-name> --yes --no-install --template <default|3d>
 ```
 
-It renders via:
+In monorepo mode, it renders via:
 
 ```bash
 pnpm forge render --app <app-name> --composition Main --output <path>
 ```
+
+In standalone mode, it writes:
+
+- `package.json`
+- `tsconfig.json`
+- `remotion.config.ts`
+- `src/index.ts`
+- `src/Root.tsx`
+- `src/video-spec.ts`
+- `public/assets/data/video-spec.json`
+
+Standalone preview uses `pnpm exec remotion studio src/index.ts`; standalone rendering installs dependencies when needed and runs `pnpm exec remotion render src/index.ts Main <output>`.
 
 ### `packages/engine-hyperframes`
 

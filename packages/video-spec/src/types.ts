@@ -87,8 +87,18 @@ export type EngineDecision = {
   confidence: number;
   reason: string;
   recommendation: EngineRecommendation;
+  engineFits: EngineFit[];
+  selectionGuide: string;
   licenseRisk: "low" | "medium" | "high";
   fallback?: EngineName;
+};
+
+export type EngineFit = {
+  engine: EngineName;
+  fitPercent: number;
+  reason: string;
+  bestUse: string;
+  recommendation: EngineRecommendation;
 };
 
 export type EngineRecommendation = {

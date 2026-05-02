@@ -19,8 +19,13 @@ import { resolveRemotionRepoPath } from "./paths.js";
 
 export type RemotionEngineOptions = {
   remotionRepoPath?: string;
+  remotionMode?: RemotionProjectMode;
   cwd?: string;
 };
+
+export type RemotionProjectMode = "auto" | "monorepo" | "standalone";
+
+type ResolvedRemotionProjectMode = Exclude<RemotionProjectMode, "auto">;
 
 type CommandResult = {
   code: number;
@@ -29,14 +34,22 @@ type CommandResult = {
   command: string;
 };
 
+const REMOTION_VERSION = "^4.0.455";
+const REACT_VERSION = "^19.2.5";
+const REACT_TYPES_VERSION = "^19.2.14";
+const REACT_DOM_TYPES_VERSION = "^19.2.3";
+const TYPESCRIPT_VERSION = "^5.8.3";
+
 export function createRemotionEngine(
   options: RemotionEngineOptions = {}
 ): VideoEngine {
   const cwd = options.cwd ?? process.cwd();
+  const remotionMode = options.remotionMode ?? "auto";
   const remotionRepoPath = resolveRemotionRepoPath(
     options.remotionRepoPath,
     cwd
   );
+  const hasExplicitRemotionRepoPath = Boolean(options.remotionRepoPath);
 
   return {
     name: "remotion",
@@ -44,7 +57,9 @@ export function createRemotionEngine(
     generateProject: (spec, context) =>
       generateRemotionProject(spec, {
         ...context,
-        remotionRepoPath
+        remotionRepoPath,
+        remotionMode,
+        hasExplicitRemotionRepoPath
       }),
     preview: (project) => previewRemotionProject(project, remotionRepoPath),
     render: (project, context) =>
@@ -80,6 +95,22 @@ export function selectRemotionTemplate(spec: VideoSpec): "default" | "3d" {
 }
 
 async function generateRemotionProject(
+  spec: VideoSpec,
+  context: GenerateProjectContext & {
+    remotionRepoPath: string;
+    remotionMode: RemotionProjectMode;
+    hasExplicitRemotionRepoPath: boolean;
+  }
+): Promise<GeneratedProject> {
+  const resolvedMode = resolveRemotionProjectMode(context);
+  if (resolvedMode === "standalone") {
+    return generateStandaloneRemotionProject(spec, context);
+  }
+
+  return generateMonorepoRemotionProject(spec, context);
+}
+
+async function generateMonorepoRemotionProject(
   spec: VideoSpec,
   context: GenerateProjectContext & { remotionRepoPath: string }
 ): Promise<GeneratedProject> {
@@ -130,6 +161,7 @@ async function generateRemotionProject(
     appName,
     compositionId,
     template,
+    remotionMode: "monorepo",
     projectPath,
     remotionRepoPath: context.remotionRepoPath,
     generatedAt: new Date().toISOString()
@@ -159,10 +191,87 @@ async function generateRemotionProject(
   };
 }
 
+async function generateStandaloneRemotionProject(
+  spec: VideoSpec,
+  context: GenerateProjectContext
+): Promise<GeneratedProject> {
+  const appName = createAppName(spec);
+  const compositionId = "Main";
+  const template = "official-minimal";
+  const durationInFrames = Math.round(spec.format.durationSec * spec.format.fps);
+  const projectPath = context.outputDir
+    ? path.join(context.outputDir, "project", "remotion")
+    : path.resolve("outputs", "remotion", appName);
+
+  await writeStandaloneRemotionProjectFiles(projectPath, spec, {
+    appName,
+    compositionId,
+    durationInFrames
+  });
+
+  await writeLog(context.logDir, "generate.log", {
+    code: 0,
+    stdout: `Generated standalone Remotion project at ${projectPath}\n`,
+    stderr: "",
+    command: "michibiki remotion standalone"
+  });
+
+  const manifest = {
+    id: `project_${randomUUID()}`,
+    engine: "remotion",
+    appName,
+    compositionId,
+    template,
+    remotionMode: "standalone",
+    projectPath,
+    generatedAt: new Date().toISOString()
+  };
+
+  if (context.outputDir) {
+    const projectDir = path.join(context.outputDir, "project");
+    await fs.mkdir(projectDir, { recursive: true });
+    await fs.writeFile(
+      path.join(projectDir, "project.json"),
+      `${JSON.stringify(manifest, null, 2)}\n`,
+      "utf8"
+    );
+  }
+
+  return {
+    id: manifest.id,
+    engine: "remotion",
+    name: appName,
+    rootPath: projectPath,
+    files: [
+      path.join(projectPath, "package.json"),
+      path.join(projectPath, "src", "index.ts"),
+      path.join(projectPath, "src", "Root.tsx"),
+      path.join(projectPath, "src", "video-spec.ts"),
+      path.join(projectPath, "public", "assets", "data", "video-spec.json")
+    ],
+    metadata: manifest
+  };
+}
+
 function previewRemotionProject(
   project: GeneratedProject,
   remotionRepoPath: string
 ): Promise<PreviewResult> {
+  if (isStandaloneRemotionProject(project)) {
+    const command = [
+      `pnpm -C ${quotePath(project.rootPath)} install`,
+      `pnpm -C ${quotePath(project.rootPath)} exec remotion studio src/index.ts`
+    ].join(" && ");
+
+    return Promise.resolve({
+      ok: true,
+      projectId: project.id,
+      command,
+      message:
+        "Install dependencies, then run Remotion Studio in the standalone project."
+    });
+  }
+
   const command = `pnpm -C ${quotePath(remotionRepoPath)} forge studio`;
 
   return Promise.resolve({
@@ -177,6 +286,10 @@ async function renderRemotionProject(
   project: GeneratedProject,
   context: RenderContext & { remotionRepoPath: string }
 ): Promise<RenderResult> {
+  if (isStandaloneRemotionProject(project)) {
+    return renderStandaloneRemotionProject(project, context);
+  }
+
   assertRemotionRepo(context.remotionRepoPath);
 
   const appName = getStringMetadata(project, "appName") ?? project.name;
@@ -230,6 +343,60 @@ async function renderRemotionProject(
       ok
         ? "Remotion render completed."
         : "Remotion render failed. Inspect logs/render.log."
+  };
+}
+
+async function renderStandaloneRemotionProject(
+  project: GeneratedProject,
+  context: RenderContext
+): Promise<RenderResult> {
+  const compositionId = getStringMetadata(project, "compositionId") ?? "Main";
+  const outputDir = context.outputDir
+    ? path.join(context.outputDir, "render")
+    : path.join(project.rootPath, "out");
+  const outputPath = path.join(outputDir, "output.mp4");
+  await fs.mkdir(outputDir, { recursive: true });
+
+  const results: CommandResult[] = [];
+  if (!context.skipBuildPackages) {
+    const installResult = await run("pnpm", ["install", "--no-frozen-lockfile"], {
+      cwd: project.rootPath
+    });
+    results.push(installResult);
+    if (installResult.code !== 0) {
+      const failed = combineCommandResults(results);
+      await writeLog(context.logDir, "render.log", failed);
+      return {
+        ok: false,
+        projectId: project.id,
+        outputPath,
+        command: failed.command,
+        logs: `${failed.stdout}${failed.stderr}`,
+        message: "Standalone Remotion dependency install failed. Inspect logs/render.log."
+      };
+    }
+  }
+
+  const renderResult = await run(
+    "pnpm",
+    ["exec", "remotion", "render", "src/index.ts", compositionId, outputPath],
+    { cwd: project.rootPath }
+  );
+  results.push(renderResult);
+  const combined = combineCommandResults(results);
+  await writeLog(context.logDir, "render.log", combined);
+  const ok = renderResult.code === 0 && existsSync(outputPath);
+
+  return {
+    ok,
+    projectId: project.id,
+    outputPath,
+    command: combined.command,
+    logs: `${combined.stdout}${combined.stderr}`,
+    message:
+      ok
+        ? "Standalone Remotion render completed."
+        : "Standalone Remotion render failed. Inspect logs/render.log."
   };
 }
 
@@ -293,6 +460,282 @@ async function writeRemotionSpecFiles(
   await fs.writeFile(metaPath, `${JSON.stringify(meta, null, 2)}\n`, "utf8");
 }
 
+async function writeStandaloneRemotionProjectFiles(
+  projectPath: string,
+  spec: VideoSpec,
+  metadata: {
+    appName: string;
+    compositionId: string;
+    durationInFrames: number;
+  }
+): Promise<void> {
+  const srcDir = path.join(projectPath, "src");
+  const dataDir = path.join(projectPath, "public", "assets", "data");
+  await fs.mkdir(srcDir, { recursive: true });
+  await fs.mkdir(dataDir, { recursive: true });
+
+  await fs.writeFile(
+    path.join(projectPath, "package.json"),
+    `${JSON.stringify(buildStandalonePackageJson(spec), null, 2)}\n`,
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(projectPath, "tsconfig.json"),
+    `${JSON.stringify(buildStandaloneTsConfig(), null, 2)}\n`,
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(projectPath, "remotion.config.ts"),
+    buildStandaloneRemotionConfig(),
+    "utf8"
+  );
+  await fs.writeFile(path.join(srcDir, "index.ts"), buildStandaloneEntry(), "utf8");
+  await fs.writeFile(
+    path.join(srcDir, "Root.tsx"),
+    buildStandaloneRoot(spec, metadata),
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(srcDir, "video-spec.ts"),
+    `export const videoSpec = ${JSON.stringify(spec, null, 2)} as const;\n`,
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(dataDir, "video-spec.json"),
+    `${JSON.stringify(spec, null, 2)}\n`,
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(dataDir, "props.json"),
+    `${JSON.stringify(
+      {
+        videoSpec: spec,
+        router: {
+          generatedBy: "michibiki",
+          generatedAt: new Date().toISOString(),
+          remotionMode: "standalone"
+        }
+      },
+      null,
+      2
+    )}\n`,
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(projectPath, "app.meta.json"),
+    `${JSON.stringify(
+      {
+        title: spec.title,
+        description: spec.goal,
+        tags: ["michibiki", "remotion", "standalone", spec.format.aspectRatio],
+        category: "michibiki",
+        michibiki: {
+          specId: spec.id,
+          appName: metadata.appName,
+          compositionId: metadata.compositionId,
+          durationInFrames: metadata.durationInFrames,
+          remotionMode: "standalone"
+        }
+      },
+      null,
+      2
+    )}\n`,
+    "utf8"
+  );
+}
+
+function buildStandalonePackageJson(spec: VideoSpec): Record<string, unknown> {
+  return {
+    name: slugify(spec.title || "michibiki-remotion-video"),
+    version: "0.0.0",
+    private: true,
+    type: "module",
+    scripts: {
+      studio: "remotion studio src/index.ts",
+      dev: "remotion studio src/index.ts",
+      render: "remotion render src/index.ts Main out/output.mp4"
+    },
+    dependencies: {
+      "@remotion/cli": REMOTION_VERSION,
+      "@remotion/renderer": REMOTION_VERSION,
+      react: REACT_VERSION,
+      "react-dom": REACT_VERSION,
+      remotion: REMOTION_VERSION
+    },
+    devDependencies: {
+      "@types/react": REACT_TYPES_VERSION,
+      "@types/react-dom": REACT_DOM_TYPES_VERSION,
+      typescript: TYPESCRIPT_VERSION
+    }
+  };
+}
+
+function buildStandaloneTsConfig(): Record<string, unknown> {
+  return {
+    compilerOptions: {
+      target: "ES2022",
+      module: "ESNext",
+      moduleResolution: "Bundler",
+      jsx: "react-jsx",
+      strict: true,
+      noEmit: true,
+      skipLibCheck: true
+    },
+    include: ["src", "remotion.config.ts"]
+  };
+}
+
+function buildStandaloneRemotionConfig(): string {
+  return [
+    'import { Config } from "@remotion/cli/config";',
+    "",
+    'Config.setVideoImageFormat("jpeg");',
+    'Config.setOverwriteOutput(true);',
+    ""
+  ].join("\n");
+}
+
+function buildStandaloneEntry(): string {
+  return [
+    'import { registerRoot } from "remotion";',
+    'import { RemotionRoot } from "./Root";',
+    "",
+    "registerRoot(RemotionRoot);",
+    ""
+  ].join("\n");
+}
+
+function buildStandaloneRoot(
+  spec: VideoSpec,
+  metadata: { compositionId: string; durationInFrames: number }
+): string {
+  const scenes = (spec.content.scenes ?? []).map((scene) => ({
+    label: `Scene ${scene.order}`,
+    text: scene.text ?? scene.description
+  }));
+  const fallbackScenes =
+    scenes.length > 0
+      ? scenes
+      : [
+          {
+            label: "Scene 1",
+            text: spec.goal
+          }
+        ];
+
+  return [
+    'import { AbsoluteFill, Composition, interpolate, useCurrentFrame } from "remotion";',
+    'import { videoSpec } from "./video-spec";',
+    "",
+    `const WIDTH = ${spec.format.width};`,
+    `const HEIGHT = ${spec.format.height};`,
+    `const FPS = ${spec.format.fps};`,
+    `const DURATION = ${metadata.durationInFrames};`,
+    `const CTA = ${JSON.stringify(spec.content.cta ?? spec.format.aspectRatio)};`,
+    `const scenes = ${JSON.stringify(fallbackScenes, null, 2)} as const;`,
+    "const fallbackScene = { label: \"Scene 1\", text: videoSpec.goal };",
+    "",
+    "function MainVideo() {",
+    "  const frame = useCurrentFrame();",
+    "  const progress = frame / Math.max(1, DURATION - 1);",
+    "  const activeIndex = Math.min(",
+    "    scenes.length - 1,",
+    "    Math.floor(progress * scenes.length)",
+    "  );",
+    "  const activeScene = scenes[activeIndex] ?? fallbackScene;",
+    "  const reveal = interpolate(frame, [0, Math.min(24, DURATION)], [0, 1], {",
+    '    extrapolateRight: "clamp"',
+    "  });",
+    "  const slide = interpolate(progress, [0, 1], [24, -24]);",
+    "",
+    "  return (",
+    "    <AbsoluteFill",
+    "      style={{",
+    '        background: "linear-gradient(135deg, #111827 0%, #2563eb 52%, #f8fafc 100%)",',
+    '        color: "white",',
+    '        fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",',
+    '        overflow: "hidden"',
+    "      }}",
+    "    >",
+    "      <div",
+    "        style={{",
+    '          position: "absolute",',
+    '          inset: "7%",',
+    '          display: "flex",',
+    '          flexDirection: "column",',
+    '          justifyContent: "space-between",',
+    "          opacity: reveal,",
+    '          transform: `translateY(${(1 - reveal) * 24}px)`',
+    "        }}",
+    "      >",
+    "        <div",
+    "          style={{",
+    '            fontSize: 24,',
+    '            letterSpacing: 0,',
+    '            opacity: 0.78,',
+    '            textTransform: "uppercase"',
+    "          }}",
+    "        >",
+    "          Michibiki / Standalone Remotion",
+    "        </div>",
+    "        <div>",
+    "          <div",
+    "            style={{",
+    '              fontSize: Math.max(58, WIDTH * 0.055),',
+    "              fontWeight: 800,",
+    "              lineHeight: 0.95,",
+    '              letterSpacing: 0,',
+    "              maxWidth: WIDTH * 0.72",
+    "            }}",
+    "          >",
+    "            {videoSpec.title}",
+    "          </div>",
+    "          <div",
+    "            style={{",
+    '              marginTop: 34,',
+    '              fontSize: Math.max(30, WIDTH * 0.025),',
+    '              lineHeight: 1.22,',
+    "              maxWidth: WIDTH * 0.68,",
+    "              opacity: 0.9,",
+    '              transform: `translateX(${slide}px)`',
+    "            }}",
+    "          >",
+    "            {activeScene.text}",
+    "          </div>",
+    "        </div>",
+    "        <div",
+    "          style={{",
+    '            display: "flex",',
+    '            alignItems: "center",',
+    '            justifyContent: "space-between",',
+    '            gap: 32,',
+    '            fontSize: 28',
+    "          }}",
+    "        >",
+    "          <span>{activeScene.label}</span>",
+    "          <span>{CTA}</span>",
+    "        </div>",
+    "      </div>",
+    "    </AbsoluteFill>",
+    "  );",
+    "}",
+    "",
+    "export function RemotionRoot() {",
+    "  return (",
+    "    <Composition",
+    `      id=${JSON.stringify(metadata.compositionId)}`,
+    "      component={MainVideo}",
+    "      durationInFrames={DURATION}",
+    "      fps={FPS}",
+    "      width={WIDTH}",
+    "      height={HEIGHT}",
+    "    />",
+    "  );",
+    "}",
+    ""
+  ].join("\n");
+}
+
 async function applyVideoSpecToRemotionProject(
   projectPath: string,
   spec: VideoSpec,
@@ -351,6 +794,28 @@ function assertRemotionRepo(remotionRepoPath: string): void {
   }
 }
 
+function resolveRemotionProjectMode(context: {
+  remotionRepoPath: string;
+  remotionMode: RemotionProjectMode;
+  hasExplicitRemotionRepoPath: boolean;
+}): ResolvedRemotionProjectMode {
+  if (context.remotionMode === "standalone") return "standalone";
+  if (
+    context.remotionMode === "monorepo" ||
+    context.hasExplicitRemotionRepoPath
+  ) {
+    return "monorepo";
+  }
+
+  return existsSync(path.join(context.remotionRepoPath, "package.json"))
+    ? "monorepo"
+    : "standalone";
+}
+
+function isStandaloneRemotionProject(project: GeneratedProject): boolean {
+  return getStringMetadata(project, "remotionMode") === "standalone";
+}
+
 function createAppName(spec: VideoSpec): string {
   const slug = slugify(spec.title || "michibiki");
   return `${slug}-${new Date().toISOString().slice(0, 10).replaceAll("-", "")}-${randomUUID().slice(0, 8)}`;
@@ -402,6 +867,16 @@ async function writeLog(
   ].join("\n");
 
   await fs.writeFile(path.join(logDir, fileName), body, "utf8");
+}
+
+function combineCommandResults(results: CommandResult[]): CommandResult {
+  const last = results.at(-1);
+  return {
+    code: results.find((result) => result.code !== 0)?.code ?? last?.code ?? 0,
+    stdout: results.map((result) => result.stdout).join("\n"),
+    stderr: results.map((result) => result.stderr).join("\n"),
+    command: results.map((result) => result.command).join(" && ")
+  };
 }
 
 function run(

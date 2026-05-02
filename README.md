@@ -62,7 +62,15 @@ pnpm michibiki generate --prompt "Create a 15-second vertical event promo video.
 
 Michibiki is currently distributed through GitHub Releases, not npmjs.com. To use the CLI, clone or download the release source, then run the local `pnpm michibiki` commands from the repository root.
 
-The Remotion adapter looks for the external Remotion Studio Monorepo in this order:
+The Remotion adapter runs in `auto` mode by default. If the external Remotion Studio Monorepo is found, Michibiki generates into that monorepo. If it is not found, Michibiki creates a standalone official Remotion project under the job directory instead.
+
+Standalone Remotion output includes a minimal `package.json`, `src/index.ts`, `src/Root.tsx`, and `public/assets/data/video-spec.json`. Preview it with the command printed by `michibiki preview`, or force it with:
+
+```bash
+pnpm michibiki generate --engine remotion --remotion-mode standalone --prompt "Create a 15-second promo."
+```
+
+For monorepo mode, the adapter looks for the external Remotion Studio Monorepo in this order:
 
 1. `VIDEO_ROUTER_REMOTION_REPO`
 2. `engines/remotion-studio-monorepo`
@@ -76,6 +84,8 @@ git clone https://github.com/Takamasa045/remotion-studio-monorepo engines/remoti
 pnpm --dir engines/remotion-studio-monorepo install
 ```
 
+You can force monorepo mode with `--remotion-mode monorepo` or force standalone mode with `--remotion-mode standalone`.
+
 ## CLI
 
 After `pnpm build`:
@@ -86,6 +96,8 @@ pnpm michibiki generate \
 ```
 
 The legacy `pnpm video-router` script and `video-router` binary remain available as aliases.
+
+Every generated job writes `engine-decision.json` with the selected engine, a natural-language `selectionGuide`, and `engineFits` scores for Remotion, HyperFrames, and Editframe. The percentages are relative across the three engines so users can choose a different path with `--engine` when the creative direction fits better.
 
 Useful commands:
 
@@ -131,7 +143,8 @@ Runnable MVP examples are in `examples/`.
 ```bash
 pnpm michibiki generate --engine hyperframes --duration 1 --render --prompt "$(cat examples/lp-trailer/prompt.txt)"
 pnpm michibiki generate --engine editframe --duration 1 --asset examples/asset-short/input/clip.mp4 --asset examples/asset-short/input/voice.mp3 --render --prompt "$(cat examples/asset-short/prompt.txt)"
-pnpm michibiki create --engine remotion --duration 3 --dry-run --prompt "$(cat examples/event-promo/prompt.txt)"
+pnpm michibiki create --engine remotion --duration 3 --prompt "$(cat examples/event-promo/prompt.txt)"
+pnpm michibiki create --engine remotion --remotion-mode standalone --duration 3 --prompt "$(cat examples/event-promo/prompt.txt)"
 ```
 
 Use `docs/MVP_CHECKLIST.md` as the release gate for the CLI-first MVP.

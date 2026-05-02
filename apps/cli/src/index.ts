@@ -3,7 +3,10 @@ import path from "node:path";
 import { validateLicense } from "@michibiki/compliance";
 import { createEditframeEngine } from "@michibiki/engine-editframe";
 import { createHyperFramesEngine } from "@michibiki/engine-hyperframes";
-import { createRemotionEngine } from "@michibiki/engine-remotion";
+import {
+  createRemotionEngine,
+  type RemotionProjectMode
+} from "@michibiki/engine-remotion";
 import {
   createJobPaths,
   readJobManifest,
@@ -15,6 +18,7 @@ import { selectEngine } from "@michibiki/router";
 import {
   createVideoSpecFromPrompt,
   type AspectRatio,
+  type EngineFit,
   type EngineName,
   type EnginePreference,
   type EngineRecommendation,
@@ -109,7 +113,8 @@ async function generate(args: ReturnType<typeof parseArgs>): Promise<void> {
     console.log(`License guard blocked execution: ${license.message}`);
   } else {
     const engine = createEngine(decision.engine, {
-      remotionRepoPath: getValue(args, "remotion-repo")
+      remotionRepoPath: getValue(args, "remotion-repo"),
+      remotionMode: parseRemotionMode(getValue(args, "remotion-mode"))
     });
     project = await engine.generateProject(spec, {
       jobId: paths.jobId,
@@ -140,6 +145,8 @@ async function generate(args: ReturnType<typeof parseArgs>): Promise<void> {
     engine: decision.engine,
     reason: decision.reason,
     recommendation: decision.recommendation,
+    engineFits: decision.engineFits,
+    selectionGuide: decision.selectionGuide,
     fallback: decision.fallback,
     licenseMessage: license.message,
     projectPath: project?.rootPath,
@@ -159,7 +166,8 @@ async function render(args: ReturnType<typeof parseArgs>): Promise<void> {
 
   const { jobDir, manifest, project } = await loadGeneratedProject(job);
   const engine = createEngine(manifest.decision.engine, {
-    remotionRepoPath: getValue(args, "remotion-repo")
+    remotionRepoPath: getValue(args, "remotion-repo"),
+    remotionMode: parseRemotionMode(getValue(args, "remotion-mode"))
   });
   const result = await engine.render(project, {
     outputDir: jobDir,
@@ -184,7 +192,8 @@ async function preview(args: ReturnType<typeof parseArgs>): Promise<void> {
 
   const { jobDir, manifest, project } = await loadGeneratedProject(job);
   const engine = createEngine(manifest.decision.engine, {
-    remotionRepoPath: getValue(args, "remotion-repo")
+    remotionRepoPath: getValue(args, "remotion-repo"),
+    remotionMode: parseRemotionMode(getValue(args, "remotion-mode"))
   });
   const result = await engine.preview(project);
   const previewPath = await writePreviewResult(jobDir, result);
@@ -237,15 +246,17 @@ Generate options:
   --license-mode <mode>       personal, oss, commercial, client-work
   --output-type <type>        mp4, webm, project, code, preview
   --remotion-repo <path>      Override Remotion monorepo path
+  --remotion-mode <mode>      auto, monorepo, standalone
   --render                    Render after project generation
-  --dry-run                   Remotion only: write job files without running engine commands
+  --dry-run                   Remotion monorepo only: write job files without running engine commands
 `);
 }
 
 function printEngines(): void {
   console.log(`Available engines:
   remotion     Best for coded templates, React/TypeScript motion graphics, data-driven variants, and repeatable renders.
-               Watch for external Remotion repo setup and commercial/team license requirements.
+               Uses an external monorepo when found; otherwise creates a standalone official Remotion project.
+               Watch for commercial/team license requirements.
   hyperframes  Best for Web, DOM, CSS, JavaScript, URL, and LP-style browser-native motion.
                Watch for footage-heavy edits and official SDK gaps in the current draft adapter.
   editframe    Best for source footage, audio, captions, B-roll, and timeline handoff workflows.
@@ -258,6 +269,8 @@ function printGenerateSummary(params: {
   engine: EngineName;
   reason: string;
   recommendation: EngineRecommendation;
+  engineFits: EngineFit[];
+  selectionGuide: string;
   fallback?: EngineName;
   licenseMessage: string;
   projectPath?: string;
@@ -270,8 +283,15 @@ function printGenerateSummary(params: {
   console.log(`Job: ${params.jobDir}`);
   console.log(`Engine: ${params.engine}`);
   console.log(`Reason: ${params.reason}`);
-  console.log(`Proposal: ${params.recommendation.summary}`);
-  console.log(`Direction: ${params.recommendation.creativeDirection}`);
+  console.log(`Selection guide: ${params.selectionGuide}`);
+  console.log("Engine fit:");
+  for (const fit of params.engineFits) {
+    console.log(`- ${fit.engine}: ${fit.fitPercent}%`);
+    console.log(`  Why: ${fit.reason}`);
+    console.log(`  Best use: ${fit.bestUse}`);
+  }
+  console.log(`Selected proposal: ${params.recommendation.summary}`);
+  console.log(`Selected direction: ${params.recommendation.creativeDirection}`);
   console.log(`Strengths: ${params.recommendation.strengths.join("; ")}`);
   console.log(`Tradeoffs: ${params.recommendation.tradeoffs.join("; ")}`);
   if (params.fallback) {
@@ -332,11 +352,15 @@ function formatPreviewTarget(
 
 function createEngine(
   engine: EngineName,
-  options: { remotionRepoPath?: string } = {}
+  options: {
+    remotionRepoPath?: string;
+    remotionMode?: RemotionProjectMode;
+  } = {}
 ): VideoEngine {
   if (engine === "remotion") {
     return createRemotionEngine({
-      remotionRepoPath: options.remotionRepoPath
+      remotionRepoPath: options.remotionRepoPath,
+      remotionMode: options.remotionMode
     });
   }
   if (engine === "hyperframes") {
@@ -377,6 +401,15 @@ function parseEnginePreference(
     value === "hyperframes" ||
     value === "editframe"
   ) {
+    return value;
+  }
+  return undefined;
+}
+
+function parseRemotionMode(
+  value: string | undefined
+): RemotionProjectMode | undefined {
+  if (value === "auto" || value === "monorepo" || value === "standalone") {
     return value;
   }
   return undefined;

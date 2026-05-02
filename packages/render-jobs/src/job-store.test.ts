@@ -53,6 +53,46 @@ describe("render job store", () => {
         tradeoffs: ["not a footage timeline"],
         creativeDirection: "Animate the page as a short browser-native preview."
       },
+      engineFits: [
+        {
+          engine: "hyperframes",
+          fitPercent: 60,
+          reason: "Browser-native motion fits the request.",
+          bestUse: "Animate DOM sections as panels.",
+          recommendation: {
+            summary: "Use HyperFrames for browser-native motion.",
+            strengths: ["DOM motion"],
+            tradeoffs: ["not a footage timeline"],
+            creativeDirection: "Animate the page as a short browser-native preview."
+          }
+        },
+        {
+          engine: "remotion",
+          fitPercent: 30,
+          reason: "Could work as a coded template.",
+          bestUse: "Build a reusable template.",
+          recommendation: {
+            summary: "Use Remotion for templates.",
+            strengths: ["template motion"],
+            tradeoffs: ["requires setup"],
+            creativeDirection: "Build a prop-driven template."
+          }
+        },
+        {
+          engine: "editframe",
+          fitPercent: 10,
+          reason: "Less useful without source media.",
+          bestUse: "Use for footage timelines.",
+          recommendation: {
+            summary: "Use Editframe for timeline edits.",
+            strengths: ["timeline editing"],
+            tradeoffs: ["less useful for DOM motion"],
+            creativeDirection: "Cut clips and captions."
+          }
+        }
+      ],
+      selectionGuide:
+        "Recommended engine: hyperframes (60%). Use HyperFrames for browser-native motion.",
       licenseRisk: "low"
     };
 

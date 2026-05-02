@@ -11,7 +11,13 @@ describe("selectEngine", () => {
 
     expect(selectEngine(spec)).toMatchObject({
       engine: "hyperframes",
-      confidence: 1
+      confidence: 1,
+      engineFits: expect.arrayContaining([
+        expect.objectContaining({ engine: "remotion" }),
+        expect.objectContaining({ engine: "hyperframes" }),
+        expect.objectContaining({ engine: "editframe" })
+      ]),
+      selectionGuide: expect.stringContaining("Recommended engine: hyperframes")
     });
   });
 
@@ -21,7 +27,8 @@ describe("selectEngine", () => {
       assetSources: ["./assets/talk.mp4", "./assets/bgm.mp3"]
     });
 
-    expect(selectEngine(spec)).toMatchObject({
+    const decision = selectEngine(spec);
+    expect(decision).toMatchObject({
       engine: "editframe",
       fallback: "remotion",
       recommendation: {
@@ -31,6 +38,11 @@ describe("selectEngine", () => {
         creativeDirection: expect.stringContaining("captions")
       }
     });
+    expect(sumFitPercents(decision.engineFits)).toBe(100);
+    expect(findFitPercent(decision.engineFits, "editframe")).toBeGreaterThan(
+      findFitPercent(decision.engineFits, "remotion")
+    );
+    expect(decision.selectionGuide).toContain("Recommended engine: editframe");
   });
 
   it("routes URL/DOM workflows to HyperFrames", () => {
@@ -38,7 +50,8 @@ describe("selectEngine", () => {
       prompt: "LPをGSAPっぽく動画化したい https://example.com"
     });
 
-    expect(selectEngine(spec)).toMatchObject({
+    const decision = selectEngine(spec);
+    expect(decision).toMatchObject({
       engine: "hyperframes",
       licenseRisk: "low",
       recommendation: {
@@ -48,6 +61,14 @@ describe("selectEngine", () => {
         creativeDirection: expect.stringContaining("browser-native")
       }
     });
+    expect(sumFitPercents(decision.engineFits)).toBe(100);
+    expect(findFitPercent(decision.engineFits, "hyperframes")).toBeGreaterThan(
+      findFitPercent(decision.engineFits, "remotion")
+    );
+    expect(decision.engineFits[0]).toMatchObject({
+      engine: "hyperframes",
+      bestUse: expect.stringContaining("web page")
+    });
   });
 
   it("defaults to Remotion for template motion graphics", () => {
@@ -55,7 +76,8 @@ describe("selectEngine", () => {
       prompt: "イベント告知動画を30秒で作りたい。縦型でタイトルを出したい。"
     });
 
-    expect(selectEngine(spec)).toMatchObject({
+    const decision = selectEngine(spec);
+    expect(decision).toMatchObject({
       engine: "remotion",
       fallback: "hyperframes",
       recommendation: {
@@ -65,5 +87,28 @@ describe("selectEngine", () => {
         creativeDirection: expect.stringContaining("hook")
       }
     });
+    expect(sumFitPercents(decision.engineFits)).toBe(100);
+    expect(findFitPercent(decision.engineFits, "remotion")).toBeGreaterThan(
+      findFitPercent(decision.engineFits, "editframe")
+    );
+    expect(decision.engineFits[0]).toMatchObject({
+      engine: "remotion",
+      bestUse: expect.stringContaining("reusable coded template")
+    });
   });
 });
+
+function sumFitPercents(
+  engineFits: Array<{ fitPercent: number }>
+): number {
+  return engineFits.reduce((sum, fit) => sum + fit.fitPercent, 0);
+}
+
+function findFitPercent(
+  engineFits: Array<{ engine: string; fitPercent: number }>,
+  engine: string
+): number {
+  const fit = engineFits.find((candidate) => candidate.engine === engine);
+  if (!fit) throw new Error(`Missing fit for ${engine}`);
+  return fit.fitPercent;
+}
