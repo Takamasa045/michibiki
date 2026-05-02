@@ -98,6 +98,7 @@ export type EngineFit = {
   fitPercent: number;
   reason: string;
   bestUse: string;
+  featureHighlights: string[];
   recommendation: EngineRecommendation;
 };
 

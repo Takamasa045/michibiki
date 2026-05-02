@@ -289,6 +289,7 @@ function printGenerateSummary(params: {
     console.log(`- ${fit.engine}: ${fit.fitPercent}%`);
     console.log(`  Why: ${fit.reason}`);
     console.log(`  Best use: ${fit.bestUse}`);
+    console.log(`  Features: ${fit.featureHighlights.join("; ")}`);
   }
   console.log(`Selected proposal: ${params.recommendation.summary}`);
   console.log(`Selected direction: ${params.recommendation.creativeDirection}`);

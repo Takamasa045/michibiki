@@ -158,6 +158,7 @@ function buildEngineFits(spec: VideoSpec, signals: RouterSignals): EngineFit[] {
       fitPercent: normalized[engine],
       reason: buildFitReason(engine, signals),
       bestUse: buildBestUse(engine, spec),
+      featureHighlights: buildFeatureHighlights(engine),
       recommendation: buildEngineRecommendation(engine, spec)
     }))
     .sort((left, right) => right.fitPercent - left.fitPercent);
@@ -191,7 +192,7 @@ function buildFitReason(engine: EngineName, signals: RouterSignals): string {
     if (signals.hasVideoOrAudioAssets || signals.mentionsTimelineEditing) {
       return "Source media, captions, voice, B-roll, or timeline-editing signals make Editframe a strong fit.";
     }
-    return "Editframe is useful if the project later brings footage, voiceover, music, captions, or B-roll, but it is less central for a code-first prompt.";
+    return "Editframe can still shape a polished timeline-driven promo with captions, audio beats, transitions, and generated or static visual layers, but it is less central when no media assets are supplied.";
   }
 
   if (engine === "hyperframes") {
@@ -202,20 +203,47 @@ function buildFitReason(engine: EngineName, signals: RouterSignals): string {
   }
 
   if (signals.mentionsDataDrivenOrTemplateWorkflow) {
-    return "Template, React, data, props, or repeatable-render signals make Remotion a strong fit.";
+    return "Template, React, data, props, frame-accurate choreography, or repeatable-render signals make Remotion a strong fit.";
   }
-  return "Remotion is a good default for coded motion graphics, event promos, title sequences, and reusable video templates.";
+  return "Remotion is a good default for coded motion graphics, one-off animated promos, kinetic title sequences, and reusable video templates.";
 }
 
 function buildBestUse(engine: EngineName, spec: VideoSpec): string {
   const format = `${spec.format.durationSec}-second ${spec.format.aspectRatio}`;
   if (engine === "editframe") {
-    return `Use Editframe for this ${format} video if you want to assemble clips, voice, music, captions, and B-roll into a timeline-first edit.`;
+    return `Use Editframe for this ${format} video if you want a timeline-shaped promo with explicit scene timegroups, caption or word-level text beats, voice/music sync, waveform-informed pacing, transitions, overlays, and B-roll or generated visual layers. It is not only for existing footage; it is strongest when the edit rhythm, audio, subtitles, and layered media should drive the piece.`;
   }
   if (engine === "hyperframes") {
-    return `Use HyperFrames for this ${format} video if you want the concept to feel like a web page or LP turning into motion with browser-native sections and transitions.`;
+    return `Use HyperFrames for this ${format} video if you want the concept to feel like a web page or LP turning into motion with plain HTML/CSS/JS, GSAP/Lottie/CSS animations, frame-seekable timing, browser-native sections, and deterministic page-to-video rendering.`;
   }
-  return `Use Remotion for this ${format} video if you want a reusable coded template where titles, dates, CTA text, colors, and data can be changed as props.`;
+  return `Use Remotion for this ${format} video if you want a one-off, frame-accurate React motion piece with Sequence-based timing, useCurrentFrame choreography, kinetic typography, custom easing/spring motion, layered transitions, captions/audio, Lottie or Three.js-style flourishes, and optional props for later reuse.`;
+}
+
+function buildFeatureHighlights(engine: EngineName): string[] {
+  if (engine === "editframe") {
+    return [
+      "HTML web components or React compositions built from timegroups, so scenes can be sequence, fixed, or layered.",
+      "First-class media elements for video, audio, images, text, captions, waveform, and transitions.",
+      "Text can split by word, character, or line with stagger, easing, custom animations, and deterministic CSS variables.",
+      "Good fit for editor-like workflows: timeline, scrubber, preview, transform handles, render API, and cloud/local rendering paths."
+    ];
+  }
+
+  if (engine === "hyperframes") {
+    return [
+      "HTML-first authoring: compositions are plain HTML/CSS/JS with data attributes for timing and layout.",
+      "Seek-driven deterministic capture: each frame is positioned independently in headless Chrome and encoded through FFmpeg.",
+      "Strong with GSAP, Lottie, CSS, Motion One, CodePen-style effects, and existing website/LP DOM that should become motion.",
+      "Agent-friendly and low-friction: no React rewrite, no custom DSL, non-interactive CLI, and strong website-to-video workflows."
+    ];
+  }
+
+  return [
+    "React/TypeScript composition model for frame-accurate videos rendered to MP4/WebM with browser preview.",
+    "Sequence, Series, useCurrentFrame, interpolate, spring, and animation utilities enable precise choreographed motion.",
+    "Rich ecosystem for captions, audio, Lottie, Three.js/React Three Fiber, transitions, shapes, fonts, and cloud rendering.",
+    "Works for both one-off high-polish animations and prop-driven/programmatic variants."
+  ];
 }
 
 function getEngineFit(engineFits: EngineFit[], engine: EngineName): EngineFit {
@@ -263,18 +291,18 @@ function buildEngineRecommendation(
   if (engine === "editframe") {
     return {
       summary:
-        "Use Editframe when the request is really an edit: source footage, audio, captions, and timeline decisions matter most.",
+        "Use Editframe when timeline rhythm, captions, audio, transitions, layered media, and edit decisions should lead the video.",
       strengths: [
-        "timeline-first editing for video/audio assets",
-        "caption, voice, music, B-roll, and recap workflows",
-        "timeline.json handoff that preserves media-editing intent"
+        "timeline-first composition for scenes, captions, audio, overlays, and B-roll",
+        "word/character text animation, subtitles, music/voice sync, and transition-heavy story edits",
+        "timeline.json handoff that preserves pacing, sequencing, and media-editing intent"
       ],
       tradeoffs: [
         "current adapter is a timeline handoff and local preview, not the full Editframe SDK integration",
-        "less efficient for pure template or data-driven motion graphics",
+        "less efficient for pure code-only template variants or data-driven batch renders",
         "commercial, team, or cloud use depends on Editframe terms and plan requirements"
       ],
-      creativeDirection: `Cut a ${format} timeline around the strongest source clip, then layer voice/music, captions, B-roll beats, and a final title card.${cta}`
+      creativeDirection: `Design a ${format} timeline with an opening beat, caption-led message steps, music/voice sync points, crossfades or zoom transitions, overlay cards, and a final title card.${cta} Use clips if available; otherwise use generated stills, page captures, text, and sound as layered media.`
     };
   }
 
@@ -298,17 +326,17 @@ function buildEngineRecommendation(
 
   return {
     summary:
-      "Use Remotion when the request benefits from coded templates, React/TypeScript control, data-driven variants, or repeatable motion graphics.",
+      "Use Remotion when the request benefits from frame-accurate coded animation, custom motion design, React/TypeScript control, or reusable variants.",
     strengths: [
-      "template-driven React/TypeScript motion graphics",
-      "repeatable data/props variants and batch renders",
-      "strong fit for event promos, product explainers, dashboards, and title-heavy pieces"
+      "frame-accurate choreography for kinetic typography, custom easing, springs, and scene transitions",
+      "single-use high-polish animations as well as repeatable data/props variants and batch renders",
+      "strong fit for event promos, product explainers, dashboards, title-heavy pieces, Lottie-style motion, and 3D-like flourishes"
     ],
     tradeoffs: [
       "uses an external Remotion Studio Monorepo when available, otherwise generates a standalone Remotion project that needs dependency install",
       "commercial automation, team use, SaaS, or client work may require a Remotion Company License",
       "less natural for raw footage timelines than a media-editing engine"
     ],
-    creativeDirection: `Structure a ${format} template with an opening hook, two or three modular scenes, layered typography/motion, and a final CTA lockup.${cta} Keep text, dates, and data as props for variants.`
+    creativeDirection: `Build a ${format} animated promo with an opening hook, kinetic title reveal, staggered detail callouts, custom easing/spring transitions, depth/parallax or Lottie/3D-style accents, and a final CTA lockup.${cta} Expose text, dates, and colors as props only when reuse is useful.`
   };
 }

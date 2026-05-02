@@ -35,7 +35,7 @@ describe("selectEngine", () => {
         summary: expect.stringContaining("Editframe"),
         strengths: expect.arrayContaining([expect.stringContaining("timeline")]),
         tradeoffs: expect.arrayContaining([expect.stringContaining("handoff")]),
-        creativeDirection: expect.stringContaining("captions")
+        creativeDirection: expect.stringContaining("caption-led")
       }
     });
     expect(sumFitPercents(decision.engineFits)).toBe(100);
@@ -67,7 +67,10 @@ describe("selectEngine", () => {
     );
     expect(decision.engineFits[0]).toMatchObject({
       engine: "hyperframes",
-      bestUse: expect.stringContaining("web page")
+      bestUse: expect.stringContaining("plain HTML/CSS/JS"),
+      featureHighlights: expect.arrayContaining([
+        expect.stringContaining("Seek-driven deterministic capture")
+      ])
     });
   });
 
@@ -82,7 +85,9 @@ describe("selectEngine", () => {
       fallback: "hyperframes",
       recommendation: {
         summary: expect.stringContaining("Remotion"),
-        strengths: expect.arrayContaining([expect.stringContaining("template")]),
+        strengths: expect.arrayContaining([
+          expect.stringContaining("kinetic typography")
+        ]),
         tradeoffs: expect.arrayContaining([expect.stringContaining("external")]),
         creativeDirection: expect.stringContaining("hook")
       }
@@ -93,8 +98,17 @@ describe("selectEngine", () => {
     );
     expect(decision.engineFits[0]).toMatchObject({
       engine: "remotion",
-      bestUse: expect.stringContaining("reusable coded template")
+      bestUse: expect.stringContaining("one-off"),
+      featureHighlights: expect.arrayContaining([
+        expect.stringContaining("Sequence")
+      ])
     });
+    expect(getFitBestUse(decision.engineFits, "remotion")).toContain(
+      "kinetic typography"
+    );
+    expect(getFitBestUse(decision.engineFits, "editframe")).toContain(
+      "timeline-shaped"
+    );
   });
 });
 
@@ -111,4 +125,13 @@ function findFitPercent(
   const fit = engineFits.find((candidate) => candidate.engine === engine);
   if (!fit) throw new Error(`Missing fit for ${engine}`);
   return fit.fitPercent;
+}
+
+function getFitBestUse(
+  engineFits: Array<{ engine: string; bestUse: string }>,
+  engine: string
+): string {
+  const fit = engineFits.find((candidate) => candidate.engine === engine);
+  if (!fit) throw new Error(`Missing fit for ${engine}`);
+  return fit.bestUse;
 }

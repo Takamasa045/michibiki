@@ -59,6 +59,7 @@ describe("render job store", () => {
           fitPercent: 60,
           reason: "Browser-native motion fits the request.",
           bestUse: "Animate DOM sections as panels.",
+          featureHighlights: ["HTML/CSS/JS composition", "seek-driven rendering"],
           recommendation: {
             summary: "Use HyperFrames for browser-native motion.",
             strengths: ["DOM motion"],
@@ -71,6 +72,7 @@ describe("render job store", () => {
           fitPercent: 30,
           reason: "Could work as a coded template.",
           bestUse: "Build a reusable template.",
+          featureHighlights: ["React composition", "frame-accurate animation"],
           recommendation: {
             summary: "Use Remotion for templates.",
             strengths: ["template motion"],
@@ -83,6 +85,7 @@ describe("render job store", () => {
           fitPercent: 10,
           reason: "Less useful without source media.",
           bestUse: "Use for footage timelines.",
+          featureHighlights: ["timegroup sequencing", "captions and audio"],
           recommendation: {
             summary: "Use Editframe for timeline edits.",
             strengths: ["timeline editing"],
