@@ -60,13 +60,7 @@ pnpm michibiki doctor
 pnpm michibiki generate --prompt "Create a 15-second vertical event promo video."
 ```
 
-After the npm packages are published, the CLI can be installed as:
-
-```bash
-npm install -g @michibiki/cli
-michibiki doctor
-michibiki generate --prompt "Create a 15-second vertical event promo video."
-```
+Michibiki is currently distributed through GitHub Releases, not npmjs.com. To use the CLI, clone or download the release source, then run the local `pnpm michibiki` commands from the repository root.
 
 The Remotion adapter looks for the external Remotion Studio Monorepo in this order:
 

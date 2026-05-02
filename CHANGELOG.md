@@ -4,6 +4,16 @@ All notable changes to Michibiki will be documented in this file.
 
 This project follows semantic versioning for public releases.
 
+## Unreleased
+
+### Changed
+
+- Switched release automation from npm publishing to GitHub Releases via Release Please.
+
+### Removed
+
+- Removed the npm publishing workflow and token/Trusted Publishing requirement.
+
 ## [0.1.2] - 2026-05-02
 
 ### Added

@@ -36,5 +36,5 @@ jobs:
       - name: Audit
         run: pnpm audit --audit-level moderate
 
-      - name: Check npm package contents
+      - name: Check package contents
         run: pnpm pack:check

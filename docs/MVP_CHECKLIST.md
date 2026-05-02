@@ -33,7 +33,7 @@ This checklist defines the current CLI-first MVP completion target.
 
 ## Release Gate
 
-Run these before tagging an MVP release:
+Run these before creating an MVP GitHub Release:
 
 ```bash
 pnpm install
