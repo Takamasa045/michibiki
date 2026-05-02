@@ -4,21 +4,12 @@ All notable changes to Michibiki will be documented in this file.
 
 This project follows semantic versioning for public releases.
 
-## Unreleased
-
-### Changed
-
-- Switched release automation from npm publishing to GitHub Releases via Release Please.
-
-### Removed
-
-- Removed the npm publishing workflow and token/Trusted Publishing requirement.
-
 ## [0.1.3](https://github.com/Takamasa045/michibiki/compare/v0.1.2...v0.1.3) (2026-05-02)
 
 
 ### Bug Fixes
 
+* configure Release Please to create component-matched release PR titles
 * switch release flow to GitHub releases ([a20a295](https://github.com/Takamasa045/michibiki/commit/a20a295ad353880f899a3846cc3d662c962b4014))
 
 ## [0.1.2] - 2026-05-02

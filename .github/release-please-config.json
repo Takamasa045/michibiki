@@ -6,6 +6,8 @@
   "bump-minor-pre-major": true,
   "bump-patch-for-minor-pre-major": true,
   "separate-pull-requests": false,
+  "pull-request-title-pattern": "chore${scope}: release ${component} ${version}",
+  "group-pull-request-title-pattern": "chore${scope}: release ${component} ${version}",
   "changelog-sections": [
     {
       "type": "feat",
@@ -50,6 +52,7 @@
   "packages": {
     ".": {
       "package-name": "michibiki",
+      "component": "michibiki",
       "changelog-path": "CHANGELOG.md"
     }
   }
