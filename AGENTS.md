@@ -10,7 +10,7 @@
 
 1. URLや素材がある場合は、ページ本文・素材種別・既存動画ファイル参照を確認する。
 2. 既存MP4や動画素材があると判断した場合は、実際の `.mp4` / `.webm` / `<video>` / `og:video` 参照、またはユーザー提供のローカルファイルを根拠として示す。見出しやテキストだけで「既存MP4がある」と断定しない。
-3. `michibiki generate --engine auto --prompt "<user request>"`、または同等の `selectEngine()` 判定を使い、`engine-decision.json` の `engineFits` と `selectionGuide` を確認する。
+3. `michibiki generate --engine auto --prompt "<user request>"`、または同等の `selectEngine()` 判定を使い、`engine-decision.json` の `engineFits` と `selectionGuide`、および selected engine / selected proposal 相当の項目を確認する。
 4. Remotion / HyperFrames / Editframe の3つを、相対評価パーセンテージ付きで提示する。
 5. 各エンジンについて「この動画ならどう活かせるか」を1文で説明する。
 6. 自動推奨エンジンを示したうえで、ユーザーが `--engine remotion` / `--engine hyperframes` / `--engine editframe` を選べるようにする。
@@ -23,6 +23,18 @@
 - 各エンジンの `bestUse`
 - 各エンジンの `featureHighlights`
 - 既存動画素材の有無と、その判断根拠
+
+選定ロジックの扱い:
+
+- `engineFits` は3エンジン間の相対評価であり、最大パーセンテージだけを `Recommended engine` とみなさない。
+- `selectionGuide` の `Recommended engine`、または `engine-decision.json` の selected engine / selected proposal 相当の項目がある場合は、それを最終推奨として優先する。
+- 尺、アスペクト、BGM/SFX、ナレーション、字幕同期、ハイテンポ編集など制作条件が追加・変更された場合は、前回の判定を流用せず再度 `selectEngine()` 相当を実行する。
+- 相対スコア最大のエンジンと最終推奨が異なる場合は、スコア差と制作条件による補正理由を1文で説明する。
+
+生成品質の扱い:
+
+- エンジン選定と映像コピー設計は別工程として扱い、長いプロンプトやページ本文をそのまま表示テキストへ流し込まない。
+- `generate` の出力は、制作条件と視聴者向けコピーを分離し、Hook / Detail / CTA などの短い `script` / `captions` / `scenes[].text` に再構成してから各エンジンへ渡す。
 
 返答例:
 
@@ -50,4 +62,5 @@ Recommended engine: hyperframes (55%)
 
 - ページ概要だけを返して、エンジン比較を省略する。
 - `engineFits` を確認せずに「今回は Remotion でよい」など単一エンジンだけを提案する。
+- `engineFits` の最大パーセンテージだけで `Recommended engine` を決める。
 - 動画ファイル参照を確認せずに「既存MP4がある」と断定する。

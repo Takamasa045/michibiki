@@ -31,6 +31,34 @@ describe("createVideoSpecFromPrompt", () => {
     ]);
   });
 
+  it("reconstructs long requests into concise video copy", () => {
+    const prompt = [
+      "20秒ハイテンポ 横長 BGM、効果音はあり https://ai-lab0530.peatix.com",
+      "AIエージェント勉強会のプロモ動画を作りたい。",
+      "松本の中央公民館 Mウイングで、限定5名、未経験歓迎、無料ツール中心。",
+      "当日は思いつきをその場で原型にして、最後にPeatix申込CTAを出したい。"
+    ].join("\n");
+
+    const spec = createVideoSpecFromPrompt({
+      id: "spec_copy",
+      prompt
+    });
+    const sceneText = spec.content.scenes?.map((scene) => scene.text ?? "");
+
+    expect(spec.content.script).not.toBe(prompt);
+    expect(spec.content.script).toContain("AIエージェント勉強会");
+    expect(spec.content.cta).toBe("ai-lab0530.peatix.com");
+    expect(sceneText).toEqual(
+      expect.arrayContaining([
+        "AIエージェント勉強会",
+        "松本の中央公民館 Mウイング",
+        "限定5名・未経験歓迎・無料ツール中心"
+      ])
+    );
+    expect(sceneText?.every((text) => text.length <= 34)).toBe(true);
+    expect(sceneText?.join(" ")).not.toContain("https://");
+  });
+
   it("rejects an empty prompt", () => {
     expect(() =>
       createVideoSpecFromPrompt({
@@ -39,4 +67,3 @@ describe("createVideoSpecFromPrompt", () => {
     ).toThrow("Prompt is required.");
   });
 });
-
