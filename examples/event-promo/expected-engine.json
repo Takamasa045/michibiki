@@ -1,4 +1,12 @@
 {
   "engine": "remotion",
-  "reason": "Template-driven event promotion is a Remotion-first workflow in the MVP."
+  "inputType": "natural-language",
+  "promptFile": "prompt.txt",
+  "requiredDecisionFields": [
+    "engineFits",
+    "selectionGuide",
+    "bestUse",
+    "featureHighlights"
+  ],
+  "reason": "A natural-language event promo without URL or source media should default to Remotion for coded motion graphics."
 }

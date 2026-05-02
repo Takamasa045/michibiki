@@ -144,14 +144,17 @@ outputs/jobs/<job-id>/
 
 ## Examples and Release Readiness
 
-Runnable examples are in `examples/`.
+Runnable examples are in `examples/`. They cover multiple entry points, not only URLs:
 
 ```bash
-pnpm michibiki generate --engine hyperframes --duration 1 --render --prompt "$(cat examples/lp-trailer/prompt.txt)"
-pnpm michibiki generate --engine editframe --duration 1 --asset examples/asset-short/input/clip.mp4 --asset examples/asset-short/input/voice.mp3 --render --prompt "$(cat examples/asset-short/prompt.txt)"
-pnpm michibiki create --engine remotion --duration 3 --prompt "$(cat examples/event-promo/prompt.txt)"
+pnpm michibiki create --duration 3 --prompt "$(cat examples/event-promo/prompt.txt)"
+pnpm michibiki generate --duration 1 --render --prompt "$(cat examples/lp-trailer/prompt.txt)"
+pnpm michibiki create --duration 3 --prompt "$(cat examples/data-video/brief.json)"
+pnpm michibiki generate --duration 1 --asset examples/asset-short/input/clip.mp4 --asset examples/asset-short/input/voice.mp3 --render --prompt "$(cat examples/asset-short/prompt.txt)"
 pnpm michibiki create --engine remotion --remotion-mode standalone --duration 3 --prompt "$(cat examples/event-promo/prompt.txt)"
 ```
+
+The example set includes natural-language prompts, URL/LP inputs, structured JSON briefs, and asset-based timeline inputs. Each path is expected to produce the same decision shape: selected engine, `engineFits`, `selectionGuide`, `bestUse`, and `featureHighlights`.
 
 Use `docs/PUBLISHING.md` for release publishing steps and `docs/ROADMAP.md` for planned work.
 
@@ -205,7 +208,7 @@ pnpm michibiki preview --job outputs/jobs/<job-id>
 pnpm michibiki generate --prompt "AIエージェント勉強会のプロモ動画を30秒で作りたい。"
 ```
 
-実行例は `examples/` にあります。
+実行例は `examples/` にあります。自然言語、URL/LP、構成JSON、素材ありの入力タイプを含み、どの入口でも `engineFits`、`selectionGuide`、`bestUse`、`featureHighlights` が出ることを確認できます。
 公開手順は `docs/PUBLISHING.md`、今後の計画は `docs/ROADMAP.md` を確認してください。
 
 ライセンス:

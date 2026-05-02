@@ -1,4 +1,12 @@
 {
   "engine": "remotion",
+  "inputType": "structured",
+  "promptFile": "brief.json",
+  "requiredDecisionFields": [
+    "engineFits",
+    "selectionGuide",
+    "bestUse",
+    "featureHighlights"
+  ],
   "reason": "Data-driven, repeatable template videos are Remotion-first workflows."
 }

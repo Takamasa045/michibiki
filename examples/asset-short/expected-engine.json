@@ -1,4 +1,16 @@
 {
   "engine": "editframe",
+  "inputType": "assets",
+  "promptFile": "prompt.txt",
+  "assetSources": [
+    "examples/asset-short/input/clip.mp4",
+    "examples/asset-short/input/voice.mp3"
+  ],
+  "requiredDecisionFields": [
+    "engineFits",
+    "selectionGuide",
+    "bestUse",
+    "featureHighlights"
+  ],
   "reason": "Video/audio assets and captioned timeline editing should route to Editframe."
 }

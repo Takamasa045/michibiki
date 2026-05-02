@@ -1,4 +1,12 @@
 {
   "engine": "hyperframes",
+  "inputType": "url",
+  "promptFile": "prompt.txt",
+  "requiredDecisionFields": [
+    "engineFits",
+    "selectionGuide",
+    "bestUse",
+    "featureHighlights"
+  ],
   "reason": "LP, URL, and DOM-style motion should route to HyperFrames."
 }

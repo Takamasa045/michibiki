@@ -1,0 +1,27 @@
+{
+  "title": "地域コミュニティ月次レポート",
+  "inputType": "structured-brief",
+  "durationSec": 3,
+  "aspectRatio": "16:9",
+  "engineIntent": "Remotion向けにJSON propsで差し替えられるデータ動画",
+  "data": {
+    "participants": 128,
+    "satisfaction": "94%",
+    "nextEvent": "来月第2土曜日"
+  },
+  "scenes": [
+    {
+      "time": "0.0-1.0",
+      "description": "参加者数を大きな数値アニメーションで表示"
+    },
+    {
+      "time": "1.0-2.0",
+      "description": "満足度をゲージと短いコメントで表示"
+    },
+    {
+      "time": "2.0-3.0",
+      "description": "次回予定とCTAをタイトルカードで表示"
+    }
+  ],
+  "cta": "次回も参加受付中"
+}

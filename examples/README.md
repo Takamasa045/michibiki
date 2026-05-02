@@ -1,43 +1,42 @@
 # Examples
 
-These examples are small, local-first prompts for validating the MVP routing and rendering flow.
+These examples are small, local-first inputs for validating that Michibiki can route from multiple entry points and still produce `engineFits`, `selectionGuide`, `bestUse`, and `featureHighlights`.
 
 Run from the repository root after `pnpm build`.
 
-## Remotion: Event Promo
+## Natural Language: Event Promo
 
-Best for template-driven motion graphics and the existing Remotion Studio Monorepo.
+Best for a plain user request with no URL, source media, or structured file.
 
 ```bash
 pnpm michibiki create \
-  --engine remotion \
   --aspect-ratio 9:16 \
   --duration 3 \
   --dry-run \
   --prompt "$(cat examples/event-promo/prompt.txt)"
 ```
 
-Use `--render` instead of `--dry-run` when the Remotion Studio Monorepo is installed and you want an MP4.
+This should recommend Remotion by default while still showing HyperFrames and Editframe as relative alternatives.
 
-## HyperFrames: LP Trailer
+## URL / LP: Website Trailer
 
-Best for Web, DOM, CSS, JavaScript, URL, and LP-style motion.
+Best for a website, landing page, or URL that should become browser-native motion.
 
 ```bash
 pnpm michibiki generate \
-  --engine hyperframes \
   --duration 1 \
   --render \
   --prompt "$(cat examples/lp-trailer/prompt.txt)"
 ```
 
-## Editframe: Asset Short
+This should recommend HyperFrames by default while still explaining how Remotion or Editframe could be used creatively.
 
-Best for media assets, timeline previews, captions, audio, and B-roll workflows.
+## Assets: Timeline Short
+
+Best for source video, audio, captions, B-roll, and timeline-led editing.
 
 ```bash
 pnpm michibiki generate \
-  --engine editframe \
   --duration 1 \
   --asset examples/asset-short/input/clip.mp4 \
   --asset examples/asset-short/input/voice.mp3 \
@@ -45,16 +44,17 @@ pnpm michibiki generate \
   --prompt "$(cat examples/asset-short/prompt.txt)"
 ```
 
-The MVP timeline preview does not require these placeholder asset files to exist. The paths are preserved in `timeline.json` for the future real Editframe SDK/CLI integration.
+The local timeline preview does not require these placeholder asset files to exist. The paths are preserved in `timeline.json` for a future full Editframe SDK/CLI integration.
 
-## Data Video
+## Structured Brief / Code-Like Input: Data Video
 
-Best for data-driven Remotion templates and future CSV/JSON-driven variants.
+Best for JSON, Markdown, scene specs, props, code-like instructions, or repeatable data-driven variants.
 
 ```bash
 pnpm michibiki create \
-  --engine remotion \
   --duration 3 \
   --dry-run \
-  --prompt "$(cat examples/data-video/prompt.txt)"
+  --prompt "$(cat examples/data-video/brief.json)"
 ```
+
+This should recommend Remotion by default because the input describes JSON props, data, scenes, and deterministic motion.

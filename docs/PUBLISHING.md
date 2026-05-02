@@ -23,9 +23,10 @@ Run this before merging release changes:
 ```bash
 pnpm release:check
 pnpm michibiki doctor
-pnpm michibiki generate --engine hyperframes --duration 1 --render --prompt "$(cat examples/lp-trailer/prompt.txt)"
-pnpm michibiki generate --engine editframe --duration 1 --asset examples/asset-short/input/clip.mp4 --asset examples/asset-short/input/voice.mp3 --render --prompt "$(cat examples/asset-short/prompt.txt)"
-pnpm michibiki create --engine remotion --duration 3 --prompt "$(cat examples/event-promo/prompt.txt)"
+pnpm michibiki create --duration 3 --prompt "$(cat examples/event-promo/prompt.txt)"
+pnpm michibiki generate --duration 1 --render --prompt "$(cat examples/lp-trailer/prompt.txt)"
+pnpm michibiki create --duration 3 --prompt "$(cat examples/data-video/brief.json)"
+pnpm michibiki generate --duration 1 --asset examples/asset-short/input/clip.mp4 --asset examples/asset-short/input/voice.mp3 --render --prompt "$(cat examples/asset-short/prompt.txt)"
 pnpm michibiki create --engine remotion --remotion-mode standalone --duration 3 --prompt "$(cat examples/event-promo/prompt.txt)"
 ```
 
