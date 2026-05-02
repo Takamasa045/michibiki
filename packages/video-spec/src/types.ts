@@ -86,8 +86,16 @@ export type EngineDecision = {
   engine: EngineName;
   confidence: number;
   reason: string;
+  recommendation: EngineRecommendation;
   licenseRisk: "low" | "medium" | "high";
   fallback?: EngineName;
+};
+
+export type EngineRecommendation = {
+  summary: string;
+  strengths: string[];
+  tradeoffs: string[];
+  creativeDirection: string;
 };
 
 export type LicenseContext = {
@@ -155,4 +163,3 @@ export interface VideoEngine {
   ): Promise<RenderResult>;
   validateLicense(context: LicenseContext): Promise<LicenseResult>;
 }
-

@@ -17,6 +17,7 @@ import {
   type AspectRatio,
   type EngineName,
   type EnginePreference,
+  type EngineRecommendation,
   type GeneratedProject,
   type LicenseMode,
   type OutputType,
@@ -138,6 +139,8 @@ async function generate(args: ReturnType<typeof parseArgs>): Promise<void> {
     jobDir: paths.jobDir,
     engine: decision.engine,
     reason: decision.reason,
+    recommendation: decision.recommendation,
+    fallback: decision.fallback,
     licenseMessage: license.message,
     projectPath: project?.rootPath,
     previewTarget: previewResult
@@ -241,9 +244,12 @@ Generate options:
 
 function printEngines(): void {
   console.log(`Available engines:
-  remotion     Execution adapter. Uses existing Remotion Studio Monorepo.
-  hyperframes  Execution adapter. Generates HTML/CSS/JS projects and renders MP4 via headless Chrome + ffmpeg.
-  editframe    Execution adapter. Generates timeline.json handoff projects and renders MP4 timeline previews.
+  remotion     Best for coded templates, React/TypeScript motion graphics, data-driven variants, and repeatable renders.
+               Watch for external Remotion repo setup and commercial/team license requirements.
+  hyperframes  Best for Web, DOM, CSS, JavaScript, URL, and LP-style browser-native motion.
+               Watch for footage-heavy edits and official SDK gaps in the current draft adapter.
+  editframe    Best for source footage, audio, captions, B-roll, and timeline handoff workflows.
+               Watch for current timeline-preview limits and Editframe plan/terms requirements.
 `);
 }
 
@@ -251,6 +257,8 @@ function printGenerateSummary(params: {
   jobDir: string;
   engine: EngineName;
   reason: string;
+  recommendation: EngineRecommendation;
+  fallback?: EngineName;
   licenseMessage: string;
   projectPath?: string;
   previewTarget?: string;
@@ -262,6 +270,13 @@ function printGenerateSummary(params: {
   console.log(`Job: ${params.jobDir}`);
   console.log(`Engine: ${params.engine}`);
   console.log(`Reason: ${params.reason}`);
+  console.log(`Proposal: ${params.recommendation.summary}`);
+  console.log(`Direction: ${params.recommendation.creativeDirection}`);
+  console.log(`Strengths: ${params.recommendation.strengths.join("; ")}`);
+  console.log(`Tradeoffs: ${params.recommendation.tradeoffs.join("; ")}`);
+  if (params.fallback) {
+    console.log(`Fallback: ${params.fallback}`);
+  }
   console.log(`License: ${params.licenseMessage}`);
   if (params.projectPath) {
     console.log(`Project: ${params.projectPath}`);

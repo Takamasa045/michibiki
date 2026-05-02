@@ -47,6 +47,12 @@ describe("render job store", () => {
       engine: "hyperframes",
       confidence: 1,
       reason: "test",
+      recommendation: {
+        summary: "Use HyperFrames for browser-native motion.",
+        strengths: ["DOM motion"],
+        tradeoffs: ["not a footage timeline"],
+        creativeDirection: "Animate the page as a short browser-native preview."
+      },
       licenseRisk: "low"
     };
 

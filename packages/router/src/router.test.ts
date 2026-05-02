@@ -23,7 +23,13 @@ describe("selectEngine", () => {
 
     expect(selectEngine(spec)).toMatchObject({
       engine: "editframe",
-      fallback: "remotion"
+      fallback: "remotion",
+      recommendation: {
+        summary: expect.stringContaining("Editframe"),
+        strengths: expect.arrayContaining([expect.stringContaining("timeline")]),
+        tradeoffs: expect.arrayContaining([expect.stringContaining("handoff")]),
+        creativeDirection: expect.stringContaining("captions")
+      }
     });
   });
 
@@ -34,7 +40,13 @@ describe("selectEngine", () => {
 
     expect(selectEngine(spec)).toMatchObject({
       engine: "hyperframes",
-      licenseRisk: "low"
+      licenseRisk: "low",
+      recommendation: {
+        summary: expect.stringContaining("HyperFrames"),
+        strengths: expect.arrayContaining([expect.stringContaining("DOM")]),
+        tradeoffs: expect.arrayContaining([expect.stringContaining("footage")]),
+        creativeDirection: expect.stringContaining("browser-native")
+      }
     });
   });
 
@@ -45,8 +57,13 @@ describe("selectEngine", () => {
 
     expect(selectEngine(spec)).toMatchObject({
       engine: "remotion",
-      fallback: "hyperframes"
+      fallback: "hyperframes",
+      recommendation: {
+        summary: expect.stringContaining("Remotion"),
+        strengths: expect.arrayContaining([expect.stringContaining("template")]),
+        tradeoffs: expect.arrayContaining([expect.stringContaining("external")]),
+        creativeDirection: expect.stringContaining("hook")
+      }
     });
   });
 });
-
