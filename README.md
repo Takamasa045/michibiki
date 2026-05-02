@@ -10,7 +10,7 @@ Michibiki is an AI video production router. It turns a natural-language video re
 
 The name comes from the Japanese word "導き" (michibiki), meaning guidance. It reflects the agent's role: guiding each video request toward the most suitable path by choosing the right engine, workflow, and output shape.
 
-Current MVP execution supports Remotion project generation/rendering, HyperFrames HTML/CSS/JS project generation with local MP4 rendering, and Editframe timeline handoff project generation with local MP4 timeline previews. Remotion uses the existing Remotion Studio Monorepo; HyperFrames renders through headless Chrome plus ffmpeg; Editframe renders timeline previews through the same local browser/ffmpeg path.
+Current execution supports Remotion project generation/rendering, HyperFrames HTML/CSS/JS project generation with local MP4 rendering, and Editframe timeline handoff project generation with local MP4 timeline previews. Remotion runs in `auto` mode by default: it uses an existing Remotion Studio Monorepo when available, then falls back to a standalone official Remotion project when no monorepo is present. HyperFrames renders through headless Chrome plus ffmpeg; Editframe renders timeline previews through the same local browser/ffmpeg path.
 
 ```text
 User Prompt / CLI / Studio UI
@@ -25,18 +25,18 @@ Engine Router
 Generated Project / Preview / Render
 ```
 
-### MVP Scope
+### Current Scope
 
-This is a CLI-first MVP. The HyperFrames and Editframe adapters generate local draft projects and MP4 previews; they do not bundle or replace the official HyperFrames/Editframe SDKs. The Remotion adapter calls an external Remotion Studio Monorepo checkout. Generated jobs may contain prompts, asset paths, and rendered files, and are ignored by default under `outputs/jobs/`.
+Michibiki is CLI-first today. The HyperFrames and Editframe adapters generate local draft projects and MP4 previews; they do not bundle or replace the official HyperFrames/Editframe SDKs. The Remotion adapter uses an external Remotion Studio Monorepo checkout when available, or creates a standalone official Remotion project inside the job directory when it is not. Generated jobs may contain prompts, asset paths, and rendered files, and are ignored by default under `outputs/jobs/`.
 
-## MVP Packages
+## Packages
 
 - `packages/video-spec` - core `VideoSpec`, `SceneSpec`, `AssetSpec`, engine interface, and prompt-to-spec heuristics
-- `packages/router` - engine selection rules
+- `packages/router` - engine selection rules, relative `engineFits` scoring, `selectionGuide`, and `featureHighlights`
 - `packages/compliance` - license guard messages and execution blocking decisions
 - `packages/render-jobs` - shared job directory, manifest, and preview-result management
 - `packages/browser-renderer` - shared headless Chrome + ffmpeg renderer for browser-preview engines
-- `packages/engine-remotion` - adapter for the existing Remotion Studio Monorepo
+- `packages/engine-remotion` - adapter for external Remotion Studio Monorepo projects and standalone official Remotion projects
 - `packages/engine-hyperframes` - adapter for Web/DOM/CSS/JS motion projects and local MP4 rendering
 - `packages/engine-editframe` - adapter for timeline/media handoff projects and local MP4 timeline previews
 - `apps/cli` - `michibiki` CLI (`video-router` remains available as an alias)
@@ -92,12 +92,18 @@ After `pnpm build`:
 
 ```bash
 pnpm michibiki generate \
-  --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。縦型、焚き火、星空、AIエージェント感を入れて。"
+  --prompt "AIエージェント勉強会のプロモ動画を30秒で作りたい。縦型、日程、会場、参加枠、CTAを入れて。"
 ```
 
 The legacy `pnpm video-router` script and `video-router` binary remain available as aliases.
 
-Every generated job writes `engine-decision.json` with the selected engine, a natural-language `selectionGuide`, and `engineFits` scores for Remotion, HyperFrames, and Editframe. The percentages are relative across the three engines so users can choose a different path with `--engine` when the creative direction fits better.
+Every generated job writes `engine-decision.json` with the selected engine, a natural-language `selectionGuide`, and `engineFits` scores for Remotion, HyperFrames, and Editframe. The percentages are relative across the three engines so users can choose a different path with `--engine` when the creative direction fits better. Each engine fit includes `bestUse` and `featureHighlights`, so the output does not reduce Remotion to reusable templates or Editframe to asset-only timeline edits.
+
+Engine behavior and recommendation rules are documented in:
+
+- `docs/ENGINE_PROFILES.md` - detailed Remotion / HyperFrames / Editframe strengths, tradeoffs, and best-use patterns
+- `AGENTS.md` - Codex-readable agent rules for natural-language video requests and URL promo requests
+- `CLAUDE.md` - Claude Code-readable companion rules with the same engine-fit expectations
 
 Useful commands:
 
@@ -136,9 +142,9 @@ outputs/jobs/<job-id>/
   logs/
 ```
 
-## Examples and MVP Gate
+## Examples and Release Readiness
 
-Runnable MVP examples are in `examples/`.
+Runnable examples are in `examples/`.
 
 ```bash
 pnpm michibiki generate --engine hyperframes --duration 1 --render --prompt "$(cat examples/lp-trailer/prompt.txt)"
@@ -147,7 +153,7 @@ pnpm michibiki create --engine remotion --duration 3 --prompt "$(cat examples/ev
 pnpm michibiki create --engine remotion --remotion-mode standalone --duration 3 --prompt "$(cat examples/event-promo/prompt.txt)"
 ```
 
-Use `docs/MVP_CHECKLIST.md` as the release gate for the CLI-first MVP.
+Use `docs/PUBLISHING.md` for release publishing steps and `docs/ROADMAP.md` for planned work.
 
 ## License Notice
 
@@ -168,21 +174,23 @@ Michibiki は、自然言語の動画制作リクエストを `VideoSpec` に変
 
 名前は日本語の「導き」に由来します。Agent が動画制作リクエストを読み取り、最適なエンジン・ワークフロー・出力形式へ導く存在であることを表しています。
 
-現在のMVPでは、Remotionのプロジェクト生成・レンダリングに加え、HyperFrames の HTML/CSS/JS 生成とローカルMP4レンダー、Editframe の `timeline.json` 生成とローカルMP4タイムラインプレビューに対応しています。Remotion は既存の Remotion Studio Monorepo を利用し、HyperFrames/Editframe は headless Chrome と ffmpeg でMP4化します。
+現在は、Remotion のプロジェクト生成・レンダリングに加え、HyperFrames の HTML/CSS/JS 生成とローカルMP4レンダー、Editframe の `timeline.json` 生成とローカルMP4タイムラインプレビューに対応しています。Remotion は標準で `auto` モードです。外部の Remotion Studio Monorepo があればそれを利用し、無ければジョブディレクトリ内に standalone の公式Remotion最小プロジェクトを生成します。HyperFrames/Editframe は headless Chrome と ffmpeg でMP4化します。
 
-### MVP の範囲
+### 現在の範囲
 
-これは CLI-first の MVP です。HyperFrames / Editframe アダプターはローカルのドラフトプロジェクトと MP4 プレビューを生成しますが、公式 SDK の同梱や代替実装ではありません。Remotion アダプターは外部の Remotion Studio Monorepo を呼び出します。生成ジョブにはプロンプト、素材パス、レンダー結果が含まれる可能性があり、標準では `outputs/jobs/` 配下として git 管理外にしています。
+Michibiki は現在 CLI-first です。HyperFrames / Editframe アダプターはローカルのドラフトプロジェクトと MP4 プレビューを生成しますが、公式 SDK の同梱や代替実装ではありません。Remotion アダプターは外部の Remotion Studio Monorepo があればそれを呼び出し、無ければジョブディレクトリ内に standalone の公式Remotionプロジェクトを生成します。生成ジョブにはプロンプト、素材パス、レンダー結果が含まれる可能性があり、標準では `outputs/jobs/` 配下として git 管理外にしています。
 
 主な機能:
 
 - 自然言語プロンプトから `VideoSpec` を生成
-- Engine Router によるエンジン選択
-- Remotion Studio Monorepo へのプロジェクト生成
+- Engine Router によるエンジン選択と、3エンジンの `engineFits` 相対評価
+- `selectionGuide` / `bestUse` / `featureHighlights` による自然言語の提案
+- Remotion auto モードによる Monorepo / standalone 公式プロジェクト生成
 - HyperFrames HTML/CSS/JS プロジェクト生成とMP4レンダー
 - Editframe timeline handoff 生成とMP4タイムラインプレビュー
 - HyperFrames/Editframe 共通の headless Chrome + ffmpeg レンダー基盤
 - `outputs/jobs/<job-id>` への成果物保存
+- `docs/ENGINE_PROFILES.md`、`AGENTS.md`、`CLAUDE.md` による Codex / Claude Code 向けエンジン提案ルール
 - ライセンス注意の表示
 
 基本コマンド:
@@ -191,14 +199,14 @@ Michibiki は、自然言語の動画制作リクエストを `VideoSpec` に変
 pnpm install
 pnpm build
 pnpm test
-pnpm michibiki create --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。"
+pnpm michibiki create --prompt "AIエージェント勉強会のプロモ動画を30秒で作りたい。"
 pnpm michibiki doctor
 pnpm michibiki preview --job outputs/jobs/<job-id>
-pnpm michibiki generate --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。"
+pnpm michibiki generate --prompt "AIエージェント勉強会のプロモ動画を30秒で作りたい。"
 ```
 
-MVP用の実行例は `examples/` にあります。
-CLI-first MVP の公開前チェックは `docs/MVP_CHECKLIST.md` を確認してください。
+実行例は `examples/` にあります。
+公開手順は `docs/PUBLISHING.md`、今後の計画は `docs/ROADMAP.md` を確認してください。
 
 ライセンス:
 
@@ -217,13 +225,14 @@ CLI-first MVP の公開前チェックは `docs/MVP_CHECKLIST.md` を確認し�
 
 Michibiki 是一个 AI 视频制作路由器。它会把自然语言视频需求转换为 `VideoSpec`，然后在 Remotion / HyperFrames / Editframe 中选择最合适的视频生成或编辑引擎。
 
-当前 MVP 支持 Remotion 项目生成和渲染，也支持 HyperFrames 的 HTML/CSS/JS 生成与本地 MP4 渲染，以及 Editframe 的 `timeline.json` 生成与本地 MP4 时间线预览。Remotion 使用现有的 Remotion Studio Monorepo；HyperFrames/Editframe 通过 headless Chrome 和 ffmpeg 渲染。
+当前版本支持 Remotion 项目生成和渲染，也支持 HyperFrames 的 HTML/CSS/JS 生成与本地 MP4 渲染，以及 Editframe 的 `timeline.json` 生成与本地 MP4 时间线预览。Remotion 默认使用 `auto` 模式：有 Remotion Studio Monorepo 时使用它，没有时在任务目录中生成 standalone 官方 Remotion 项目。HyperFrames/Editframe 通过 headless Chrome 和 ffmpeg 渲染。
 
 主要功能:
 
 - 从自然语言提示生成 `VideoSpec`
-- 自动选择视频引擎
-- 调用 Remotion Studio Monorepo 生成项目
+- 自动选择视频引擎，并输出 Remotion / HyperFrames / Editframe 的相对适合度
+- 输出 `selectionGuide`、`bestUse` 和 `featureHighlights`
+- 通过 Remotion auto 模式生成 Monorepo 或 standalone 官方项目
 - 生成 HyperFrames HTML/CSS/JS 项目并渲染 MP4
 - 生成 Editframe timeline handoff 并渲染 MP4 时间线预览
 - 将结果保存到 `outputs/jobs/<job-id>`
@@ -255,13 +264,14 @@ pnpm michibiki generate --prompt "Create a 30-second vertical event promo video.
 
 Michibiki는 자연어 영상 제작 요청을 `VideoSpec`으로 변환하고, Remotion / HyperFrames / Editframe 중 가장 적합한 영상 제작 엔진을 선택하는 AI 영상 제작 라우터입니다.
 
-현재 MVP는 Remotion 프로젝트 생성/렌더링, HyperFrames HTML/CSS/JS 생성과 로컬 MP4 렌더링, Editframe `timeline.json` 생성과 로컬 MP4 타임라인 프리뷰를 지원합니다. Remotion은 기존 Remotion Studio Monorepo를 사용하고, HyperFrames/Editframe은 headless Chrome과 ffmpeg로 렌더링합니다.
+현재 버전은 Remotion 프로젝트 생성/렌더링, HyperFrames HTML/CSS/JS 생성과 로컬 MP4 렌더링, Editframe `timeline.json` 생성과 로컬 MP4 타임라인 프리뷰를 지원합니다. Remotion은 기본적으로 `auto` 모드로 실행됩니다. Remotion Studio Monorepo가 있으면 이를 사용하고, 없으면 작업 디렉터리에 standalone 공식 Remotion 프로젝트를 생성합니다. HyperFrames/Editframe은 headless Chrome과 ffmpeg로 렌더링합니다.
 
 주요 기능:
 
 - 자연어 프롬프트에서 `VideoSpec` 생성
-- Engine Router를 통한 엔진 선택
-- Remotion Studio Monorepo 프로젝트 생성
+- Engine Router를 통한 엔진 선택과 Remotion / HyperFrames / Editframe 상대 적합도 출력
+- `selectionGuide`, `bestUse`, `featureHighlights` 출력
+- Remotion auto 모드로 Monorepo 또는 standalone 공식 프로젝트 생성
 - HyperFrames HTML/CSS/JS 프로젝트 생성 및 MP4 렌더링
 - Editframe timeline handoff 생성 및 MP4 타임라인 프리뷰 렌더링
 - `outputs/jobs/<job-id>`에 결과 저장
@@ -293,13 +303,14 @@ pnpm michibiki generate --prompt "Create a 30-second vertical event promo video.
 
 Michibiki es un enrutador de producción de video con IA. Convierte una solicitud en lenguaje natural en un `VideoSpec`, selecciona el motor de video más adecuado y crea un proyecto generado o una salida de render.
 
-El MVP actual admite generación y renderizado con Remotion, generación HTML/CSS/JS y renderizado MP4 local para HyperFrames, y generación `timeline.json` con previsualización MP4 local para Editframe. Remotion usa el Remotion Studio Monorepo existente; HyperFrames/Editframe renderizan con headless Chrome y ffmpeg.
+La versión actual admite generación y renderizado con Remotion, generación HTML/CSS/JS y renderizado MP4 local para HyperFrames, y generación `timeline.json` con previsualización MP4 local para Editframe. Remotion usa el modo `auto` por defecto: utiliza el Remotion Studio Monorepo cuando existe y, si no, crea un proyecto oficial standalone de Remotion dentro del trabajo. HyperFrames/Editframe renderizan con headless Chrome y ffmpeg.
 
 Funciones principales:
 
 - Generar `VideoSpec` desde un prompt en lenguaje natural
-- Seleccionar automáticamente el motor de video
-- Crear proyectos mediante Remotion Studio Monorepo
+- Seleccionar automáticamente el motor de video y mostrar el ajuste relativo de Remotion / HyperFrames / Editframe
+- Generar `selectionGuide`, `bestUse` y `featureHighlights`
+- Crear proyectos Remotion mediante Monorepo o standalone oficial con modo auto
 - Generar proyectos HTML/CSS/JS para HyperFrames y renderizar MP4
 - Generar handoffs `timeline.json` para Editframe y renderizar previsualizaciones MP4
 - Guardar resultados en `outputs/jobs/<job-id>`
@@ -331,13 +342,14 @@ Antes de usarlo con fines comerciales, en equipo o como SaaS, revisa las condici
 
 Michibiki est un routeur de production vidéo basé sur l'IA. Il transforme une demande en langage naturel en `VideoSpec`, choisit le moteur vidéo le plus adapté, puis crée un projet généré ou une sortie de rendu.
 
-Le MVP actuel prend en charge la génération et le rendu Remotion, la génération HTML/CSS/JS et le rendu MP4 local pour HyperFrames, ainsi que la génération `timeline.json` avec aperçu MP4 local pour Editframe. Remotion utilise le Remotion Studio Monorepo existant; HyperFrames/Editframe rendent via headless Chrome et ffmpeg.
+La version actuelle prend en charge la génération et le rendu Remotion, la génération HTML/CSS/JS et le rendu MP4 local pour HyperFrames, ainsi que la génération `timeline.json` avec aperçu MP4 local pour Editframe. Remotion utilise le mode `auto` par défaut: il utilise le Remotion Studio Monorepo s'il existe, sinon il crée un projet officiel standalone Remotion dans le dossier du job. HyperFrames/Editframe rendent via headless Chrome et ffmpeg.
 
 Fonctionnalités principales:
 
 - Générer un `VideoSpec` à partir d'un prompt en langage naturel
-- Sélectionner automatiquement le moteur vidéo
-- Créer des projets via Remotion Studio Monorepo
+- Sélectionner automatiquement le moteur vidéo et afficher l'adéquation relative de Remotion / HyperFrames / Editframe
+- Générer `selectionGuide`, `bestUse` et `featureHighlights`
+- Créer des projets Remotion via Monorepo ou standalone officiel en mode auto
 - Générer des projets HTML/CSS/JS pour HyperFrames et rendre en MP4
 - Générer des handoffs `timeline.json` pour Editframe et rendre des aperçus MP4
 - Enregistrer les résultats dans `outputs/jobs/<job-id>`
