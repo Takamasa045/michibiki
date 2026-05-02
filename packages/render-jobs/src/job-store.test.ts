@@ -13,7 +13,7 @@ import {
 
 describe("render job store", () => {
   it("writes and reads preview results with the job manifest", async () => {
-    const outputRoot = await fs.mkdtemp(path.join(os.tmpdir(), "video-router-job-"));
+    const outputRoot = await fs.mkdtemp(path.join(os.tmpdir(), "michibiki-job-"));
     const paths = await createJobPaths(outputRoot);
     const spec: VideoSpec = {
       id: "spec_1",

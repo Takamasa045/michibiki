@@ -1,6 +1,6 @@
 {
   "name": "@michibiki/engine-remotion",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Remotion Studio Monorepo adapter for Michibiki.",
   "type": "module",
   "license": "MIT",

@@ -21,11 +21,21 @@ pnpm michibiki create --engine remotion --duration 3 --dry-run --prompt "$(cat e
 
 The repository is a pnpm workspace. The root package stays `private: true` to prevent accidental publication.
 
-Publish workspace packages only after confirming the package names and scope are available in the target npm organization:
+Publish workspace packages only after confirming the package names and scope are available in the target npm organization.
+
+Local publish:
 
 ```bash
+npm login
+npm whoami
 pnpm -r publish --access public
 ```
+
+GitHub Actions publish:
+
+1. Create an npm automation token with publish access.
+2. Add it to the repository as the `NPM_TOKEN` secret.
+3. Run the `Publish npm packages` workflow manually. It will run `pnpm release:check` and publish workspace packages.
 
 Each publishable package includes only compiled `dist` files and `package.json`.
 

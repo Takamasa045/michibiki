@@ -1,6 +1,6 @@
 {
   "name": "@michibiki/router",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Engine selection rules for Michibiki.",
   "type": "module",
   "license": "MIT",

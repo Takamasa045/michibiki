@@ -117,7 +117,7 @@ async function captureFrames(params: {
   logLabel: string;
   extraQuery: Record<string, string>;
 }): Promise<{ ok: boolean; log: string }> {
-  const profileDir = await fs.mkdtemp(path.join(os.tmpdir(), "video-router-chrome-"));
+  const profileDir = await fs.mkdtemp(path.join(os.tmpdir(), "michibiki-chrome-"));
   const entryUrl = pathToFileURL(params.entryFile);
   const logLines: string[] = [
     `Capturing ${params.frameCount} ${params.logLabel} frames at ${params.width}x${params.height} ${params.fps}fps`,

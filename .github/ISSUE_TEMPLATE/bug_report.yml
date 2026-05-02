@@ -1,0 +1,49 @@
+name: Bug report
+description: Report a reproducible Michibiki problem.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Please include enough detail to reproduce it locally.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Commands, prompt text, input files, or job path.
+      placeholder: |
+        1. pnpm michibiki ...
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or output
+      description: Paste terminal output, `outputs/jobs/<job-id>/logs/*`, or relevant JSON.
+      render: shell
+  - type: input
+    id: version
+    attributes:
+      label: Michibiki version or commit
+      placeholder: v0.1.1
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: macOS 15, Node 22, pnpm 10, ffmpeg 8

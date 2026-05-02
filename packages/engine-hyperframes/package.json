@@ -1,6 +1,6 @@
 {
   "name": "@michibiki/engine-hyperframes",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "HyperFrames-style browser motion adapter for Michibiki.",
   "type": "module",
   "license": "MIT",

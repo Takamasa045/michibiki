@@ -188,7 +188,7 @@ async function renderRemotionProject(
   const engineOutputDir = path.join(project.rootPath, "out");
   const engineOutputPath = path.join(
     engineOutputDir,
-    `video-router-${Date.now()}.mp4`
+    `michibiki-${Date.now()}.mp4`
   );
   await fs.mkdir(outputDir, { recursive: true });
   await fs.mkdir(engineOutputDir, { recursive: true });
@@ -276,13 +276,13 @@ async function writeRemotionSpecFiles(
     title: spec.title,
     description: spec.goal,
     tags: [
-      "video-router",
+      "michibiki",
       "remotion",
       metadata.template,
       spec.format.aspectRatio
     ],
-    category: "video-router",
-    videoRouter: {
+    category: "michibiki",
+    michibiki: {
       specId: spec.id,
       appName: metadata.appName,
       compositionId: metadata.compositionId,
@@ -352,7 +352,7 @@ function assertRemotionRepo(remotionRepoPath: string): void {
 }
 
 function createAppName(spec: VideoSpec): string {
-  const slug = slugify(spec.title || "video-router");
+  const slug = slugify(spec.title || "michibiki");
   return `${slug}-${new Date().toISOString().slice(0, 10).replaceAll("-", "")}-${randomUUID().slice(0, 8)}`;
 }
 
@@ -366,7 +366,7 @@ function slugify(value: string): string {
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
 
-  return normalized.length > 0 ? normalized.slice(0, 40) : "video-router";
+  return normalized.length > 0 ? normalized.slice(0, 40) : "michibiki";
 }
 
 function getStringMetadata(

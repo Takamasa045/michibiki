@@ -1,6 +1,6 @@
 {
   "name": "@michibiki/browser-renderer",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Headless Chrome and ffmpeg renderer shared by Video Router browser-preview engines.",
   "type": "module",
   "license": "MIT",

@@ -1,0 +1,41 @@
+name: Feature request
+description: Suggest a practical improvement for Michibiki.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or workflow
+      description: What video workflow or user problem should this improve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the behavior, CLI shape, package API, or adapter change you want.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - CLI
+        - VideoSpec
+        - Router
+        - Remotion adapter
+        - HyperFrames adapter
+        - Editframe adapter
+        - Browser renderer
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Links, examples, generated job paths, or design notes.

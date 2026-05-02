@@ -49,6 +49,25 @@ pnpm build
 pnpm test
 ```
 
+## Quickstart
+
+Run locally from the repository root:
+
+```bash
+pnpm install
+pnpm build
+pnpm michibiki doctor
+pnpm michibiki generate --prompt "Create a 15-second vertical event promo video."
+```
+
+After the npm packages are published, the CLI can be installed as:
+
+```bash
+npm install -g @michibiki/cli
+michibiki doctor
+michibiki generate --prompt "Create a 15-second vertical event promo video."
+```
+
 The Remotion adapter looks for the external Remotion Studio Monorepo in this order:
 
 1. `VIDEO_ROUTER_REMOTION_REPO`

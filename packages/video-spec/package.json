@@ -1,6 +1,6 @@
 {
   "name": "@michibiki/video-spec",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Shared VideoSpec types and prompt-to-spec heuristics for Michibiki.",
   "type": "module",
   "license": "MIT",

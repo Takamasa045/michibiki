@@ -4,6 +4,18 @@ All notable changes to Michibiki will be documented in this file.
 
 This project follows semantic versioning for public releases.
 
+## [0.1.2] - 2026-05-02
+
+### Added
+
+- Added a README quickstart with local and npm install commands.
+- Added GitHub issue templates for bug reports and feature requests.
+- Added a GitHub Actions workflow for npm publishing from published releases.
+
+### Changed
+
+- Aligned generated metadata, temporary paths, and Remotion output prefixes with the Michibiki name.
+
 ## [0.1.1] - 2026-05-02
 
 ### Changed
