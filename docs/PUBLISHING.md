@@ -33,9 +33,10 @@ pnpm -r publish --access public
 
 GitHub Actions publish:
 
-1. Create an npm automation token with publish access.
-2. Add it to the repository as the `NPM_TOKEN` secret.
-3. Run the `Publish npm packages` workflow manually. It will run `pnpm release:check` and publish workspace packages.
+1. Configure npm Trusted Publishing for each `@michibiki/*` package.
+2. Use `Takamasa045/michibiki` as the GitHub repository.
+3. Use `npm-publish.yml` as the workflow filename. The file lives at `.github/workflows/npm-publish.yml`, but npm expects only the filename in the Trusted Publisher setting.
+4. Run the `Publish npm packages` workflow manually. It will run `pnpm release:check` and publish workspace packages through OIDC, without an npm token.
 
 Each publishable package includes only compiled `dist` files and `package.json`.
 

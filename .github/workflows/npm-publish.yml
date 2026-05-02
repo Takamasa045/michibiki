@@ -6,6 +6,9 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - name: Checkout
@@ -14,7 +17,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: 24
           registry-url: https://registry.npmjs.org
 
       - name: Setup pnpm
@@ -25,10 +28,26 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Use npm 11
+        run: npm install -g npm@11.11.1
+
       - name: Verify release
         run: pnpm release:check
 
       - name: Publish workspace packages
-        run: pnpm -r publish --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -e
+          for dir in \
+            packages/video-spec \
+            packages/compliance \
+            packages/browser-renderer \
+            packages/router \
+            packages/render-jobs \
+            packages/engine-remotion \
+            packages/engine-hyperframes \
+            packages/engine-editframe \
+            apps/cli
+          do
+            echo "Publishing $dir"
+            (cd "$dir" && npm publish --access public)
+          done
