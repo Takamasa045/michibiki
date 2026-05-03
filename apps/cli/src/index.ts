@@ -82,6 +82,22 @@ async function main(): Promise<void> {
 
 async function generate(args: ReturnType<typeof parseArgs>): Promise<void> {
   const { spec, decision, license } = buildDecisionFromArgs(args);
+
+  if (
+    decision.clarifyingQuestions.length > 0 &&
+    !getValue(args, "engine") &&
+    !hasFlag(args, "resolve-ambiguity")
+  ) {
+    printAmbiguityBlock({
+      engine: decision.engine,
+      engineFits: decision.engineFits,
+      switchHints: decision.switchHints,
+      clarifyingQuestions: decision.clarifyingQuestions
+    });
+    process.exitCode = 2;
+    return;
+  }
+
   const outputsRoot = path.resolve(getValue(args, "outputs") ?? "outputs");
   const paths = await createJobPaths(outputsRoot);
 
@@ -287,6 +303,8 @@ Decide/generate options:
   --remotion-mode <mode>      auto, monorepo, standalone
   --render                    Render after project generation
   --dry-run                   Remotion monorepo only: write job files without running engine commands
+  --resolve-ambiguity         Proceed with the auto recommendation even when the router cannot decide between two engines (top vs runner-up margin ≤ 8%)
+  --allow-license-risk        Proceed even when license guard flags risk
 `);
 }
 
@@ -412,6 +430,41 @@ function printClarifyingQuestions(questions: string[]): void {
   for (const question of questions) {
     console.log(`- ${question}`);
   }
+}
+
+function printAmbiguityBlock(params: {
+  engine: EngineName;
+  engineFits: EngineFit[];
+  switchHints: SwitchHint[];
+  clarifyingQuestions: string[];
+}): void {
+  console.log("");
+  console.log("Engine selection is ambiguous — refusing to generate.");
+  console.log(
+    "The auto router cannot decide between two engines with high confidence."
+  );
+  console.log("");
+  console.log("Engine fit:");
+  for (const fit of [...params.engineFits].sort(
+    (left, right) => right.fitPercent - left.fitPercent
+  )) {
+    console.log(`- ${fit.engine}: ${fit.fitPercent}%`);
+  }
+  console.log("");
+  printClarifyingQuestions(params.clarifyingQuestions);
+  console.log("");
+  printSwitchHints(params.switchHints);
+  console.log("");
+  console.log("To proceed, choose one of:");
+  console.log(
+    `  1) Re-run with an explicit engine: --engine remotion | hyperframes | editframe`
+  );
+  console.log(
+    `  2) Accept the auto recommendation (${params.engine}) anyway: add --resolve-ambiguity`
+  );
+  console.log(
+    "  3) Use \"michibiki decide\" first to inspect engineFits without generating"
+  );
 }
 
 async function loadGeneratedProject(job: string): Promise<{

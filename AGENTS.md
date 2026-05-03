@@ -39,6 +39,7 @@
 - 否定文（〜なし/〜無い/〜じゃない/〜ではない/〜は作らない）とメタ参照（〜について/〜の話/〜を取り上げる）は near-context（前後 16 文字）で検出し、該当 keyword を無効化する。「LPは作らないが、企業ロゴアニメ」のような prompt は LP signal が消えて Remotion が選ばれる。
 - ルーターが見るテキストは `spec.goal`（ユーザー入力の生プロンプト）と user-provided CTA のみ。`spec.title` / `content.script` / `content.captions` / `content.scenes` は from-prompt.ts が自動推論したもので、否定文脈を失った keyword を再注入する可能性があるので signal 抽出には使わない。
 - `clarifyingQuestions` は top vs 2nd の差が 8% 以下の時に生成される。提案文ではこれをユーザーへの質問としてそのまま提示し、回答（A/B または `--engine`）を待つ。
+- `michibiki generate` / `michibiki create` は `clarifyingQuestions` が空でない状態で `--engine` も `--resolve-ambiguity` も指定されていない場合、生成を拒否して exit code 2 で停止する（曖昧性ゲート）。エージェントは generate を呼ぶ前に `decide` で曖昧性を確認し、ユーザーに `(A)/(B)` を聞く・もしくは `--engine` を指定する手順を踏む。
 
 生成品質の扱い:
 
