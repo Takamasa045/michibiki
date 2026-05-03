@@ -74,6 +74,39 @@ describe("selectEngine", () => {
     });
   });
 
+  it("uses score-based selection so asset attachment alone does not lock Editframe in", () => {
+    const spec = createVideoSpecFromPrompt({
+      prompt:
+        "LP風セクションでクリップを動画埋め込み風に見せたい、HTMLとCSSで組みたい",
+      assetSources: ["./clip.mp4"]
+    });
+
+    const decision = selectEngine(spec);
+
+    expect(decision.engine).toBe("hyperframes");
+    expect(findFitPercent(decision.engineFits, "hyperframes")).toBeGreaterThan(
+      findFitPercent(decision.engineFits, "editframe")
+    );
+  });
+
+  it("returns switchHints for the two non-selected engines", () => {
+    const spec = createVideoSpecFromPrompt({
+      prompt: "イベント告知動画を30秒で作りたい。縦型でタイトルを出したい。"
+    });
+
+    const decision = selectEngine(spec);
+
+    expect(decision.engine).toBe("remotion");
+    expect(decision.switchHints).toHaveLength(2);
+    const targets = decision.switchHints.map((hint) => hint.targetEngine).sort();
+    expect(targets).toEqual(["editframe", "hyperframes"]);
+    for (const hint of decision.switchHints) {
+      expect(hint.targetEngine).not.toBe(decision.engine);
+      expect(hint.condition.length).toBeGreaterThan(20);
+      expect(hint.why.length).toBeGreaterThan(20);
+    }
+  });
+
   it("defaults to Remotion for template motion graphics", () => {
     const spec = createVideoSpecFromPrompt({
       prompt: "イベント告知動画を30秒で作りたい。縦型でタイトルを出したい。"

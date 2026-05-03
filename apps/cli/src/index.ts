@@ -26,6 +26,7 @@ import {
   type LicenseMode,
   type OutputType,
   type PreviewResult,
+  type SwitchHint,
   type VideoEngine
 } from "@michibiki/video-spec";
 import { parseArgs, getValue, getValues, hasFlag } from "./args.js";
@@ -36,6 +37,11 @@ async function main(): Promise<void> {
 
   if (!args.command || args.command === "help" || hasFlag(args, "help")) {
     printHelp();
+    return;
+  }
+
+  if (args.command === "decide" || args.command === "route") {
+    decide(args);
     return;
   }
 
@@ -75,32 +81,9 @@ async function main(): Promise<void> {
 }
 
 async function generate(args: ReturnType<typeof parseArgs>): Promise<void> {
-  const prompt = getValue(args, "prompt") ?? args.positionals.join(" ");
-  if (!prompt) {
-    throw new Error("Missing prompt. Use --prompt \"...\".");
-  }
-
+  const { spec, decision, license } = buildDecisionFromArgs(args);
   const outputsRoot = path.resolve(getValue(args, "outputs") ?? "outputs");
   const paths = await createJobPaths(outputsRoot);
-  const enginePreference = parseEnginePreference(getValue(args, "engine"));
-  const licenseMode = parseLicenseMode(getValue(args, "license-mode"));
-  const spec = createVideoSpecFromPrompt({
-    prompt,
-    title: getValue(args, "title"),
-    durationSec: parseNumber(getValue(args, "duration")),
-    aspectRatio: parseAspectRatio(getValue(args, "aspect-ratio")),
-    outputType: parseOutputType(getValue(args, "output-type")),
-    assetSources: getValues(args, "asset"),
-    referenceUrls: getValues(args, "url"),
-    enginePreference,
-    licenseMode,
-    allowCloudRender: hasFlag(args, "allow-cloud-render")
-  });
-  const decision = selectEngine(spec);
-  const license = validateLicense(decision.engine, {
-    usage: spec.constraints.licenseMode ?? "personal",
-    allowCloudRender: spec.constraints.allowCloudRender
-  });
 
   await writeJobFiles({ paths, spec, decision, license });
 
@@ -147,6 +130,7 @@ async function generate(args: ReturnType<typeof parseArgs>): Promise<void> {
     recommendation: decision.recommendation,
     engineFits: decision.engineFits,
     selectionGuide: decision.selectionGuide,
+    switchHints: decision.switchHints,
     fallback: decision.fallback,
     licenseMessage: license.message,
     projectPath: project?.rootPath,
@@ -156,6 +140,57 @@ async function generate(args: ReturnType<typeof parseArgs>): Promise<void> {
     renderMessage,
     renderOutputPath
   });
+}
+
+function decide(args: ReturnType<typeof parseArgs>): void {
+  const { spec, decision, license } = buildDecisionFromArgs(args);
+
+  printDecisionSummary({
+    title: spec.title,
+    durationSec: spec.format.durationSec,
+    aspectRatio: spec.format.aspectRatio,
+    engine: decision.engine,
+    reason: decision.reason,
+    recommendation: decision.recommendation,
+    engineFits: decision.engineFits,
+    selectionGuide: decision.selectionGuide,
+    switchHints: decision.switchHints,
+    fallback: decision.fallback,
+    licenseMessage: license.message
+  });
+}
+
+function buildDecisionFromArgs(args: ReturnType<typeof parseArgs>): {
+  spec: ReturnType<typeof createVideoSpecFromPrompt>;
+  decision: ReturnType<typeof selectEngine>;
+  license: ReturnType<typeof validateLicense>;
+} {
+  const prompt = getValue(args, "prompt") ?? args.positionals.join(" ");
+  if (!prompt) {
+    throw new Error("Missing prompt. Use --prompt \"...\".");
+  }
+
+  const enginePreference = parseEnginePreference(getValue(args, "engine"));
+  const licenseMode = parseLicenseMode(getValue(args, "license-mode"));
+  const spec = createVideoSpecFromPrompt({
+    prompt,
+    title: getValue(args, "title"),
+    durationSec: parseNumber(getValue(args, "duration")),
+    aspectRatio: parseAspectRatio(getValue(args, "aspect-ratio")),
+    outputType: parseOutputType(getValue(args, "output-type")),
+    assetSources: getValues(args, "asset"),
+    referenceUrls: getValues(args, "url"),
+    enginePreference,
+    licenseMode,
+    allowCloudRender: hasFlag(args, "allow-cloud-render")
+  });
+  const decision = selectEngine(spec);
+  const license = validateLicense(decision.engine, {
+    usage: spec.constraints.licenseMode ?? "personal",
+    allowCloudRender: spec.constraints.allowCloudRender
+  });
+
+  return { spec, decision, license };
 }
 
 async function render(args: ReturnType<typeof parseArgs>): Promise<void> {
@@ -226,6 +261,7 @@ function printHelp(): void {
   console.log(`Michibiki
 
 Usage:
+  michibiki decide --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。縦型..."
   michibiki create --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。縦型..."
   michibiki generate --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。縦型..."
   michibiki generate --prompt "..." --render
@@ -235,7 +271,7 @@ Usage:
   michibiki engines
   michibiki doctor
 
-Generate options:
+Decide/generate options:
   --prompt <text>             Natural language video request
   --title <text>              Optional title
   --duration <seconds>        Override duration
@@ -271,6 +307,7 @@ function printGenerateSummary(params: {
   recommendation: EngineRecommendation;
   engineFits: EngineFit[];
   selectionGuide: string;
+  switchHints: SwitchHint[];
   fallback?: EngineName;
   licenseMessage: string;
   projectPath?: string;
@@ -295,6 +332,7 @@ function printGenerateSummary(params: {
   console.log(`Selected direction: ${params.recommendation.creativeDirection}`);
   console.log(`Strengths: ${params.recommendation.strengths.join("; ")}`);
   console.log(`Tradeoffs: ${params.recommendation.tradeoffs.join("; ")}`);
+  printSwitchHints(params.switchHints);
   if (params.fallback) {
     console.log(`Fallback: ${params.fallback}`);
   }
@@ -310,6 +348,55 @@ function printGenerateSummary(params: {
   }
   if (params.renderOutputPath) {
     console.log(`Output: ${params.renderOutputPath}`);
+  }
+}
+
+function printDecisionSummary(params: {
+  title: string;
+  durationSec: number;
+  aspectRatio: AspectRatio;
+  engine: EngineName;
+  reason: string;
+  recommendation: EngineRecommendation;
+  engineFits: EngineFit[];
+  selectionGuide: string;
+  switchHints: SwitchHint[];
+  fallback?: EngineName;
+  licenseMessage: string;
+}): void {
+  console.log("");
+  console.log("Decision complete");
+  console.log("No job, project, preview, or render files were created.");
+  console.log(`Title: ${params.title}`);
+  console.log(`Format: ${params.durationSec}s ${params.aspectRatio}`);
+  console.log(`Engine: ${params.engine}`);
+  console.log(`Reason: ${params.reason}`);
+  console.log(`Selection guide: ${params.selectionGuide}`);
+  console.log("Engine fit:");
+  for (const fit of params.engineFits) {
+    console.log(`- ${fit.engine}: ${fit.fitPercent}%`);
+    console.log(`  Why: ${fit.reason}`);
+    console.log(`  Best use: ${fit.bestUse}`);
+    console.log(`  Features: ${fit.featureHighlights.join("; ")}`);
+  }
+  console.log(`Selected proposal: ${params.recommendation.summary}`);
+  console.log(`Selected direction: ${params.recommendation.creativeDirection}`);
+  console.log(`Strengths: ${params.recommendation.strengths.join("; ")}`);
+  console.log(`Tradeoffs: ${params.recommendation.tradeoffs.join("; ")}`);
+  printSwitchHints(params.switchHints);
+  if (params.fallback) {
+    console.log(`Fallback: ${params.fallback}`);
+  }
+  console.log(`License: ${params.licenseMessage}`);
+}
+
+function printSwitchHints(hints: SwitchHint[]): void {
+  if (!hints.length) return;
+  console.log("Switch hints:");
+  for (const hint of hints) {
+    console.log(`- → ${hint.targetEngine}`);
+    console.log(`  When: ${hint.condition}`);
+    console.log(`  Why:  ${hint.why}`);
   }
 }
 

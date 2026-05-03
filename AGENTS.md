@@ -10,13 +10,14 @@
 
 標準フロー:
 
-1. URLや素材がある場合は、ページ本文・素材種別・既存動画ファイル参照を確認する。
+1. ユーザーのプロンプト本文・URL・素材種別・既存動画ファイル参照を最初に確認する。プロンプト全体を読み、何が「主たる仕事」（編集 / Web/LP表現 / コード駆動演出 / 量産）かを判断する。
 2. 既存MP4や動画素材があると判断した場合は、実際の `.mp4` / `.webm` / `<video>` / `og:video` 参照、またはユーザー提供のローカルファイルを根拠として示す。見出しやテキストだけで「既存MP4がある」と断定しない。
-3. 比較・提案だけが目的の場合は `michibiki decide --engine auto --prompt "<user request>"`、または同等の副作用なし `selectEngine()` 判定を使い、`engineFits` と `selectionGuide`、および selected engine / selected proposal 相当の項目を確認する。
-4. Remotion / HyperFrames / Editframe の3つを、相対評価パーセンテージ付きで提示する。
+3. 比較・提案だけが目的の場合は `michibiki decide --engine auto --prompt "<user request>"`、または同等の副作用なし `selectEngine()` 判定を使い、`engineFits` / `selectionGuide` / `switchHints` / selected engine / selected proposal 相当の項目を確認する。
+4. Remotion / HyperFrames / Editframe の3つを、相対評価パーセンテージ付きで提示する。`Recommended engine` は3エンジン中で最も `fitPercent` が高いエンジン（同点時は remotion → hyperframes → editframe の順で固定）。素材の有無だけで自動的に Editframe にしない。
 5. 各エンジンについて「この動画ならどう活かせるか」を1文で説明する（具体機能の根拠は `docs/ENGINE_PROFILES.md` を参照）。
-6. 自動推奨エンジンを示したうえで、ユーザーが `--engine remotion` / `--engine hyperframes` / `--engine editframe` を選べるようにする。
-7. ユーザーがエンジン選択を明示していない場合、比較提示のあとに「この方針で生成に進めるか」を確認する。「プロモを作って」「動画にして」は、原則としてエンジン比較と制作方針提案までに留める。
+6. `switchHints` の各候補（推奨以外の2エンジン）について、「どんな条件が増えれば／変われば、そのエンジンが推奨になるか」をユーザーに示す。例: 「LP感を強めたいなら HyperFrames が伸びる」「ナレーションと字幕同期を入れるなら Editframe が伸びる」。
+7. 自動推奨エンジンを示したうえで、ユーザーが `--engine remotion` / `--engine hyperframes` / `--engine editframe` を選べるようにする。
+8. ユーザーがエンジン選択を明示していない場合、比較提示のあとに「この方針で生成に進めるか」を確認する。「プロモを作って」「動画にして」は、原則としてエンジン比較と制作方針提案までに留める。
 
 返答に必ず含める内容:
 
@@ -24,14 +25,15 @@
 - `engineFits` の3エンジン分の相対評価
 - 各エンジンの `bestUse`
 - 各エンジンの `featureHighlights`
+- `switchHints` の各候補（条件 + そのエンジンに切り替えると何が良くなるか）
 - 既存動画素材の有無と、その判断根拠
 
 選定ロジックの扱い:
 
-- `engineFits` は3エンジン間の相対評価であり、最大パーセンテージだけを `Recommended engine` とみなさない。
-- `selectionGuide` の `Recommended engine`、または `engine-decision.json` の selected engine / selected proposal 相当の項目がある場合は、それを最終推奨として優先する。
+- `engineFits` は3エンジン間の相対評価で、`Recommended engine` は最大スコアのエンジン（同点時は remotion → hyperframes → editframe）。`selectAutoEngine` がスコアを参照するので、素材添付や特定キーワードだけで if/else 確定はしない。
+- `selectionGuide` の `Recommended engine`、または `engine-decision.json` の selected engine / selected proposal 相当の項目がある場合は、それを最終推奨として使う。
 - 尺、アスペクト、BGM/SFX、ナレーション、字幕同期、ハイテンポ編集など制作条件が追加・変更された場合は、前回の判定を流用せず再度 `selectEngine()` 相当を実行する。
-- 相対スコア最大のエンジンと最終推奨が異なる場合は、スコア差と制作条件による補正理由を1文で説明する。
+- `switchHints` は推奨以外の2エンジンに対し、「どの条件が加わればそちらが伸びるか」を返す。提案文ではこれをそのまま読み替えてユーザーに示す。
 
 生成品質の扱い:
 
@@ -56,6 +58,7 @@ Skill 利用ルール:
 - ページ概要だけを返して、エンジン比較を省略する。
 - 比較・提案だけの段階で `generate` / `create` / `render` / `preview` を実行する。
 - `engineFits` を確認せずに「今回は Remotion でよい」など単一エンジンだけを提案する。
-- `engineFits` の最大パーセンテージだけで `Recommended engine` を決める。
+- 素材が添付されているという理由だけで自動的に Editframe を推奨と決める（`engineFits` のスコアを必ず参照）。
+- `switchHints` を省略してユーザーに「他エンジンに切り替える判断材料」を渡さない。
 - 動画ファイル参照を確認せずに「既存MP4がある」と断定する。
 - エンジンの特徴を `docs/ENGINE_PROFILES.md` を確認せずに語る（Remotion を「再利用テンプレート専用」、Editframe を「既存素材編集専用」と限定するなど）。

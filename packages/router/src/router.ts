@@ -3,6 +3,7 @@ import type {
   EngineFit,
   EngineName,
   EngineRecommendation,
+  SwitchHint,
   VideoSpec
 } from "@michibiki/video-spec";
 
@@ -21,8 +22,11 @@ export function selectEngine(spec: VideoSpec): EngineDecision {
   const signals = getRouterSignals(spec);
   const engineFits = buildEngineFits(spec, signals);
   const selectedEngine =
-    enginePreference === "auto" ? selectAutoEngine(signals) : enginePreference;
+    enginePreference === "auto"
+      ? selectAutoEngine(engineFits)
+      : enginePreference;
   const selectedFit = getEngineFit(engineFits, selectedEngine);
+  const switchHints = buildSwitchHints(engineFits, selectedEngine, signals);
 
   if (enginePreference !== "auto") {
     return {
@@ -32,6 +36,7 @@ export function selectEngine(spec: VideoSpec): EngineDecision {
       recommendation: selectedFit.recommendation,
       engineFits,
       selectionGuide: buildSelectionGuide(engineFits, selectedEngine),
+      switchHints,
       licenseRisk: defaultLicenseRisk(selectedEngine)
     };
   }
@@ -43,6 +48,7 @@ export function selectEngine(spec: VideoSpec): EngineDecision {
     recommendation: selectedFit.recommendation,
     engineFits,
     selectionGuide: buildSelectionGuide(engineFits, selectedEngine),
+    switchHints,
     licenseRisk: defaultLicenseRisk(selectedEngine),
     fallback: getFallbackEngine(engineFits, selectedEngine)
   };
@@ -105,14 +111,71 @@ function mentionsDataDrivenOrTemplateWorkflow(text: string): boolean {
   );
 }
 
-function selectAutoEngine(signals: RouterSignals): EngineName {
-  if (signals.hasVideoOrAudioAssets || signals.mentionsTimelineEditing) {
-    return "editframe";
+function selectAutoEngine(engineFits: EngineFit[]): EngineName {
+  const sorted = [...engineFits].sort((left, right) => {
+    if (right.fitPercent !== left.fitPercent) {
+      return right.fitPercent - left.fitPercent;
+    }
+    return tieBreakOrder(left.engine) - tieBreakOrder(right.engine);
+  });
+  const top = sorted[0];
+  if (!top) {
+    throw new Error("buildEngineFits returned no engine fits.");
   }
-  if (signals.hasUrlAsset || signals.mentionsWebDomWorkflow) {
-    return "hyperframes";
+  return top.engine;
+}
+
+function tieBreakOrder(engine: EngineName): number {
+  if (engine === "remotion") return 0;
+  if (engine === "hyperframes") return 1;
+  return 2;
+}
+
+function buildSwitchHints(
+  engineFits: EngineFit[],
+  selectedEngine: EngineName,
+  signals: RouterSignals
+): SwitchHint[] {
+  return engineFits
+    .filter((fit) => fit.engine !== selectedEngine)
+    .sort((left, right) => right.fitPercent - left.fitPercent)
+    .map((fit) => buildSwitchHint(fit.engine, signals));
+}
+
+function buildSwitchHint(
+  targetEngine: EngineName,
+  signals: RouterSignals
+): SwitchHint {
+  if (targetEngine === "editframe") {
+    const condition = signals.hasVideoOrAudioAssets
+      ? "If you want to edit those clips/voice on a timeline with captions, BGM beats, transitions, and overlays"
+      : "If you want narration/voice sync, captions, BGM beats, transitions, or to layer existing media on a timeline";
+    return {
+      targetEngine,
+      condition,
+      why: "Editframe becomes the strongest fit because timeline rhythm, captions, audio sync, and layered media drive the piece."
+    };
   }
-  return "remotion";
+
+  if (targetEngine === "hyperframes") {
+    const condition = signals.hasUrlAsset
+      ? "If you want the page itself to become the video (sections, scroll, GSAP/Lottie/CSS motion captured from the DOM)"
+      : "If you'd rather author the video as a web page (HTML/CSS/JS), reuse an existing LP/DOM, or use GSAP/Lottie/CSS motion";
+    return {
+      targetEngine,
+      condition,
+      why: "HyperFrames becomes the strongest fit because it captures DOM/CSS/JS motion deterministically through headless Chrome and ffmpeg."
+    };
+  }
+
+  const condition = signals.mentionsDataDrivenOrTemplateWorkflow
+    ? "If you want to template this and render many data-driven variants (props/JSON/CSV) at once"
+    : "If you want frame-accurate React motion, kinetic typography, spring/easing choreography, or to template the same video for many data variants";
+  return {
+    targetEngine,
+    condition,
+    why: "Remotion becomes the strongest fit because React/TSX gives precise frame-by-frame control and reusable, prop-driven variants."
+  };
 }
 
 function buildEngineFits(spec: VideoSpec, signals: RouterSignals): EngineFit[] {
@@ -275,7 +338,7 @@ function buildSelectionGuide(
     `Recommended engine: ${selectedEngine} (${selectedFit.fitPercent}%).`,
     selectedFit.bestUse,
     `Alternatives: ${alternatives}.`,
-    "Use the percentages as a relative fit among Remotion, HyperFrames, and Editframe, then override with --engine when the creative direction points elsewhere."
+    "The recommended engine is chosen by highest relative fit. Switch with --engine when creative direction or scope changes (see switchHints)."
   ].join(" ");
 }
 
