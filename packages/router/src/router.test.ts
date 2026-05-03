@@ -74,6 +74,216 @@ describe("selectEngine", () => {
     });
   });
 
+  it("uses score-based selection so asset attachment alone does not lock Editframe in", () => {
+    const spec = createVideoSpecFromPrompt({
+      prompt:
+        "LP風セクションでクリップを動画埋め込み風に見せたい、HTMLとCSSで組みたい",
+      assetSources: ["./clip.mp4"]
+    });
+
+    const decision = selectEngine(spec);
+
+    expect(decision.engine).toBe("hyperframes");
+    expect(findFitPercent(decision.engineFits, "hyperframes")).toBeGreaterThan(
+      findFitPercent(decision.engineFits, "editframe")
+    );
+  });
+
+  describe("signal extraction edge cases (regression)", () => {
+    const cases = [
+      {
+        name: "no-asset prompt does not get false-positive editframe boost from word 素材",
+        prompt: "素材なしで完全に0から動画を作りたい",
+        expected: "remotion"
+      },
+      {
+        name: "URL used only as a reference does not lock in HyperFrames",
+        prompt:
+          "詳細はこちらのURLを参照 https://example.com イベント告知動画を作って",
+        expected: "remotion"
+      },
+      {
+        name: "explicit kinetic typography in a captioned vertical short still routes to Remotion",
+        prompt: "字幕付きの縦型ショート、kinetic typoが中心、素材は無し",
+        expected: "remotion"
+      },
+      {
+        name: "narration + BGM + edit intent routes to Editframe",
+        prompt: "ナレーションをBGMに合わせて編集したい",
+        expected: "editframe"
+      },
+      {
+        name: "product page request routes to HyperFrames via web/page synonym",
+        prompt: "プロダクトページを動画にして",
+        expected: "hyperframes"
+      },
+      {
+        name: "GSAP scroll motion routes to HyperFrames",
+        prompt: "GSAPの既存スクロール演出を動画化したい",
+        expected: "hyperframes"
+      },
+      {
+        name: "JSON brief alone is not enough to score Remotion higher than the default",
+        prompt: "JSONブリーフを読み込んで動画を作る",
+        expected: "remotion"
+      },
+      {
+        name: "explainer/tutorial videos route to Remotion",
+        prompt: "3分の解説動画を作りたい、図解中心",
+        expected: "remotion"
+      },
+      {
+        name: "data visualization (dashboard/KPI) routes to Remotion",
+        prompt: "ダッシュボードのKPIを動画で見せたい",
+        expected: "remotion"
+      },
+      {
+        name: "lyric/MV requests route to Remotion",
+        prompt: "プロダクトのリリックビデオMVを作る",
+        expected: "remotion"
+      },
+      {
+        name: "webinar recap routes to Editframe",
+        prompt: "ウェビナーのリキャップ動画",
+        expected: "editframe"
+      },
+      {
+        name: "avatar / talking-head requests route to HyperFrames",
+        prompt: "アバターが解説するWeb動画",
+        expected: "hyperframes"
+      },
+      {
+        name: "CSV-driven batch render routes to Remotion",
+        prompt: "商品データCSVから100本の動画をバッチレンダ",
+        expected: "remotion"
+      },
+      {
+        name: "slideshow keyword routes to Editframe",
+        prompt: "スライドショー形式で見せたい",
+        expected: "editframe"
+      }
+    ] as const;
+
+    for (const testCase of cases) {
+      it(testCase.name, () => {
+        const decision = selectEngine(
+          createVideoSpecFromPrompt({ prompt: testCase.prompt })
+        );
+        expect(decision.engine).toBe(testCase.expected);
+      });
+    }
+
+    it("multi-image asset attachment routes to Editframe (slideshow)", () => {
+      const decision = selectEngine(
+        createVideoSpecFromPrompt({
+          prompt: "商品画像10枚をスライドショーに",
+          assetSources: ["./img1.png", "./img2.png", "./img3.png"]
+        })
+      );
+      expect(decision.engine).toBe("editframe");
+    });
+
+    describe("negation and meta-reference handling", () => {
+      const negationCases = [
+        {
+          name: "verb-negation suppresses LP signal: LPは作らないが",
+          prompt: "LPは作らないが、シンプルな企業ロゴアニメだけ",
+          expected: "remotion"
+        },
+        {
+          name: "verb-negation suppresses GSAP signal: GSAPは使わない",
+          prompt: "GSAPは使わない、ピュアなReactモーション",
+          expected: "remotion"
+        },
+        {
+          name: "post-keyword negation suppresses ナレーション: ナレーションは無い",
+          prompt: "キネティックタイポを中心にしたい、ナレーションは無い",
+          expected: "remotion"
+        },
+        {
+          name: "meta reference suppresses 動画編集 when used as topic, not intent",
+          prompt: "動画編集の話を取り上げる解説動画",
+          expected: "remotion"
+        },
+        {
+          name: "router only reads spec.goal so auto-inferred title (Website Trailer) cannot revive negated LP signal",
+          prompt: "LPは作らないが、ロゴアニメだけ",
+          expected: "remotion"
+        }
+      ] as const;
+
+      for (const testCase of negationCases) {
+        it(testCase.name, () => {
+          const decision = selectEngine(
+            createVideoSpecFromPrompt({ prompt: testCase.prompt })
+          );
+          expect(decision.engine).toBe(testCase.expected);
+        });
+      }
+    });
+
+    it("emits a clarifying question when top vs runner-up margin ≤ 8%", () => {
+      const decision = selectEngine(
+        createVideoSpecFromPrompt({
+          prompt:
+            "LP風セクションでクリップを動画埋め込み風に見せたい、HTMLとCSSで組みたい",
+          assetSources: ["./clip.mp4"]
+        })
+      );
+      const sorted = [...decision.engineFits].sort(
+        (left, right) => right.fitPercent - left.fitPercent
+      );
+      const margin = (sorted[0]?.fitPercent ?? 0) - (sorted[1]?.fitPercent ?? 0);
+      if (margin <= 8) {
+        expect(decision.clarifyingQuestions.length).toBeGreaterThan(0);
+        expect(decision.clarifyingQuestions[0]).toMatch(/Two engines/);
+      }
+    });
+
+    it("returns no clarifying question when the lead is decisive", () => {
+      const decision = selectEngine(
+        createVideoSpecFromPrompt({
+          prompt: "GSAPの既存スクロール演出を動画化したい"
+        })
+      );
+      expect(decision.clarifyingQuestions).toEqual([]);
+    });
+
+    it("close-call selectionGuide warns when top vs runner-up margin is small", () => {
+      const decision = selectEngine(
+        createVideoSpecFromPrompt({
+          prompt:
+            "詳細はこちらのURLを参照 https://example.com イベント告知動画を作って"
+        })
+      );
+      const sorted = [...decision.engineFits].sort(
+        (left, right) => right.fitPercent - left.fitPercent
+      );
+      const margin = (sorted[0]?.fitPercent ?? 0) - (sorted[1]?.fitPercent ?? 0);
+      if (margin <= 8) {
+        expect(decision.selectionGuide).toContain("Close call");
+      }
+    });
+  });
+
+  it("returns switchHints for the two non-selected engines", () => {
+    const spec = createVideoSpecFromPrompt({
+      prompt: "イベント告知動画を30秒で作りたい。縦型でタイトルを出したい。"
+    });
+
+    const decision = selectEngine(spec);
+
+    expect(decision.engine).toBe("remotion");
+    expect(decision.switchHints).toHaveLength(2);
+    const targets = decision.switchHints.map((hint) => hint.targetEngine).sort();
+    expect(targets).toEqual(["editframe", "hyperframes"]);
+    for (const hint of decision.switchHints) {
+      expect(hint.targetEngine).not.toBe(decision.engine);
+      expect(hint.condition.length).toBeGreaterThan(20);
+      expect(hint.why.length).toBeGreaterThan(20);
+    }
+  });
+
   it("defaults to Remotion for template motion graphics", () => {
     const spec = createVideoSpecFromPrompt({
       prompt: "イベント告知動画を30秒で作りたい。縦型でタイトルを出したい。"

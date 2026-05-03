@@ -89,8 +89,16 @@ export type EngineDecision = {
   recommendation: EngineRecommendation;
   engineFits: EngineFit[];
   selectionGuide: string;
+  switchHints: SwitchHint[];
+  clarifyingQuestions: string[];
   licenseRisk: "low" | "medium" | "high";
   fallback?: EngineName;
+};
+
+export type SwitchHint = {
+  targetEngine: EngineName;
+  condition: string;
+  why: string;
 };
 
 export type EngineFit = {

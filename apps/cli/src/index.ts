@@ -26,6 +26,7 @@ import {
   type LicenseMode,
   type OutputType,
   type PreviewResult,
+  type SwitchHint,
   type VideoEngine
 } from "@michibiki/video-spec";
 import { parseArgs, getValue, getValues, hasFlag } from "./args.js";
@@ -36,6 +37,11 @@ async function main(): Promise<void> {
 
   if (!args.command || args.command === "help" || hasFlag(args, "help")) {
     printHelp();
+    return;
+  }
+
+  if (args.command === "decide" || args.command === "route") {
+    decide(args);
     return;
   }
 
@@ -75,32 +81,25 @@ async function main(): Promise<void> {
 }
 
 async function generate(args: ReturnType<typeof parseArgs>): Promise<void> {
-  const prompt = getValue(args, "prompt") ?? args.positionals.join(" ");
-  if (!prompt) {
-    throw new Error("Missing prompt. Use --prompt \"...\".");
+  const { spec, decision, license } = buildDecisionFromArgs(args);
+
+  if (
+    decision.clarifyingQuestions.length > 0 &&
+    !getValue(args, "engine") &&
+    !hasFlag(args, "resolve-ambiguity")
+  ) {
+    printAmbiguityBlock({
+      engine: decision.engine,
+      engineFits: decision.engineFits,
+      switchHints: decision.switchHints,
+      clarifyingQuestions: decision.clarifyingQuestions
+    });
+    process.exitCode = 2;
+    return;
   }
 
   const outputsRoot = path.resolve(getValue(args, "outputs") ?? "outputs");
   const paths = await createJobPaths(outputsRoot);
-  const enginePreference = parseEnginePreference(getValue(args, "engine"));
-  const licenseMode = parseLicenseMode(getValue(args, "license-mode"));
-  const spec = createVideoSpecFromPrompt({
-    prompt,
-    title: getValue(args, "title"),
-    durationSec: parseNumber(getValue(args, "duration")),
-    aspectRatio: parseAspectRatio(getValue(args, "aspect-ratio")),
-    outputType: parseOutputType(getValue(args, "output-type")),
-    assetSources: getValues(args, "asset"),
-    referenceUrls: getValues(args, "url"),
-    enginePreference,
-    licenseMode,
-    allowCloudRender: hasFlag(args, "allow-cloud-render")
-  });
-  const decision = selectEngine(spec);
-  const license = validateLicense(decision.engine, {
-    usage: spec.constraints.licenseMode ?? "personal",
-    allowCloudRender: spec.constraints.allowCloudRender
-  });
 
   await writeJobFiles({ paths, spec, decision, license });
 
@@ -123,19 +122,32 @@ async function generate(args: ReturnType<typeof parseArgs>): Promise<void> {
       dryRun: hasFlag(args, "dry-run")
     });
 
-    previewResult = await engine.preview(project);
-    previewResultPath = await writePreviewResult(paths.jobDir, previewResult);
+    if (hasFlag(args, "preview")) {
+      previewResult = await engine.preview(project);
+      previewResultPath = await writePreviewResult(paths.jobDir, previewResult);
+    }
 
     if (hasFlag(args, "render")) {
-      const renderResult = await engine.render(project, {
-        outputDir: paths.jobDir,
-        logDir: paths.logDir,
-        skipBuildPackages: hasFlag(args, "skip-build-packages")
-      });
-      renderMessage = renderResult.message;
-      renderOutputPath = renderResult.outputPath;
-      if (!renderResult.ok) {
-        process.exitCode = 1;
+      if (!hasFlag(args, "confirm-render")) {
+        console.log("");
+        console.log(
+          "Render gate: --render was set, but MP4 rendering needs explicit user approval."
+        );
+        console.log(
+          "Re-run the same command with --confirm-render once the user has approved the final render."
+        );
+        process.exitCode = 2;
+      } else {
+        const renderResult = await engine.render(project, {
+          outputDir: paths.jobDir,
+          logDir: paths.logDir,
+          skipBuildPackages: hasFlag(args, "skip-build-packages")
+        });
+        renderMessage = renderResult.message;
+        renderOutputPath = renderResult.outputPath;
+        if (!renderResult.ok) {
+          process.exitCode = 1;
+        }
       }
     }
   }
@@ -147,6 +159,8 @@ async function generate(args: ReturnType<typeof parseArgs>): Promise<void> {
     recommendation: decision.recommendation,
     engineFits: decision.engineFits,
     selectionGuide: decision.selectionGuide,
+    switchHints: decision.switchHints,
+    clarifyingQuestions: decision.clarifyingQuestions,
     fallback: decision.fallback,
     licenseMessage: license.message,
     projectPath: project?.rootPath,
@@ -158,10 +172,73 @@ async function generate(args: ReturnType<typeof parseArgs>): Promise<void> {
   });
 }
 
+function decide(args: ReturnType<typeof parseArgs>): void {
+  const { spec, decision, license } = buildDecisionFromArgs(args);
+
+  printDecisionSummary({
+    title: spec.title,
+    durationSec: spec.format.durationSec,
+    aspectRatio: spec.format.aspectRatio,
+    engine: decision.engine,
+    reason: decision.reason,
+    recommendation: decision.recommendation,
+    engineFits: decision.engineFits,
+    selectionGuide: decision.selectionGuide,
+    switchHints: decision.switchHints,
+    clarifyingQuestions: decision.clarifyingQuestions,
+    fallback: decision.fallback,
+    licenseMessage: license.message
+  });
+}
+
+function buildDecisionFromArgs(args: ReturnType<typeof parseArgs>): {
+  spec: ReturnType<typeof createVideoSpecFromPrompt>;
+  decision: ReturnType<typeof selectEngine>;
+  license: ReturnType<typeof validateLicense>;
+} {
+  const prompt = getValue(args, "prompt") ?? args.positionals.join(" ");
+  if (!prompt) {
+    throw new Error("Missing prompt. Use --prompt \"...\".");
+  }
+
+  const enginePreference = parseEnginePreference(getValue(args, "engine"));
+  const licenseMode = parseLicenseMode(getValue(args, "license-mode"));
+  const spec = createVideoSpecFromPrompt({
+    prompt,
+    title: getValue(args, "title"),
+    durationSec: parseNumber(getValue(args, "duration")),
+    aspectRatio: parseAspectRatio(getValue(args, "aspect-ratio")),
+    outputType: parseOutputType(getValue(args, "output-type")),
+    assetSources: getValues(args, "asset"),
+    referenceUrls: getValues(args, "url"),
+    enginePreference,
+    licenseMode,
+    allowCloudRender: hasFlag(args, "allow-cloud-render")
+  });
+  const decision = selectEngine(spec);
+  const license = validateLicense(decision.engine, {
+    usage: spec.constraints.licenseMode ?? "personal",
+    allowCloudRender: spec.constraints.allowCloudRender
+  });
+
+  return { spec, decision, license };
+}
+
 async function render(args: ReturnType<typeof parseArgs>): Promise<void> {
   const job = getValue(args, "job") ?? args.positionals[0];
   if (!job) {
     throw new Error("Missing job. Use michibiki render --job outputs/jobs/<job-id>.");
+  }
+
+  if (!hasFlag(args, "confirm-render")) {
+    console.log(
+      "Render gate: MP4 rendering needs explicit user approval before it runs."
+    );
+    console.log(
+      "Re-run the same command with --confirm-render once the user has approved the final render."
+    );
+    process.exitCode = 2;
+    return;
   }
 
   const { jobDir, manifest, project } = await loadGeneratedProject(job);
@@ -226,6 +303,7 @@ function printHelp(): void {
   console.log(`Michibiki
 
 Usage:
+  michibiki decide --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。縦型..."
   michibiki create --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。縦型..."
   michibiki generate --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。縦型..."
   michibiki generate --prompt "..." --render
@@ -235,7 +313,7 @@ Usage:
   michibiki engines
   michibiki doctor
 
-Generate options:
+Decide/generate options:
   --prompt <text>             Natural language video request
   --title <text>              Optional title
   --duration <seconds>        Override duration
@@ -247,8 +325,18 @@ Generate options:
   --output-type <type>        mp4, webm, project, code, preview
   --remotion-repo <path>      Override Remotion monorepo path
   --remotion-mode <mode>      auto, monorepo, standalone
-  --render                    Render after project generation
+  --preview                   Run preview after project generation (opt-in; HyperFrames/Editframe preview launches headless Chrome + ffmpeg)
+  --render                    Render the final MP4 after project generation (still requires --confirm-render to actually run)
+  --confirm-render            Required acknowledgement that MP4 rendering is intended; protects against accidental render runs by agents
   --dry-run                   Remotion monorepo only: write job files without running engine commands
+  --resolve-ambiguity         Proceed with the auto recommendation even when the router cannot decide between two engines (top vs runner-up margin ≤ 8%)
+  --allow-license-risk        Proceed even when license guard flags risk
+
+Recommended sequence (the steps the agent rules expect):
+  1. michibiki decide --prompt "..."                          (no side effects)
+  2. michibiki generate --prompt "..." [--engine X]           (creates project files only)
+  3. michibiki preview --job outputs/jobs/<id>                (run preview to validate)
+  4. michibiki render --job outputs/jobs/<id> --confirm-render (final MP4)
 `);
 }
 
@@ -271,6 +359,8 @@ function printGenerateSummary(params: {
   recommendation: EngineRecommendation;
   engineFits: EngineFit[];
   selectionGuide: string;
+  switchHints: SwitchHint[];
+  clarifyingQuestions: string[];
   fallback?: EngineName;
   licenseMessage: string;
   projectPath?: string;
@@ -295,6 +385,8 @@ function printGenerateSummary(params: {
   console.log(`Selected direction: ${params.recommendation.creativeDirection}`);
   console.log(`Strengths: ${params.recommendation.strengths.join("; ")}`);
   console.log(`Tradeoffs: ${params.recommendation.tradeoffs.join("; ")}`);
+  printSwitchHints(params.switchHints);
+  printClarifyingQuestions(params.clarifyingQuestions);
   if (params.fallback) {
     console.log(`Fallback: ${params.fallback}`);
   }
@@ -311,6 +403,100 @@ function printGenerateSummary(params: {
   if (params.renderOutputPath) {
     console.log(`Output: ${params.renderOutputPath}`);
   }
+}
+
+function printDecisionSummary(params: {
+  title: string;
+  durationSec: number;
+  aspectRatio: AspectRatio;
+  engine: EngineName;
+  reason: string;
+  recommendation: EngineRecommendation;
+  engineFits: EngineFit[];
+  selectionGuide: string;
+  switchHints: SwitchHint[];
+  clarifyingQuestions: string[];
+  fallback?: EngineName;
+  licenseMessage: string;
+}): void {
+  console.log("");
+  console.log("Decision complete");
+  console.log("No job, project, preview, or render files were created.");
+  console.log(`Title: ${params.title}`);
+  console.log(`Format: ${params.durationSec}s ${params.aspectRatio}`);
+  console.log(`Engine: ${params.engine}`);
+  console.log(`Reason: ${params.reason}`);
+  console.log(`Selection guide: ${params.selectionGuide}`);
+  console.log("Engine fit:");
+  for (const fit of params.engineFits) {
+    console.log(`- ${fit.engine}: ${fit.fitPercent}%`);
+    console.log(`  Why: ${fit.reason}`);
+    console.log(`  Best use: ${fit.bestUse}`);
+    console.log(`  Features: ${fit.featureHighlights.join("; ")}`);
+  }
+  console.log(`Selected proposal: ${params.recommendation.summary}`);
+  console.log(`Selected direction: ${params.recommendation.creativeDirection}`);
+  console.log(`Strengths: ${params.recommendation.strengths.join("; ")}`);
+  console.log(`Tradeoffs: ${params.recommendation.tradeoffs.join("; ")}`);
+  printSwitchHints(params.switchHints);
+  printClarifyingQuestions(params.clarifyingQuestions);
+  if (params.fallback) {
+    console.log(`Fallback: ${params.fallback}`);
+  }
+  console.log(`License: ${params.licenseMessage}`);
+}
+
+function printSwitchHints(hints: SwitchHint[]): void {
+  if (!hints.length) return;
+  console.log("Switch hints:");
+  for (const hint of hints) {
+    console.log(`- → ${hint.targetEngine}`);
+    console.log(`  When: ${hint.condition}`);
+    console.log(`  Why:  ${hint.why}`);
+  }
+}
+
+function printClarifyingQuestions(questions: string[]): void {
+  if (!questions.length) return;
+  console.log("Clarifying question:");
+  for (const question of questions) {
+    console.log(`- ${question}`);
+  }
+}
+
+function printAmbiguityBlock(params: {
+  engine: EngineName;
+  engineFits: EngineFit[];
+  switchHints: SwitchHint[];
+  clarifyingQuestions: string[];
+}): void {
+  console.log("");
+  console.log("Engine selection is ambiguous — refusing to generate.");
+  console.log(
+    "The auto router cannot decide between two engines with high confidence."
+  );
+  console.log("");
+  console.log("Engine fit:");
+  for (const fit of [...params.engineFits].sort(
+    (left, right) => right.fitPercent - left.fitPercent
+  )) {
+    console.log(`- ${fit.engine}: ${fit.fitPercent}%`);
+  }
+  console.log("");
+  printClarifyingQuestions(params.clarifyingQuestions);
+  console.log("");
+  printSwitchHints(params.switchHints);
+  console.log("");
+  console.log("To proceed, choose one of:");
+  console.log(
+    `  1) Re-run with an explicit engine: --engine remotion | hyperframes | editframe`
+  );
+  console.log(
+    `  2) Accept the auto recommendation (${params.engine}) anyway: add --resolve-ambiguity`
+  );
+  console.log(
+    "  3) Use \"michibiki decide\" first to inspect engineFits without generating"
+  );
 }
 
 async function loadGeneratedProject(job: string): Promise<{

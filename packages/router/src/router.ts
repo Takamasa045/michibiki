@@ -3,17 +3,30 @@ import type {
   EngineFit,
   EngineName,
   EngineRecommendation,
+  SwitchHint,
   VideoSpec
 } from "@michibiki/video-spec";
 
 type RouterSignals = {
   hasVideoOrAudioAssets: boolean;
+  hasMultipleImageAssets: boolean;
   hasUrlAsset: boolean;
+  urlIsReferenceOnly: boolean;
   mentionsTimelineEditing: boolean;
+  mentionsTransitionsOrOverlays: boolean;
   mentionsWebDomWorkflow: boolean;
+  mentionsAvatarOrTalkingHead: boolean;
   mentionsDataDrivenOrTemplateWorkflow: boolean;
+  mentionsDataVisualization: boolean;
+  mentionsExplainerOrTutorial: boolean;
+  mentionsLyricOrMusicVideo: boolean;
+  mentionsCodedMotionDesign: boolean;
+  mentionsCloudBatchRender: boolean;
   mentionsShortSocialWorkflow: boolean;
   mentionsPromoWorkflow: boolean;
+  mentionsWebinarRecap: boolean;
+  isVerticalShortFormat: boolean;
+  isLongFormFormat: boolean;
 };
 
 export function selectEngine(spec: VideoSpec): EngineDecision {
@@ -21,8 +34,15 @@ export function selectEngine(spec: VideoSpec): EngineDecision {
   const signals = getRouterSignals(spec);
   const engineFits = buildEngineFits(spec, signals);
   const selectedEngine =
-    enginePreference === "auto" ? selectAutoEngine(signals) : enginePreference;
+    enginePreference === "auto"
+      ? selectAutoEngine(engineFits)
+      : enginePreference;
   const selectedFit = getEngineFit(engineFits, selectedEngine);
+  const switchHints = buildSwitchHints(engineFits, selectedEngine, signals);
+  const clarifyingQuestions = buildClarifyingQuestions(
+    engineFits,
+    selectedEngine
+  );
 
   if (enginePreference !== "auto") {
     return {
@@ -32,20 +52,84 @@ export function selectEngine(spec: VideoSpec): EngineDecision {
       recommendation: selectedFit.recommendation,
       engineFits,
       selectionGuide: buildSelectionGuide(engineFits, selectedEngine),
+      switchHints,
+      clarifyingQuestions: [],
       licenseRisk: defaultLicenseRisk(selectedEngine)
     };
   }
 
   return {
     engine: selectedEngine,
-    confidence: selectedFit.fitPercent / 100,
+    confidence: computeConfidence(engineFits, selectedFit.fitPercent),
     reason: selectedFit.reason,
     recommendation: selectedFit.recommendation,
     engineFits,
     selectionGuide: buildSelectionGuide(engineFits, selectedEngine),
+    switchHints,
+    clarifyingQuestions,
     licenseRisk: defaultLicenseRisk(selectedEngine),
     fallback: getFallbackEngine(engineFits, selectedEngine)
   };
+}
+
+function computeConfidence(
+  engineFits: EngineFit[],
+  selectedPercent: number
+): number {
+  const sorted = [...engineFits].sort(
+    (left, right) => right.fitPercent - left.fitPercent
+  );
+  const runnerUp = sorted.find((fit) => fit.fitPercent < selectedPercent);
+  if (!runnerUp) return 0.5;
+  const margin = selectedPercent - runnerUp.fitPercent;
+  const marginFactor = Math.min(1, margin / 25);
+  return Math.round((selectedPercent / 100) * marginFactor * 100) / 100;
+}
+
+function buildClarifyingQuestions(
+  engineFits: EngineFit[],
+  selectedEngine: EngineName
+): string[] {
+  const sorted = [...engineFits].sort(
+    (left, right) => right.fitPercent - left.fitPercent
+  );
+  const top = sorted[0];
+  const second = sorted[1];
+  if (!top || !second) return [];
+  const margin = top.fitPercent - second.fitPercent;
+  if (margin > 8) return [];
+
+  const pair = orderEnginePair(top.engine, second.engine);
+  return [buildClarifyingQuestion(pair, selectedEngine)];
+}
+
+function orderEnginePair(
+  a: EngineName,
+  b: EngineName
+): readonly [EngineName, EngineName] {
+  const order: EngineName[] = ["remotion", "hyperframes", "editframe"];
+  const sorted = [a, b].sort((left, right) => order.indexOf(left) - order.indexOf(right));
+  return [sorted[0]!, sorted[1]!] as const;
+}
+
+const PAIR_QUESTIONS: Record<string, string> = {
+  "remotion|hyperframes":
+    "Two engines tied: should this video feel like (A) a coded React motion piece with custom typography and choreography (Remotion), or (B) a Web/LP-style page captured as motion (HyperFrames)?",
+  "remotion|editframe":
+    "Two engines tied: should this video feel like (A) a coded motion piece with kinetic typography and reusable structure (Remotion), or (B) an edited timeline with captions, narration, BGM sync, and layered media (Editframe)?",
+  "hyperframes|editframe":
+    "Two engines tied: should this video feel like (A) a Web/LP page becoming motion with HTML/CSS/JS (HyperFrames), or (B) an edited timeline with captions, narration, BGM sync, and layered media (Editframe)?"
+};
+
+function buildClarifyingQuestion(
+  pair: readonly [EngineName, EngineName],
+  selectedEngine: EngineName
+): string {
+  const key = `${pair[0]}|${pair[1]}`;
+  const base =
+    PAIR_QUESTIONS[key] ??
+    "Two engines are nearly tied. Which direction fits the creative intent better?";
+  return `${base} Currently leaning ${selectedEngine} by a small margin — answer A or B (or pass --engine) to lock it in.`;
 }
 
 function defaultLicenseRisk(engine: EngineName): EngineDecision["licenseRisk"] {
@@ -54,65 +138,233 @@ function defaultLicenseRisk(engine: EngineName): EngineDecision["licenseRisk"] {
 }
 
 function normalizedUserRequestText(spec: VideoSpec): string {
-  return [
-    spec.title,
-    spec.goal,
-    spec.content.script,
-    spec.content.cta,
-    ...(spec.content.captions ?? []),
-    ...(spec.content.scenes?.map((scene) => scene.description) ?? [])
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
+  // Use only the raw user prompt (spec.goal) plus an explicitly user-provided
+  // CTA. spec.title / spec.content.script / spec.content.captions /
+  // spec.content.scenes are heuristically inferred from the prompt by
+  // from-prompt.ts and re-introduce keywords without their negation context
+  // (e.g. an "LPは作らない" prompt gets a "Website Trailer" title that
+  // would falsely re-fire the web/DOM signal). We deliberately do not look
+  // at those derived fields when extracting routing signals.
+  return [spec.goal, spec.content.cta].filter(Boolean).join(" ").toLowerCase();
+}
+
+const NEGATION_AFTER =
+  /^(?:[\s　]*(?:を|は|も|の|が|に|で|と|から|まで)?\s*)(?:なし|無し|不要|要らない|不必要|ない|なく(?:て)?|じゃない|ではない|ではなく|以外|は(?:な|無)い|抜き|抜きで)/i;
+
+const VERB_NEGATION_AFTER =
+  /^(?:[\s　]*(?:を|は|も|の|が|に|で|と|から|まで)?\s*)[一-龯々ぁ-んァ-ヶー]{0,6}[ぁ-ん](?:ない|なかった|ません|ませんでした|ぬ|なくて|なくても)/i;
+
+const META_AFTER =
+  /^(?:[\s　]*(?:を|は|も|の|が|に|と)?\s*)(?:について|の話|を解説|を解説する|を取り上げ|を取り上げる|に関する|の説明|の概要|に触れ|の例|を題材|の例として)/i;
+
+const NEGATION_BEFORE =
+  /(?:なし|無し|不要|不必要|なく|じゃなく|ではなく|以外|抜き|抜きで|without|no\s)\s*(?:[、。\s]|の|で|な)?\s*$/i;
+
+function hasContextualMatch(text: string, pattern: RegExp): boolean {
+  const flags = pattern.flags.includes("g")
+    ? pattern.flags
+    : `${pattern.flags}g`;
+  const globalPattern = new RegExp(pattern.source, flags);
+  let match: RegExpExecArray | null;
+  while ((match = globalPattern.exec(text)) !== null) {
+    const matchEnd = match.index + match[0].length;
+    const tail = text.substring(matchEnd, matchEnd + 20);
+    const head = text.substring(Math.max(0, match.index - 16), match.index);
+    if (NEGATION_AFTER.test(tail)) continue;
+    if (VERB_NEGATION_AFTER.test(tail)) continue;
+    if (META_AFTER.test(tail)) continue;
+    if (NEGATION_BEFORE.test(head)) continue;
+    return true;
+  }
+  return false;
 }
 
 function getRouterSignals(spec: VideoSpec): RouterSignals {
   const text = normalizedUserRequestText(spec);
+  const hasUrlAsset = spec.assets.some((asset) => asset.type === "url");
+  const imageAssetCount = spec.assets.filter(
+    (asset) => asset.type === "image"
+  ).length;
+  const hasVideoOrAudioAssets = spec.assets.some(
+    (asset) => asset.type === "video" || asset.type === "audio"
+  );
   return {
-    hasVideoOrAudioAssets: spec.assets.some(
-      (asset) => asset.type === "video" || asset.type === "audio"
-    ),
-    hasUrlAsset: spec.assets.some((asset) => asset.type === "url"),
+    hasVideoOrAudioAssets,
+    hasMultipleImageAssets: !hasVideoOrAudioAssets && imageAssetCount >= 2,
+    hasUrlAsset,
+    urlIsReferenceOnly: hasUrlAsset && urlIsReferenceOnly(text),
     mentionsTimelineEditing: mentionsTimelineEditing(text),
+    mentionsTransitionsOrOverlays: mentionsTransitionsOrOverlays(text),
     mentionsWebDomWorkflow: mentionsWebDomWorkflow(text),
+    mentionsAvatarOrTalkingHead: mentionsAvatarOrTalkingHead(text),
     mentionsDataDrivenOrTemplateWorkflow:
       mentionsDataDrivenOrTemplateWorkflow(text),
+    mentionsDataVisualization: mentionsDataVisualization(text),
+    mentionsExplainerOrTutorial: mentionsExplainerOrTutorial(text),
+    mentionsLyricOrMusicVideo: mentionsLyricOrMusicVideo(text),
+    mentionsCodedMotionDesign: mentionsCodedMotionDesign(text),
+    mentionsCloudBatchRender: mentionsCloudBatchRender(text),
     mentionsShortSocialWorkflow:
-      /(shorts?|reels?|tiktok|ショート|縦型|縦長|字幕)/i.test(text),
+      /(shorts?|reels?|tiktok|ショート|縦型|縦長)/i.test(text),
     mentionsPromoWorkflow:
-      /(イベント|告知|開催|商品|プロダクト|ec|広告|promo|promotion|ad\b|lp)/i.test(
+      /(イベント|告知|開催|商品|プロダクト|ec|広告|promo|promotion|ad\b)/i.test(
         text
-      )
+      ),
+    mentionsWebinarRecap: mentionsWebinarRecap(text),
+    isVerticalShortFormat:
+      spec.format.aspectRatio === "9:16" && spec.format.durationSec <= 60,
+    isLongFormFormat: spec.format.durationSec >= 120
   };
 }
 
 function mentionsTimelineEditing(text: string): boolean {
-  return /(timeline|タイムライン|字幕|caption|b-roll|broll|カット編集|vlog|素材|音声|voice)/i.test(
-    text
+  return hasContextualMatch(
+    text,
+    /(timeline|タイムライン|字幕|caption|subtitle|b-roll|broll|カット編集|vlog|音声|voice|narration|ナレーション|bgm|背景音楽|sound design|サウンドデザイン|編集する|動画編集|編集動画|video\s+edit(?:ing)?|edit(?:ing)?\s+(?:a\s+)?video|effects? edit|エディトリアル|editorial|スライドショー|slide\s?show|フォトムービー|photo\s?movie)/i
+  );
+}
+
+function mentionsTransitionsOrOverlays(text: string): boolean {
+  return hasContextualMatch(
+    text,
+    /(トランジション|transition|オーバーレイ|overlay|クロスフェード|crossfade|ピクチャインピクチャ|picture[- ]in[- ]picture|pip|ロワーサード|lower[- ]?third|テロップ|テキスト合成|chyron)/i
   );
 }
 
 function mentionsWebDomWorkflow(text: string): boolean {
-  return /(webサイト|website|landing page|ランディングページ|\blp\b|dom|html|css|javascript|gsap|スクロール|url)/i.test(
-    text
+  return hasContextualMatch(
+    text,
+    /(webサイト|website|web\s?page|webページ|landing page|ランディングページ|\blp\b|dom|html|css|javascript|gsap|スクロール|セクション|section|サイト動画化|page-to-video|プロダクトページ|商品ページ|webflow|framer)/i
+  );
+}
+
+function mentionsAvatarOrTalkingHead(text: string): boolean {
+  return hasContextualMatch(
+    text,
+    /(アバター|avatar|talking[- ]?head|toking head|トーキングヘッド|ai presenter|aiプレゼンター|virtual presenter|バーチャルプレゼンター|heygen)/i
   );
 }
 
 function mentionsDataDrivenOrTemplateWorkflow(text: string): boolean {
-  return /(react|remotion|テンプレート|template|json|csv|データ|data-driven|props|量産|自動レンダリング)/i.test(
+  return hasContextualMatch(
+    text,
+    /(react|remotion|テンプレート|template|csv|data-driven|データ駆動|props|量産|自動レンダリング|バッチレンダ|batch render|バリアント|variant|スプレッドシート|spreadsheet)/i
+  );
+}
+
+function mentionsDataVisualization(text: string): boolean {
+  return hasContextualMatch(
+    text,
+    /(ダッシュボード|dashboard|チャート|chart|グラフ|graph|data\s?viz|データ可視化|可視化|kpi|メトリクス|metrics|アナリティクス|analytics|プロット|plot)/i
+  );
+}
+
+function mentionsExplainerOrTutorial(text: string): boolean {
+  return hasContextualMatch(
+    text,
+    /(解説動画|解説ビデオ|explainer|tutorial|チュートリアル|how[- ]?to|ハウツー|how it works|仕組み解説|エデュケーション動画|education video|onboarding|オンボーディング)/i
+  );
+}
+
+function mentionsLyricOrMusicVideo(text: string): boolean {
+  return hasContextualMatch(
+    text,
+    /(\bmv\b|music\s?video|ミュージックビデオ|リリックビデオ|lyric\s?video|歌詞動画|歌詞付き)/i
+  );
+}
+
+function mentionsCodedMotionDesign(text: string): boolean {
+  return hasContextualMatch(
+    text,
+    /(kinetic typo|キネティックタイポ|タイポグラフィ|typography|spring|easing|frame-accurate|フレーム精度|モーショングラフィックス|motion graphics|motion design|モーションデザイン|three\.?js|react three fiber|r3f|lottie|パララックス|parallax|シェーダー|shader)/i
+  );
+}
+
+function mentionsCloudBatchRender(text: string): boolean {
+  return hasContextualMatch(
+    text,
+    /(\blambda\b|aws lambda|cloud render|クラウドレンダ|クラウドレンダリング|バッチレンダ|batch render|大量レンダ|多変量|n\s*variants?|何百本|何千本)/i
+  );
+}
+
+function mentionsWebinarRecap(text: string): boolean {
+  return hasContextualMatch(
+    text,
+    /(ウェビナー|webinar|recap|リキャップ|ダイジェスト|digest|ハイライト動画|highlight\s+video|登壇|conference\s+recap|キーノート|keynote)/i
+  );
+}
+
+function urlIsReferenceOnly(text: string): boolean {
+  return /(参照|詳細はこちら|詳しくは|reference|see\s+(here|below|the link)|details? at|詳しい情報|リンクは)/i.test(
     text
   );
 }
 
-function selectAutoEngine(signals: RouterSignals): EngineName {
-  if (signals.hasVideoOrAudioAssets || signals.mentionsTimelineEditing) {
-    return "editframe";
+function selectAutoEngine(engineFits: EngineFit[]): EngineName {
+  const sorted = [...engineFits].sort((left, right) => {
+    if (right.fitPercent !== left.fitPercent) {
+      return right.fitPercent - left.fitPercent;
+    }
+    return tieBreakOrder(left.engine) - tieBreakOrder(right.engine);
+  });
+  const top = sorted[0];
+  if (!top) {
+    throw new Error("buildEngineFits returned no engine fits.");
   }
-  if (signals.hasUrlAsset || signals.mentionsWebDomWorkflow) {
-    return "hyperframes";
+  return top.engine;
+}
+
+function tieBreakOrder(engine: EngineName): number {
+  if (engine === "remotion") return 0;
+  if (engine === "hyperframes") return 1;
+  return 2;
+}
+
+function buildSwitchHints(
+  engineFits: EngineFit[],
+  selectedEngine: EngineName,
+  signals: RouterSignals
+): SwitchHint[] {
+  return engineFits
+    .filter((fit) => fit.engine !== selectedEngine)
+    .sort((left, right) => right.fitPercent - left.fitPercent)
+    .map((fit) => buildSwitchHint(fit.engine, signals));
+}
+
+function buildSwitchHint(
+  targetEngine: EngineName,
+  signals: RouterSignals
+): SwitchHint {
+  if (targetEngine === "editframe") {
+    const condition = signals.hasVideoOrAudioAssets
+      ? "If you want to edit those clips/voice on a timeline with captions, BGM beats, transitions, and overlays"
+      : "If you want narration/voice sync, captions, BGM beats, transitions, or to layer existing media on a timeline";
+    return {
+      targetEngine,
+      condition,
+      why: "Editframe becomes the strongest fit because timeline rhythm, captions, audio sync, and layered media drive the piece."
+    };
   }
-  return "remotion";
+
+  if (targetEngine === "hyperframes") {
+    const condition = signals.hasUrlAsset
+      ? "If you want the page itself to become the video (sections, scroll, GSAP/Lottie/CSS motion captured from the DOM)"
+      : "If you'd rather author the video as a web page (HTML/CSS/JS), reuse an existing LP/DOM, or use GSAP/Lottie/CSS motion";
+    return {
+      targetEngine,
+      condition,
+      why: "HyperFrames becomes the strongest fit because it captures DOM/CSS/JS motion deterministically through headless Chrome and ffmpeg."
+    };
+  }
+
+  const condition = signals.mentionsDataDrivenOrTemplateWorkflow
+    ? "If you want to template this and render many data-driven variants (props/JSON/CSV) at once"
+    : "If you want frame-accurate React motion, kinetic typography, spring/easing choreography, or to template the same video for many data variants";
+  return {
+    targetEngine,
+    condition,
+    why: "Remotion becomes the strongest fit because React/TSX gives precise frame-by-frame control and reusable, prop-driven variants."
+  };
 }
 
 function buildEngineFits(spec: VideoSpec, signals: RouterSignals): EngineFit[] {
@@ -127,28 +379,80 @@ function buildEngineFits(spec: VideoSpec, signals: RouterSignals): EngineFit[] {
     scores.remotion -= 8;
     scores.hyperframes -= 7;
   }
+  if (signals.hasMultipleImageAssets) {
+    scores.editframe += 14;
+    scores.remotion += 10;
+    scores.hyperframes -= 2;
+  }
   if (signals.mentionsTimelineEditing) {
     scores.editframe += 36;
     scores.remotion -= 4;
     scores.hyperframes -= 4;
   }
-  if (signals.hasUrlAsset || signals.mentionsWebDomWorkflow) {
+  if (signals.mentionsTransitionsOrOverlays) {
+    scores.editframe += 14;
+    scores.remotion += 2;
+  }
+  if (signals.mentionsWebDomWorkflow) {
     scores.hyperframes += 48;
     scores.remotion += 4;
     scores.editframe -= 8;
+  } else if (signals.hasUrlAsset && !signals.urlIsReferenceOnly) {
+    scores.hyperframes += 40;
+    scores.remotion += 4;
+    scores.editframe -= 6;
+  } else if (signals.hasUrlAsset && signals.urlIsReferenceOnly) {
+    scores.hyperframes += 12;
+  }
+  if (signals.mentionsAvatarOrTalkingHead) {
+    scores.hyperframes += 24;
+    scores.editframe += 8;
   }
   if (signals.mentionsDataDrivenOrTemplateWorkflow) {
     scores.remotion += 36;
     scores.hyperframes += 6;
     scores.editframe -= 4;
   }
+  if (signals.mentionsDataVisualization) {
+    scores.remotion += 26;
+    scores.hyperframes += 4;
+    scores.editframe -= 4;
+  }
+  if (signals.mentionsExplainerOrTutorial) {
+    scores.remotion += 18;
+    scores.editframe += 4;
+  }
+  if (signals.mentionsLyricOrMusicVideo) {
+    scores.remotion += 22;
+    scores.editframe += 6;
+  }
+  if (signals.mentionsCodedMotionDesign) {
+    scores.remotion += 30;
+    scores.editframe -= 6;
+  }
+  if (signals.mentionsCloudBatchRender) {
+    scores.remotion += 18;
+  }
   if (signals.mentionsShortSocialWorkflow) {
-    scores.editframe += 8;
-    scores.remotion += 6;
+    scores.editframe += 6;
+    scores.remotion += 8;
   }
   if (signals.mentionsPromoWorkflow) {
     scores.remotion += 12;
     scores.hyperframes += 7;
+  }
+  if (signals.mentionsWebinarRecap) {
+    scores.editframe += 28;
+    scores.remotion += 4;
+  }
+  if (signals.isVerticalShortFormat) {
+    scores.editframe += 6;
+    scores.remotion += 4;
+  }
+  if (signals.isLongFormFormat) {
+    scores.remotion += 10;
+    scores.editframe += 4;
+    scores.hyperframes -= 4;
   }
 
   const normalized = normalizeFitPercents(scores);
@@ -189,21 +493,38 @@ function normalizeFitPercents(
 
 function buildFitReason(engine: EngineName, signals: RouterSignals): string {
   if (engine === "editframe") {
-    if (signals.hasVideoOrAudioAssets || signals.mentionsTimelineEditing) {
-      return "Source media, captions, voice, B-roll, or timeline-editing signals make Editframe a strong fit.";
+    if (
+      signals.hasVideoOrAudioAssets ||
+      signals.mentionsTimelineEditing ||
+      signals.mentionsWebinarRecap ||
+      signals.mentionsTransitionsOrOverlays ||
+      signals.hasMultipleImageAssets
+    ) {
+      return "Source media, multi-image slideshow, transitions, webinar/recap rhythm, or timeline-editing signals make Editframe a strong fit.";
     }
-    return "Editframe can still shape a polished timeline-driven promo with captions, audio beats, transitions, and generated or static visual layers, but it is less central when no media assets are supplied.";
+    return "Editframe can still shape a polished timeline-driven promo with captions, audio beats, transitions, and generated or static visual layers, but it is less central when no media or editorial signals are present.";
   }
 
   if (engine === "hyperframes") {
-    if (signals.hasUrlAsset || signals.mentionsWebDomWorkflow) {
-      return "URL, LP, DOM, CSS, JavaScript, or scroll-motion signals make HyperFrames a strong fit.";
+    if (
+      signals.mentionsWebDomWorkflow ||
+      (signals.hasUrlAsset && !signals.urlIsReferenceOnly) ||
+      signals.mentionsAvatarOrTalkingHead
+    ) {
+      return "URL, LP, DOM, CSS, JavaScript, scroll-motion, or avatar/talking-head signals make HyperFrames a strong fit.";
     }
     return "HyperFrames can work when the video should feel like a browser-native story with panels, cards, and web motion.";
   }
 
-  if (signals.mentionsDataDrivenOrTemplateWorkflow) {
-    return "Template, React, data, props, frame-accurate choreography, or repeatable-render signals make Remotion a strong fit.";
+  if (
+    signals.mentionsDataDrivenOrTemplateWorkflow ||
+    signals.mentionsCodedMotionDesign ||
+    signals.mentionsDataVisualization ||
+    signals.mentionsExplainerOrTutorial ||
+    signals.mentionsLyricOrMusicVideo ||
+    signals.mentionsCloudBatchRender
+  ) {
+    return "Template, props, kinetic typography, motion design, data viz, explainer, lyric/MV, or cloud/batch-render signals make Remotion a strong fit.";
   }
   return "Remotion is a good default for coded motion graphics, one-off animated promos, kinetic title sequences, and reusable video templates.";
 }
@@ -266,16 +587,25 @@ function buildSelectionGuide(
   selectedEngine: EngineName
 ): string {
   const selectedFit = getEngineFit(engineFits, selectedEngine);
-  const alternatives = engineFits
+  const sorted = [...engineFits].sort(
+    (left, right) => right.fitPercent - left.fitPercent
+  );
+  const runnerUp = sorted.find((fit) => fit.engine !== selectedEngine);
+  const alternatives = sorted
     .filter((fit) => fit.engine !== selectedEngine)
     .map((fit) => `${fit.engine} ${fit.fitPercent}%`)
     .join(", ");
+  const closeCallNotice =
+    runnerUp && selectedFit.fitPercent - runnerUp.fitPercent <= 8
+      ? ` Close call: ${selectedEngine} only leads ${runnerUp.engine} by ${selectedFit.fitPercent - runnerUp.fitPercent}%, so review switchHints before locking the engine.`
+      : "";
 
   return [
     `Recommended engine: ${selectedEngine} (${selectedFit.fitPercent}%).`,
     selectedFit.bestUse,
     `Alternatives: ${alternatives}.`,
-    "Use the percentages as a relative fit among Remotion, HyperFrames, and Editframe, then override with --engine when the creative direction points elsewhere."
+    "The recommended engine is chosen by highest relative fit. Switch with --engine when creative direction or scope changes (see switchHints)." +
+      closeCallNotice
   ].join(" ");
 }
 

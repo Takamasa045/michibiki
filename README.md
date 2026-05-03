@@ -2,7 +2,9 @@
 
 [![CI](https://github.com/Takamasa045/michibiki/actions/workflows/ci.yml/badge.svg)](https://github.com/Takamasa045/michibiki/actions/workflows/ci.yml)
 
-[English](#english) | [日本語](#日本語) | [简体中文](#简体中文) | [한국어](#한국어) | [Español](#español) | [Français](#français)
+[English](#english) | [日本語](#日本語) | [简体中文](docs/i18n/README.zh-CN.md) | [한국어](docs/i18n/README.ko.md) | [Español](docs/i18n/README.es.md) | [Français](docs/i18n/README.fr.md)
+
+> Translations under `docs/i18n/` are summaries and may lag behind the canonical English/Japanese sections. PRs welcome.
 
 ## English
 
@@ -43,24 +45,28 @@ Michibiki is CLI-first today. The HyperFrames and Editframe adapters generate lo
 
 ## Setup
 
+Michibiki is distributed through GitHub Releases, not npmjs.com. Clone the repository, install dependencies, and build:
+
 ```bash
+git clone https://github.com/Takamasa045/michibiki.git
+cd michibiki
 pnpm install
 pnpm build
 pnpm test
 ```
+
+Requirements: Node.js 20+, pnpm 9+, ffmpeg (for HyperFrames/Editframe MP4 rendering), and Chromium/Chrome (auto-detected by `michibiki doctor`).
 
 ## Quickstart
 
 Run locally from the repository root:
 
 ```bash
-pnpm install
-pnpm build
 pnpm michibiki doctor
-pnpm michibiki generate --prompt "Create a 15-second vertical event promo video."
+pnpm michibiki decide --prompt "Create a 15-second vertical event promo video."
 ```
 
-Michibiki is currently distributed through GitHub Releases, not npmjs.com. To use the CLI, clone or download the release source, then run the local `pnpm michibiki` commands from the repository root.
+`pnpm michibiki <command>` is how every CLI invocation works in this repo. The legacy `pnpm video-router` script and the `video-router` binary remain available as aliases.
 
 The Remotion adapter runs in `auto` mode by default. If the external Remotion Studio Monorepo is found, Michibiki generates into that monorepo. If it is not found, Michibiki creates a standalone official Remotion project under the job directory instead.
 
@@ -91,23 +97,27 @@ You can force monorepo mode with `--remotion-mode monorepo` or force standalone 
 After `pnpm build`:
 
 ```bash
-pnpm michibiki generate \
+pnpm michibiki decide \
   --prompt "AIエージェント勉強会のプロモ動画を30秒で作りたい。縦型、日程、会場、参加枠、CTAを入れて。"
 ```
 
 The legacy `pnpm video-router` script and `video-router` binary remain available as aliases.
 
-Every generated job writes `engine-decision.json` with the selected engine, a natural-language `selectionGuide`, and `engineFits` scores for Remotion, HyperFrames, and Editframe. The percentages are relative across the three engines so users can choose a different path with `--engine` when the creative direction fits better. Each engine fit includes `bestUse` and `featureHighlights`, so the output does not reduce Remotion to reusable templates or Editframe to asset-only timeline edits.
+Use `decide` for side-effect-free engine selection before a user has approved generation. It prints the selected engine, a natural-language `selectionGuide`, and `engineFits` scores for Remotion, HyperFrames, and Editframe without creating a job, project, preview, or render. Use `generate` or `create` only after the generation scope is approved.
 
-Engine behavior and recommendation rules are documented in:
+Every generated job writes `engine-decision.json` with the same selected engine, `selectionGuide`, and `engineFits` data. The percentages are relative across the three engines so users can choose a different path with `--engine` when the creative direction fits better. Each engine fit includes `bestUse` and `featureHighlights`.
 
-- `docs/ENGINE_PROFILES.md` - detailed Remotion / HyperFrames / Editframe strengths, tradeoffs, and best-use patterns
-- `AGENTS.md` - Codex-readable agent rules for natural-language video requests and URL promo requests
-- `CLAUDE.md` - Claude Code-readable companion rules with the same engine-fit expectations
+Engine behavior, recommendation rules, and agent contracts are documented in:
+
+- [`docs/ENGINE_PROFILES.md`](docs/ENGINE_PROFILES.md) — Remotion / HyperFrames / Editframe strengths, tradeoffs, and best-use patterns
+- [`AGENTS.md`](AGENTS.md) — canonical agent rules for natural-language video requests and URL promo requests (Codex / Claude Code both read this)
+- [`CLAUDE.md`](CLAUDE.md) — Claude Code compatibility pointer to `AGENTS.md`
+- [`docs/AGENT_RESPONSE_EXAMPLES.md`](docs/AGENT_RESPONSE_EXAMPLES.md) — agent response samples
 
 Useful commands:
 
 ```bash
+pnpm michibiki decide --prompt "..."
 pnpm michibiki create --prompt "..."
 pnpm michibiki preview --job outputs/jobs/<job-id>
 pnpm michibiki doctor
@@ -116,11 +126,16 @@ pnpm michibiki inspect --job outputs/jobs/<job-id>
 pnpm michibiki render --job outputs/jobs/<job-id>
 ```
 
-Render during generation:
+Recommended pipeline (4 stages, each opt-in):
 
 ```bash
-pnpm michibiki generate --prompt "..." --render
+pnpm michibiki decide --prompt "..."                                   # 1. inspect engineFits, no side effects
+pnpm michibiki generate --prompt "..." [--engine X]                    # 2. project files only
+pnpm michibiki preview --job outputs/jobs/<id>                         # 3. validate (headless browser for HyperFrames/Editframe)
+pnpm michibiki render --job outputs/jobs/<id> --confirm-render         # 4. final MP4 (gated)
 ```
+
+`generate` no longer auto-runs preview. Pass `--preview` to opt in. `--render` requires `--confirm-render` to actually run an MP4 — this prevents agents from rendering without explicit user approval.
 
 Force a specific engine:
 
@@ -148,9 +163,9 @@ Runnable examples are in `examples/`. They cover multiple entry points, not only
 
 ```bash
 pnpm michibiki create --duration 3 --prompt "$(cat examples/event-promo/prompt.txt)"
-pnpm michibiki generate --duration 1 --render --prompt "$(cat examples/lp-trailer/prompt.txt)"
+pnpm michibiki generate --duration 1 --render --confirm-render --prompt "$(cat examples/lp-trailer/prompt.txt)"
 pnpm michibiki create --duration 3 --prompt "$(cat examples/data-video/brief.json)"
-pnpm michibiki generate --duration 1 --asset examples/asset-short/input/clip.mp4 --asset examples/asset-short/input/voice.mp3 --render --prompt "$(cat examples/asset-short/prompt.txt)"
+pnpm michibiki generate --duration 1 --asset examples/asset-short/input/clip.mp4 --asset examples/asset-short/input/voice.mp3 --render --confirm-render --prompt "$(cat examples/asset-short/prompt.txt)"
 pnpm michibiki create --engine remotion --remotion-mode standalone --duration 3 --prompt "$(cat examples/event-promo/prompt.txt)"
 ```
 
@@ -193,17 +208,29 @@ Michibiki は現在 CLI-first です。HyperFrames / Editframe アダプター�
 - Editframe timeline handoff 生成とMP4タイムラインプレビュー
 - HyperFrames/Editframe 共通の headless Chrome + ffmpeg レンダー基盤
 - `outputs/jobs/<job-id>` への成果物保存
-- `docs/ENGINE_PROFILES.md`、`AGENTS.md`、`CLAUDE.md` による Codex / Claude Code 向けエンジン提案ルール
+- `docs/ENGINE_PROFILES.md` と `AGENTS.md` による Codex / Claude Code 向けエンジン提案ルール（`CLAUDE.md` は `AGENTS.md` への薄いポインタ）
 - ライセンス注意の表示
+
+セットアップ:
+
+Michibiki は GitHub Releases で配布しており npmjs.com には公開していません。リポジトリを clone してから依存をインストールします。
+
+```bash
+git clone https://github.com/Takamasa045/michibiki.git
+cd michibiki
+pnpm install
+pnpm build
+pnpm test
+```
+
+必要環境: Node.js 20+、pnpm 9+、ffmpeg（HyperFrames / Editframe の MP4 レンダーに必要）、Chromium / Chrome（`michibiki doctor` で自動検出）。
 
 基本コマンド:
 
 ```bash
-pnpm install
-pnpm build
-pnpm test
-pnpm michibiki create --prompt "AIエージェント勉強会のプロモ動画を30秒で作りたい。"
 pnpm michibiki doctor
+pnpm michibiki decide --prompt "AIエージェント勉強会のプロモ動画を30秒で作りたい。"
+pnpm michibiki create --prompt "AIエージェント勉強会のプロモ動画を30秒で作りたい。"
 pnpm michibiki preview --job outputs/jobs/<job-id>
 pnpm michibiki generate --prompt "AIエージェント勉強会のプロモ動画を30秒で作りたい。"
 ```
@@ -223,159 +250,3 @@ pnpm michibiki generate --prompt "AIエージェント勉強会のプロモ動�
 
 各エンジン本体は、それぞれの公式ライセンス・利用条件に従います。
 商用利用・チーム利用・SaaS利用を行う場合は、各ツールのライセンス条件をご確認ください。
-
-## 简体中文
-
-Michibiki 是一个 AI 视频制作路由器。它会把自然语言视频需求转换为 `VideoSpec`，然后在 Remotion / HyperFrames / Editframe 中选择最合适的视频生成或编辑引擎。
-
-当前版本支持 Remotion 项目生成和渲染，也支持 HyperFrames 的 HTML/CSS/JS 生成与本地 MP4 渲染，以及 Editframe 的 `timeline.json` 生成与本地 MP4 时间线预览。Remotion 默认使用 `auto` 模式：有 Remotion Studio Monorepo 时使用它，没有时在任务目录中生成 standalone 官方 Remotion 项目。HyperFrames/Editframe 通过 headless Chrome 和 ffmpeg 渲染。
-
-主要功能:
-
-- 从自然语言提示生成 `VideoSpec`
-- 自动选择视频引擎，并输出 Remotion / HyperFrames / Editframe 的相对适合度
-- 输出 `selectionGuide`、`bestUse` 和 `featureHighlights`
-- 通过 Remotion auto 模式生成 Monorepo 或 standalone 官方项目
-- 生成 HyperFrames HTML/CSS/JS 项目并渲染 MP4
-- 生成 Editframe timeline handoff 并渲染 MP4 时间线预览
-- 将结果保存到 `outputs/jobs/<job-id>`
-- 显示第三方引擎的许可证提醒
-
-基本命令:
-
-```bash
-pnpm install
-pnpm build
-pnpm test
-pnpm michibiki create --prompt "Create a 30-second vertical event promo video."
-pnpm michibiki doctor
-pnpm michibiki preview --job outputs/jobs/<job-id>
-pnpm michibiki generate --prompt "Create a 30-second vertical event promo video."
-```
-
-许可证说明:
-
-本仓库的原创代码使用 MIT License。第三方引擎仍受各自许可证和官方条款约束。
-
-- HyperFrames - Apache-2.0
-- Remotion - Remotion License
-- Editframe - Editframe 官方条款和价格政策
-
-商业、团队或 SaaS 使用前，请确认各工具的官方许可条件。
-
-## 한국어
-
-Michibiki는 자연어 영상 제작 요청을 `VideoSpec`으로 변환하고, Remotion / HyperFrames / Editframe 중 가장 적합한 영상 제작 엔진을 선택하는 AI 영상 제작 라우터입니다.
-
-현재 버전은 Remotion 프로젝트 생성/렌더링, HyperFrames HTML/CSS/JS 생성과 로컬 MP4 렌더링, Editframe `timeline.json` 생성과 로컬 MP4 타임라인 프리뷰를 지원합니다. Remotion은 기본적으로 `auto` 모드로 실행됩니다. Remotion Studio Monorepo가 있으면 이를 사용하고, 없으면 작업 디렉터리에 standalone 공식 Remotion 프로젝트를 생성합니다. HyperFrames/Editframe은 headless Chrome과 ffmpeg로 렌더링합니다.
-
-주요 기능:
-
-- 자연어 프롬프트에서 `VideoSpec` 생성
-- Engine Router를 통한 엔진 선택과 Remotion / HyperFrames / Editframe 상대 적합도 출력
-- `selectionGuide`, `bestUse`, `featureHighlights` 출력
-- Remotion auto 모드로 Monorepo 또는 standalone 공식 프로젝트 생성
-- HyperFrames HTML/CSS/JS 프로젝트 생성 및 MP4 렌더링
-- Editframe timeline handoff 생성 및 MP4 타임라인 프리뷰 렌더링
-- `outputs/jobs/<job-id>`에 결과 저장
-- 외부 엔진 라이선스 안내 표시
-
-기본 명령:
-
-```bash
-pnpm install
-pnpm build
-pnpm test
-pnpm michibiki create --prompt "Create a 30-second vertical event promo video."
-pnpm michibiki doctor
-pnpm michibiki preview --job outputs/jobs/<job-id>
-pnpm michibiki generate --prompt "Create a 30-second vertical event promo video."
-```
-
-라이선스 안내:
-
-이 저장소의 자체 작성 코드는 MIT License로 제공됩니다. 외부 엔진은 각각의 공식 라이선스와 이용 약관을 따릅니다.
-
-- HyperFrames - Apache-2.0
-- Remotion - Remotion License
-- Editframe - Editframe 공식 약관 및 가격 정책
-
-상업적 사용, 팀 사용, SaaS 사용 전에는 각 도구의 공식 라이선스 조건을 확인하세요.
-
-## Español
-
-Michibiki es un enrutador de producción de video con IA. Convierte una solicitud en lenguaje natural en un `VideoSpec`, selecciona el motor de video más adecuado y crea un proyecto generado o una salida de render.
-
-La versión actual admite generación y renderizado con Remotion, generación HTML/CSS/JS y renderizado MP4 local para HyperFrames, y generación `timeline.json` con previsualización MP4 local para Editframe. Remotion usa el modo `auto` por defecto: utiliza el Remotion Studio Monorepo cuando existe y, si no, crea un proyecto oficial standalone de Remotion dentro del trabajo. HyperFrames/Editframe renderizan con headless Chrome y ffmpeg.
-
-Funciones principales:
-
-- Generar `VideoSpec` desde un prompt en lenguaje natural
-- Seleccionar automáticamente el motor de video y mostrar el ajuste relativo de Remotion / HyperFrames / Editframe
-- Generar `selectionGuide`, `bestUse` y `featureHighlights`
-- Crear proyectos Remotion mediante Monorepo o standalone oficial con modo auto
-- Generar proyectos HTML/CSS/JS para HyperFrames y renderizar MP4
-- Generar handoffs `timeline.json` para Editframe y renderizar previsualizaciones MP4
-- Guardar resultados en `outputs/jobs/<job-id>`
-- Mostrar avisos de licencia para motores externos
-
-Comandos básicos:
-
-```bash
-pnpm install
-pnpm build
-pnpm test
-pnpm michibiki create --prompt "Create a 30-second vertical event promo video."
-pnpm michibiki doctor
-pnpm michibiki preview --job outputs/jobs/<job-id>
-pnpm michibiki generate --prompt "Create a 30-second vertical event promo video."
-```
-
-Licencia:
-
-El código original de este repositorio está publicado bajo MIT License. Cada motor externo se rige por su propia licencia y sus términos oficiales.
-
-- HyperFrames - Apache-2.0
-- Remotion - Remotion License
-- Editframe - términos y precios oficiales de Editframe
-
-Antes de usarlo con fines comerciales, en equipo o como SaaS, revisa las condiciones oficiales de cada herramienta.
-
-## Français
-
-Michibiki est un routeur de production vidéo basé sur l'IA. Il transforme une demande en langage naturel en `VideoSpec`, choisit le moteur vidéo le plus adapté, puis crée un projet généré ou une sortie de rendu.
-
-La version actuelle prend en charge la génération et le rendu Remotion, la génération HTML/CSS/JS et le rendu MP4 local pour HyperFrames, ainsi que la génération `timeline.json` avec aperçu MP4 local pour Editframe. Remotion utilise le mode `auto` par défaut: il utilise le Remotion Studio Monorepo s'il existe, sinon il crée un projet officiel standalone Remotion dans le dossier du job. HyperFrames/Editframe rendent via headless Chrome et ffmpeg.
-
-Fonctionnalités principales:
-
-- Générer un `VideoSpec` à partir d'un prompt en langage naturel
-- Sélectionner automatiquement le moteur vidéo et afficher l'adéquation relative de Remotion / HyperFrames / Editframe
-- Générer `selectionGuide`, `bestUse` et `featureHighlights`
-- Créer des projets Remotion via Monorepo ou standalone officiel en mode auto
-- Générer des projets HTML/CSS/JS pour HyperFrames et rendre en MP4
-- Générer des handoffs `timeline.json` pour Editframe et rendre des aperçus MP4
-- Enregistrer les résultats dans `outputs/jobs/<job-id>`
-- Afficher les avertissements de licence pour les moteurs externes
-
-Commandes de base:
-
-```bash
-pnpm install
-pnpm build
-pnpm test
-pnpm michibiki create --prompt "Create a 30-second vertical event promo video."
-pnpm michibiki doctor
-pnpm michibiki preview --job outputs/jobs/<job-id>
-pnpm michibiki generate --prompt "Create a 30-second vertical event promo video."
-```
-
-Licence:
-
-Le code original de ce dépôt est publié sous MIT License. Chaque moteur externe reste soumis à sa propre licence et à ses conditions officielles.
-
-- HyperFrames - Apache-2.0
-- Remotion - Remotion License
-- Editframe - conditions et tarifs officiels d'Editframe
-
-Avant une utilisation commerciale, en équipe ou en SaaS, vérifiez les conditions officielles de chaque outil.
