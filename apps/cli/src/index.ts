@@ -131,6 +131,7 @@ async function generate(args: ReturnType<typeof parseArgs>): Promise<void> {
     engineFits: decision.engineFits,
     selectionGuide: decision.selectionGuide,
     switchHints: decision.switchHints,
+    clarifyingQuestions: decision.clarifyingQuestions,
     fallback: decision.fallback,
     licenseMessage: license.message,
     projectPath: project?.rootPath,
@@ -155,6 +156,7 @@ function decide(args: ReturnType<typeof parseArgs>): void {
     engineFits: decision.engineFits,
     selectionGuide: decision.selectionGuide,
     switchHints: decision.switchHints,
+    clarifyingQuestions: decision.clarifyingQuestions,
     fallback: decision.fallback,
     licenseMessage: license.message
   });
@@ -308,6 +310,7 @@ function printGenerateSummary(params: {
   engineFits: EngineFit[];
   selectionGuide: string;
   switchHints: SwitchHint[];
+  clarifyingQuestions: string[];
   fallback?: EngineName;
   licenseMessage: string;
   projectPath?: string;
@@ -333,6 +336,7 @@ function printGenerateSummary(params: {
   console.log(`Strengths: ${params.recommendation.strengths.join("; ")}`);
   console.log(`Tradeoffs: ${params.recommendation.tradeoffs.join("; ")}`);
   printSwitchHints(params.switchHints);
+  printClarifyingQuestions(params.clarifyingQuestions);
   if (params.fallback) {
     console.log(`Fallback: ${params.fallback}`);
   }
@@ -361,6 +365,7 @@ function printDecisionSummary(params: {
   engineFits: EngineFit[];
   selectionGuide: string;
   switchHints: SwitchHint[];
+  clarifyingQuestions: string[];
   fallback?: EngineName;
   licenseMessage: string;
 }): void {
@@ -384,6 +389,7 @@ function printDecisionSummary(params: {
   console.log(`Strengths: ${params.recommendation.strengths.join("; ")}`);
   console.log(`Tradeoffs: ${params.recommendation.tradeoffs.join("; ")}`);
   printSwitchHints(params.switchHints);
+  printClarifyingQuestions(params.clarifyingQuestions);
   if (params.fallback) {
     console.log(`Fallback: ${params.fallback}`);
   }
@@ -397,6 +403,14 @@ function printSwitchHints(hints: SwitchHint[]): void {
     console.log(`- → ${hint.targetEngine}`);
     console.log(`  When: ${hint.condition}`);
     console.log(`  Why:  ${hint.why}`);
+  }
+}
+
+function printClarifyingQuestions(questions: string[]): void {
+  if (!questions.length) return;
+  console.log("Clarifying question:");
+  for (const question of questions) {
+    console.log(`- ${question}`);
   }
 }
 

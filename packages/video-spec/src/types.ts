@@ -90,6 +90,7 @@ export type EngineDecision = {
   engineFits: EngineFit[];
   selectionGuide: string;
   switchHints: SwitchHint[];
+  clarifyingQuestions: string[];
   licenseRisk: "low" | "medium" | "high";
   fallback?: EngineName;
 };

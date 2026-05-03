@@ -183,6 +183,72 @@ describe("selectEngine", () => {
       expect(decision.engine).toBe("editframe");
     });
 
+    describe("negation and meta-reference handling", () => {
+      const negationCases = [
+        {
+          name: "verb-negation suppresses LP signal: LPは作らないが",
+          prompt: "LPは作らないが、シンプルな企業ロゴアニメだけ",
+          expected: "remotion"
+        },
+        {
+          name: "verb-negation suppresses GSAP signal: GSAPは使わない",
+          prompt: "GSAPは使わない、ピュアなReactモーション",
+          expected: "remotion"
+        },
+        {
+          name: "post-keyword negation suppresses ナレーション: ナレーションは無い",
+          prompt: "キネティックタイポを中心にしたい、ナレーションは無い",
+          expected: "remotion"
+        },
+        {
+          name: "meta reference suppresses 動画編集 when used as topic, not intent",
+          prompt: "動画編集の話を取り上げる解説動画",
+          expected: "remotion"
+        },
+        {
+          name: "router only reads spec.goal so auto-inferred title (Website Trailer) cannot revive negated LP signal",
+          prompt: "LPは作らないが、ロゴアニメだけ",
+          expected: "remotion"
+        }
+      ] as const;
+
+      for (const testCase of negationCases) {
+        it(testCase.name, () => {
+          const decision = selectEngine(
+            createVideoSpecFromPrompt({ prompt: testCase.prompt })
+          );
+          expect(decision.engine).toBe(testCase.expected);
+        });
+      }
+    });
+
+    it("emits a clarifying question when top vs runner-up margin ≤ 8%", () => {
+      const decision = selectEngine(
+        createVideoSpecFromPrompt({
+          prompt:
+            "LP風セクションでクリップを動画埋め込み風に見せたい、HTMLとCSSで組みたい",
+          assetSources: ["./clip.mp4"]
+        })
+      );
+      const sorted = [...decision.engineFits].sort(
+        (left, right) => right.fitPercent - left.fitPercent
+      );
+      const margin = (sorted[0]?.fitPercent ?? 0) - (sorted[1]?.fitPercent ?? 0);
+      if (margin <= 8) {
+        expect(decision.clarifyingQuestions.length).toBeGreaterThan(0);
+        expect(decision.clarifyingQuestions[0]).toMatch(/Two engines/);
+      }
+    });
+
+    it("returns no clarifying question when the lead is decisive", () => {
+      const decision = selectEngine(
+        createVideoSpecFromPrompt({
+          prompt: "GSAPの既存スクロール演出を動画化したい"
+        })
+      );
+      expect(decision.clarifyingQuestions).toEqual([]);
+    });
+
     it("close-call selectionGuide warns when top vs runner-up margin is small", () => {
       const decision = selectEngine(
         createVideoSpecFromPrompt({

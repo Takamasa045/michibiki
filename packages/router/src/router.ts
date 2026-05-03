@@ -39,6 +39,10 @@ export function selectEngine(spec: VideoSpec): EngineDecision {
       : enginePreference;
   const selectedFit = getEngineFit(engineFits, selectedEngine);
   const switchHints = buildSwitchHints(engineFits, selectedEngine, signals);
+  const clarifyingQuestions = buildClarifyingQuestions(
+    engineFits,
+    selectedEngine
+  );
 
   if (enginePreference !== "auto") {
     return {
@@ -49,21 +53,83 @@ export function selectEngine(spec: VideoSpec): EngineDecision {
       engineFits,
       selectionGuide: buildSelectionGuide(engineFits, selectedEngine),
       switchHints,
+      clarifyingQuestions: [],
       licenseRisk: defaultLicenseRisk(selectedEngine)
     };
   }
 
   return {
     engine: selectedEngine,
-    confidence: selectedFit.fitPercent / 100,
+    confidence: computeConfidence(engineFits, selectedFit.fitPercent),
     reason: selectedFit.reason,
     recommendation: selectedFit.recommendation,
     engineFits,
     selectionGuide: buildSelectionGuide(engineFits, selectedEngine),
     switchHints,
+    clarifyingQuestions,
     licenseRisk: defaultLicenseRisk(selectedEngine),
     fallback: getFallbackEngine(engineFits, selectedEngine)
   };
+}
+
+function computeConfidence(
+  engineFits: EngineFit[],
+  selectedPercent: number
+): number {
+  const sorted = [...engineFits].sort(
+    (left, right) => right.fitPercent - left.fitPercent
+  );
+  const runnerUp = sorted.find((fit) => fit.fitPercent < selectedPercent);
+  if (!runnerUp) return 0.5;
+  const margin = selectedPercent - runnerUp.fitPercent;
+  const marginFactor = Math.min(1, margin / 25);
+  return Math.round((selectedPercent / 100) * marginFactor * 100) / 100;
+}
+
+function buildClarifyingQuestions(
+  engineFits: EngineFit[],
+  selectedEngine: EngineName
+): string[] {
+  const sorted = [...engineFits].sort(
+    (left, right) => right.fitPercent - left.fitPercent
+  );
+  const top = sorted[0];
+  const second = sorted[1];
+  if (!top || !second) return [];
+  const margin = top.fitPercent - second.fitPercent;
+  if (margin > 8) return [];
+
+  const pair = orderEnginePair(top.engine, second.engine);
+  return [buildClarifyingQuestion(pair, selectedEngine)];
+}
+
+function orderEnginePair(
+  a: EngineName,
+  b: EngineName
+): readonly [EngineName, EngineName] {
+  const order: EngineName[] = ["remotion", "hyperframes", "editframe"];
+  const sorted = [a, b].sort((left, right) => order.indexOf(left) - order.indexOf(right));
+  return [sorted[0]!, sorted[1]!] as const;
+}
+
+const PAIR_QUESTIONS: Record<string, string> = {
+  "remotion|hyperframes":
+    "Two engines tied: should this video feel like (A) a coded React motion piece with custom typography and choreography (Remotion), or (B) a Web/LP-style page captured as motion (HyperFrames)?",
+  "remotion|editframe":
+    "Two engines tied: should this video feel like (A) a coded motion piece with kinetic typography and reusable structure (Remotion), or (B) an edited timeline with captions, narration, BGM sync, and layered media (Editframe)?",
+  "hyperframes|editframe":
+    "Two engines tied: should this video feel like (A) a Web/LP page becoming motion with HTML/CSS/JS (HyperFrames), or (B) an edited timeline with captions, narration, BGM sync, and layered media (Editframe)?"
+};
+
+function buildClarifyingQuestion(
+  pair: readonly [EngineName, EngineName],
+  selectedEngine: EngineName
+): string {
+  const key = `${pair[0]}|${pair[1]}`;
+  const base =
+    PAIR_QUESTIONS[key] ??
+    "Two engines are nearly tied. Which direction fits the creative intent better?";
+  return `${base} Currently leaning ${selectedEngine} by a small margin — answer A or B (or pass --engine) to lock it in.`;
 }
 
 function defaultLicenseRisk(engine: EngineName): EngineDecision["licenseRisk"] {
@@ -72,17 +138,45 @@ function defaultLicenseRisk(engine: EngineName): EngineDecision["licenseRisk"] {
 }
 
 function normalizedUserRequestText(spec: VideoSpec): string {
-  return [
-    spec.title,
-    spec.goal,
-    spec.content.script,
-    spec.content.cta,
-    ...(spec.content.captions ?? []),
-    ...(spec.content.scenes?.map((scene) => scene.description) ?? [])
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
+  // Use only the raw user prompt (spec.goal) plus an explicitly user-provided
+  // CTA. spec.title / spec.content.script / spec.content.captions /
+  // spec.content.scenes are heuristically inferred from the prompt by
+  // from-prompt.ts and re-introduce keywords without their negation context
+  // (e.g. an "LPは作らない" prompt gets a "Website Trailer" title that
+  // would falsely re-fire the web/DOM signal). We deliberately do not look
+  // at those derived fields when extracting routing signals.
+  return [spec.goal, spec.content.cta].filter(Boolean).join(" ").toLowerCase();
+}
+
+const NEGATION_AFTER =
+  /^(?:[\s　]*(?:を|は|も|の|が|に|で|と|から|まで)?\s*)(?:なし|無し|不要|要らない|不必要|ない|なく(?:て)?|じゃない|ではない|ではなく|以外|は(?:な|無)い|抜き|抜きで)/i;
+
+const VERB_NEGATION_AFTER =
+  /^(?:[\s　]*(?:を|は|も|の|が|に|で|と|から|まで)?\s*)[一-龯々ぁ-んァ-ヶー]{0,6}[ぁ-ん](?:ない|なかった|ません|ませんでした|ぬ|なくて|なくても)/i;
+
+const META_AFTER =
+  /^(?:[\s　]*(?:を|は|も|の|が|に|と)?\s*)(?:について|の話|を解説|を解説する|を取り上げ|を取り上げる|に関する|の説明|の概要|に触れ|の例|を題材|の例として)/i;
+
+const NEGATION_BEFORE =
+  /(?:なし|無し|不要|不必要|なく|じゃなく|ではなく|以外|抜き|抜きで|without|no\s)\s*(?:[、。\s]|の|で|な)?\s*$/i;
+
+function hasContextualMatch(text: string, pattern: RegExp): boolean {
+  const flags = pattern.flags.includes("g")
+    ? pattern.flags
+    : `${pattern.flags}g`;
+  const globalPattern = new RegExp(pattern.source, flags);
+  let match: RegExpExecArray | null;
+  while ((match = globalPattern.exec(text)) !== null) {
+    const matchEnd = match.index + match[0].length;
+    const tail = text.substring(matchEnd, matchEnd + 20);
+    const head = text.substring(Math.max(0, match.index - 16), match.index);
+    if (NEGATION_AFTER.test(tail)) continue;
+    if (VERB_NEGATION_AFTER.test(tail)) continue;
+    if (META_AFTER.test(tail)) continue;
+    if (NEGATION_BEFORE.test(head)) continue;
+    return true;
+  }
+  return false;
 }
 
 function getRouterSignals(spec: VideoSpec): RouterSignals {
@@ -124,68 +218,79 @@ function getRouterSignals(spec: VideoSpec): RouterSignals {
 }
 
 function mentionsTimelineEditing(text: string): boolean {
-  return /(timeline|タイムライン|字幕|caption|subtitle|b-roll|broll|カット編集|vlog|音声|voice|narration|ナレーション|bgm|背景音楽|sound design|サウンドデザイン|編集する|動画編集|effects? edit|エディトリアル|editorial|スライドショー|slide\s?show|フォトムービー|photo\s?movie)/i.test(
-    text
+  return hasContextualMatch(
+    text,
+    /(timeline|タイムライン|字幕|caption|subtitle|b-roll|broll|カット編集|vlog|音声|voice|narration|ナレーション|bgm|背景音楽|sound design|サウンドデザイン|編集する|動画編集|編集動画|video\s+edit(?:ing)?|edit(?:ing)?\s+(?:a\s+)?video|effects? edit|エディトリアル|editorial|スライドショー|slide\s?show|フォトムービー|photo\s?movie)/i
   );
 }
 
 function mentionsTransitionsOrOverlays(text: string): boolean {
-  return /(トランジション|transition|オーバーレイ|overlay|クロスフェード|crossfade|ピクチャインピクチャ|picture[- ]in[- ]picture|pip|ロワーサード|lower[- ]?third|テロップ|テキスト合成|chyron)/i.test(
-    text
+  return hasContextualMatch(
+    text,
+    /(トランジション|transition|オーバーレイ|overlay|クロスフェード|crossfade|ピクチャインピクチャ|picture[- ]in[- ]picture|pip|ロワーサード|lower[- ]?third|テロップ|テキスト合成|chyron)/i
   );
 }
 
 function mentionsWebDomWorkflow(text: string): boolean {
-  return /(webサイト|website|web\s?page|webページ|landing page|ランディングページ|\blp\b|dom|html|css|javascript|gsap|スクロール|セクション|section|サイト動画化|page-to-video|プロダクトページ|商品ページ|webflow|framer)/i.test(
-    text
+  return hasContextualMatch(
+    text,
+    /(webサイト|website|web\s?page|webページ|landing page|ランディングページ|\blp\b|dom|html|css|javascript|gsap|スクロール|セクション|section|サイト動画化|page-to-video|プロダクトページ|商品ページ|webflow|framer)/i
   );
 }
 
 function mentionsAvatarOrTalkingHead(text: string): boolean {
-  return /(アバター|avatar|talking[- ]?head|toking head|トーキングヘッド|ai presenter|aiプレゼンター|virtual presenter|バーチャルプレゼンター|heygen)/i.test(
-    text
+  return hasContextualMatch(
+    text,
+    /(アバター|avatar|talking[- ]?head|toking head|トーキングヘッド|ai presenter|aiプレゼンター|virtual presenter|バーチャルプレゼンター|heygen)/i
   );
 }
 
 function mentionsDataDrivenOrTemplateWorkflow(text: string): boolean {
-  return /(react|remotion|テンプレート|template|csv|data-driven|データ駆動|props|量産|自動レンダリング|バッチレンダ|batch render|バリアント|variant|スプレッドシート|spreadsheet)/i.test(
-    text
+  return hasContextualMatch(
+    text,
+    /(react|remotion|テンプレート|template|csv|data-driven|データ駆動|props|量産|自動レンダリング|バッチレンダ|batch render|バリアント|variant|スプレッドシート|spreadsheet)/i
   );
 }
 
 function mentionsDataVisualization(text: string): boolean {
-  return /(ダッシュボード|dashboard|チャート|chart|グラフ|graph|data\s?viz|データ可視化|可視化|kpi|メトリクス|metrics|アナリティクス|analytics|プロット|plot)/i.test(
-    text
+  return hasContextualMatch(
+    text,
+    /(ダッシュボード|dashboard|チャート|chart|グラフ|graph|data\s?viz|データ可視化|可視化|kpi|メトリクス|metrics|アナリティクス|analytics|プロット|plot)/i
   );
 }
 
 function mentionsExplainerOrTutorial(text: string): boolean {
-  return /(解説動画|解説ビデオ|explainer|tutorial|チュートリアル|how[- ]?to|ハウツー|how it works|仕組み解説|エデュケーション動画|education video|onboarding|オンボーディング)/i.test(
-    text
+  return hasContextualMatch(
+    text,
+    /(解説動画|解説ビデオ|explainer|tutorial|チュートリアル|how[- ]?to|ハウツー|how it works|仕組み解説|エデュケーション動画|education video|onboarding|オンボーディング)/i
   );
 }
 
 function mentionsLyricOrMusicVideo(text: string): boolean {
-  return /(\bmv\b|music\s?video|ミュージックビデオ|リリックビデオ|lyric\s?video|歌詞動画|歌詞付き)/i.test(
-    text
+  return hasContextualMatch(
+    text,
+    /(\bmv\b|music\s?video|ミュージックビデオ|リリックビデオ|lyric\s?video|歌詞動画|歌詞付き)/i
   );
 }
 
 function mentionsCodedMotionDesign(text: string): boolean {
-  return /(kinetic typo|キネティックタイポ|タイポグラフィ|typography|spring|easing|frame-accurate|フレーム精度|モーショングラフィックス|motion graphics|motion design|モーションデザイン|three\.?js|react three fiber|r3f|lottie|パララックス|parallax|シェーダー|shader)/i.test(
-    text
+  return hasContextualMatch(
+    text,
+    /(kinetic typo|キネティックタイポ|タイポグラフィ|typography|spring|easing|frame-accurate|フレーム精度|モーショングラフィックス|motion graphics|motion design|モーションデザイン|three\.?js|react three fiber|r3f|lottie|パララックス|parallax|シェーダー|shader)/i
   );
 }
 
 function mentionsCloudBatchRender(text: string): boolean {
-  return /(\blambda\b|aws lambda|cloud render|クラウドレンダ|クラウドレンダリング|バッチレンダ|batch render|大量レンダ|多変量|n\s*variants?|何百本|何千本)/i.test(
-    text
+  return hasContextualMatch(
+    text,
+    /(\blambda\b|aws lambda|cloud render|クラウドレンダ|クラウドレンダリング|バッチレンダ|batch render|大量レンダ|多変量|n\s*variants?|何百本|何千本)/i
   );
 }
 
 function mentionsWebinarRecap(text: string): boolean {
-  return /(ウェビナー|webinar|recap|リキャップ|ダイジェスト|digest|ハイライト動画|highlight\s+video|登壇|conference\s+recap|キーノート|keynote)/i.test(
-    text
+  return hasContextualMatch(
+    text,
+    /(ウェビナー|webinar|recap|リキャップ|ダイジェスト|digest|ハイライト動画|highlight\s+video|登壇|conference\s+recap|キーノート|keynote)/i
   );
 }
 
