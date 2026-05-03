@@ -126,11 +126,16 @@ pnpm michibiki inspect --job outputs/jobs/<job-id>
 pnpm michibiki render --job outputs/jobs/<job-id>
 ```
 
-Render during generation:
+Recommended pipeline (4 stages, each opt-in):
 
 ```bash
-pnpm michibiki generate --prompt "..." --render
+pnpm michibiki decide --prompt "..."                                   # 1. inspect engineFits, no side effects
+pnpm michibiki generate --prompt "..." [--engine X]                    # 2. project files only
+pnpm michibiki preview --job outputs/jobs/<id>                         # 3. validate (headless browser for HyperFrames/Editframe)
+pnpm michibiki render --job outputs/jobs/<id> --confirm-render         # 4. final MP4 (gated)
 ```
+
+`generate` no longer auto-runs preview. Pass `--preview` to opt in. `--render` requires `--confirm-render` to actually run an MP4 — this prevents agents from rendering without explicit user approval.
 
 Force a specific engine:
 
@@ -158,9 +163,9 @@ Runnable examples are in `examples/`. They cover multiple entry points, not only
 
 ```bash
 pnpm michibiki create --duration 3 --prompt "$(cat examples/event-promo/prompt.txt)"
-pnpm michibiki generate --duration 1 --render --prompt "$(cat examples/lp-trailer/prompt.txt)"
+pnpm michibiki generate --duration 1 --render --confirm-render --prompt "$(cat examples/lp-trailer/prompt.txt)"
 pnpm michibiki create --duration 3 --prompt "$(cat examples/data-video/brief.json)"
-pnpm michibiki generate --duration 1 --asset examples/asset-short/input/clip.mp4 --asset examples/asset-short/input/voice.mp3 --render --prompt "$(cat examples/asset-short/prompt.txt)"
+pnpm michibiki generate --duration 1 --asset examples/asset-short/input/clip.mp4 --asset examples/asset-short/input/voice.mp3 --render --confirm-render --prompt "$(cat examples/asset-short/prompt.txt)"
 pnpm michibiki create --engine remotion --remotion-mode standalone --duration 3 --prompt "$(cat examples/event-promo/prompt.txt)"
 ```
 

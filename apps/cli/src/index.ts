@@ -122,19 +122,32 @@ async function generate(args: ReturnType<typeof parseArgs>): Promise<void> {
       dryRun: hasFlag(args, "dry-run")
     });
 
-    previewResult = await engine.preview(project);
-    previewResultPath = await writePreviewResult(paths.jobDir, previewResult);
+    if (hasFlag(args, "preview")) {
+      previewResult = await engine.preview(project);
+      previewResultPath = await writePreviewResult(paths.jobDir, previewResult);
+    }
 
     if (hasFlag(args, "render")) {
-      const renderResult = await engine.render(project, {
-        outputDir: paths.jobDir,
-        logDir: paths.logDir,
-        skipBuildPackages: hasFlag(args, "skip-build-packages")
-      });
-      renderMessage = renderResult.message;
-      renderOutputPath = renderResult.outputPath;
-      if (!renderResult.ok) {
-        process.exitCode = 1;
+      if (!hasFlag(args, "confirm-render")) {
+        console.log("");
+        console.log(
+          "Render gate: --render was set, but MP4 rendering needs explicit user approval."
+        );
+        console.log(
+          "Re-run the same command with --confirm-render once the user has approved the final render."
+        );
+        process.exitCode = 2;
+      } else {
+        const renderResult = await engine.render(project, {
+          outputDir: paths.jobDir,
+          logDir: paths.logDir,
+          skipBuildPackages: hasFlag(args, "skip-build-packages")
+        });
+        renderMessage = renderResult.message;
+        renderOutputPath = renderResult.outputPath;
+        if (!renderResult.ok) {
+          process.exitCode = 1;
+        }
       }
     }
   }
@@ -215,6 +228,17 @@ async function render(args: ReturnType<typeof parseArgs>): Promise<void> {
   const job = getValue(args, "job") ?? args.positionals[0];
   if (!job) {
     throw new Error("Missing job. Use michibiki render --job outputs/jobs/<job-id>.");
+  }
+
+  if (!hasFlag(args, "confirm-render")) {
+    console.log(
+      "Render gate: MP4 rendering needs explicit user approval before it runs."
+    );
+    console.log(
+      "Re-run the same command with --confirm-render once the user has approved the final render."
+    );
+    process.exitCode = 2;
+    return;
   }
 
   const { jobDir, manifest, project } = await loadGeneratedProject(job);
@@ -301,10 +325,18 @@ Decide/generate options:
   --output-type <type>        mp4, webm, project, code, preview
   --remotion-repo <path>      Override Remotion monorepo path
   --remotion-mode <mode>      auto, monorepo, standalone
-  --render                    Render after project generation
+  --preview                   Run preview after project generation (opt-in; HyperFrames/Editframe preview launches headless Chrome + ffmpeg)
+  --render                    Render the final MP4 after project generation (still requires --confirm-render to actually run)
+  --confirm-render            Required acknowledgement that MP4 rendering is intended; protects against accidental render runs by agents
   --dry-run                   Remotion monorepo only: write job files without running engine commands
   --resolve-ambiguity         Proceed with the auto recommendation even when the router cannot decide between two engines (top vs runner-up margin ≤ 8%)
   --allow-license-risk        Proceed even when license guard flags risk
+
+Recommended sequence (the steps the agent rules expect):
+  1. michibiki decide --prompt "..."                          (no side effects)
+  2. michibiki generate --prompt "..." [--engine X]           (creates project files only)
+  3. michibiki preview --job outputs/jobs/<id>                (run preview to validate)
+  4. michibiki render --job outputs/jobs/<id> --confirm-render (final MP4)
 `);
 }
 

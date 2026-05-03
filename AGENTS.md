@@ -48,9 +48,19 @@
 
 生成・レンダー実行の承認境界:
 
-- エンジン比較や制作方針提案のために `michibiki generate` / `michibiki create` / `michibiki render` / `michibiki preview` を実行しない。`generate --dry-run` も判定専用ではないため使わない。
-- 生成プロジェクト作成へ進むには、尺、アスペクト、用途、トーン、CTA、使用エンジンへの合意が揃っていることを確認する。
-- MP4レンダーは「レンダーして」「MP4まで」「完成動画を出して」などの明示依頼がある場合のみ実行する。
+ルーターは 4 段階で動く。各ステージは独立で、エージェントは必ず順番に進める:
+
+1. `michibiki decide --prompt "..."` — 副作用なし。エンジン比較と方針提案のみ。
+2. `michibiki generate --prompt "..." [--engine X]` — プロジェクトファイル生成のみ。preview/render は走らせない。
+3. `michibiki preview --job outputs/jobs/<id>` — preview 起動（HyperFrames/Editframe では headless Chrome + ffmpeg のフレームキャプチャが走る、副作用あり）。
+4. `michibiki render --job outputs/jobs/<id> --confirm-render` — 最終 MP4 レンダー。`--confirm-render` 無しでは実行されず exit code 2 で停止する。
+
+ルール:
+
+- エンジン比較や制作方針提案のために `generate` / `create` / `render` / `preview` を実行しない。`generate --dry-run` も判定専用ではないため使わない。
+- ステージ 2（`generate`）へ進むには、尺、アスペクト、用途、トーン、CTA、使用エンジンへの合意が揃っていることを確認する。
+- ステージ 3（`preview`）へ進むには、`generate` の出力（プロジェクト構成、コピー、シーン）をユーザーが確認してから実行する。`generate --preview` で同時実行することも可能だが、その場合も事前合意が必要。
+- ステージ 4（`render`）は「レンダーして」「MP4まで」「完成動画を出して」などの明示依頼があり、かつ preview の結果に問題がない場合のみ実行する。`--confirm-render` を必ず付ける。CLI ゲートが exit 2 で止めるが、エージェントはユーザー合意なくこのフラグを付けてはならない。
 - 「生成まで依頼している場合は推奨エンジンで進めてよい」と解釈できる場面でも、上記の合意が不足している場合は、生成・編集・レンダーへ進まず確認する。
 
 Skill 利用ルール:
