@@ -10,9 +10,11 @@ import type {
 type RouterSignals = {
   hasVideoOrAudioAssets: boolean;
   hasUrlAsset: boolean;
+  urlIsReferenceOnly: boolean;
   mentionsTimelineEditing: boolean;
   mentionsWebDomWorkflow: boolean;
   mentionsDataDrivenOrTemplateWorkflow: boolean;
+  mentionsCodedMotionDesign: boolean;
   mentionsShortSocialWorkflow: boolean;
   mentionsPromoWorkflow: boolean;
 };
@@ -75,17 +77,20 @@ function normalizedUserRequestText(spec: VideoSpec): string {
 
 function getRouterSignals(spec: VideoSpec): RouterSignals {
   const text = normalizedUserRequestText(spec);
+  const hasUrlAsset = spec.assets.some((asset) => asset.type === "url");
   return {
     hasVideoOrAudioAssets: spec.assets.some(
       (asset) => asset.type === "video" || asset.type === "audio"
     ),
-    hasUrlAsset: spec.assets.some((asset) => asset.type === "url"),
+    hasUrlAsset,
+    urlIsReferenceOnly: hasUrlAsset && urlIsReferenceOnly(text),
     mentionsTimelineEditing: mentionsTimelineEditing(text),
     mentionsWebDomWorkflow: mentionsWebDomWorkflow(text),
     mentionsDataDrivenOrTemplateWorkflow:
       mentionsDataDrivenOrTemplateWorkflow(text),
+    mentionsCodedMotionDesign: mentionsCodedMotionDesign(text),
     mentionsShortSocialWorkflow:
-      /(shorts?|reels?|tiktok|ショート|縦型|縦長|字幕)/i.test(text),
+      /(shorts?|reels?|tiktok|ショート|縦型|縦長)/i.test(text),
     mentionsPromoWorkflow:
       /(イベント|告知|開催|商品|プロダクト|ec|広告|promo|promotion|ad\b|lp)/i.test(
         text
@@ -94,19 +99,31 @@ function getRouterSignals(spec: VideoSpec): RouterSignals {
 }
 
 function mentionsTimelineEditing(text: string): boolean {
-  return /(timeline|タイムライン|字幕|caption|b-roll|broll|カット編集|vlog|素材|音声|voice)/i.test(
+  return /(timeline|タイムライン|字幕|caption|subtitle|b-roll|broll|カット編集|vlog|音声|voice|narration|ナレーション|bgm|背景音楽|sound design|サウンドデザイン|編集する|動画編集|effects? edit)/i.test(
     text
   );
 }
 
 function mentionsWebDomWorkflow(text: string): boolean {
-  return /(webサイト|website|landing page|ランディングページ|\blp\b|dom|html|css|javascript|gsap|スクロール|url)/i.test(
+  return /(webサイト|website|web\s?page|webページ|landing page|ランディングページ|\blp\b|dom|html|css|javascript|gsap|スクロール|セクション|section|サイト動画化|page-to-video|プロダクトページ|商品ページ)/i.test(
     text
   );
 }
 
 function mentionsDataDrivenOrTemplateWorkflow(text: string): boolean {
-  return /(react|remotion|テンプレート|template|json|csv|データ|data-driven|props|量産|自動レンダリング)/i.test(
+  return /(react|remotion|テンプレート|template|csv|data-driven|データ駆動|props|量産|自動レンダリング|バッチレンダ|batch render|バリアント|variant)/i.test(
+    text
+  );
+}
+
+function mentionsCodedMotionDesign(text: string): boolean {
+  return /(kinetic typo|キネティックタイポ|タイポグラフィ|typography|spring|easing|frame-accurate|フレーム精度|モーショングラフィックス|motion graphics|motion design|モーションデザイン|three\.?js|lottie|パララックス|parallax)/i.test(
+    text
+  );
+}
+
+function urlIsReferenceOnly(text: string): boolean {
+  return /(参照|詳細はこちら|詳しくは|reference|see\s+(here|below|the link)|details? at|詳しい情報|リンクは)/i.test(
     text
   );
 }
@@ -195,19 +212,29 @@ function buildEngineFits(spec: VideoSpec, signals: RouterSignals): EngineFit[] {
     scores.remotion -= 4;
     scores.hyperframes -= 4;
   }
-  if (signals.hasUrlAsset || signals.mentionsWebDomWorkflow) {
+  if (signals.mentionsWebDomWorkflow) {
     scores.hyperframes += 48;
     scores.remotion += 4;
     scores.editframe -= 8;
+  } else if (signals.hasUrlAsset && !signals.urlIsReferenceOnly) {
+    scores.hyperframes += 40;
+    scores.remotion += 4;
+    scores.editframe -= 6;
+  } else if (signals.hasUrlAsset && signals.urlIsReferenceOnly) {
+    scores.hyperframes += 12;
   }
   if (signals.mentionsDataDrivenOrTemplateWorkflow) {
     scores.remotion += 36;
     scores.hyperframes += 6;
     scores.editframe -= 4;
   }
+  if (signals.mentionsCodedMotionDesign) {
+    scores.remotion += 30;
+    scores.editframe -= 6;
+  }
   if (signals.mentionsShortSocialWorkflow) {
-    scores.editframe += 8;
-    scores.remotion += 6;
+    scores.editframe += 6;
+    scores.remotion += 8;
   }
   if (signals.mentionsPromoWorkflow) {
     scores.remotion += 12;
@@ -265,8 +292,11 @@ function buildFitReason(engine: EngineName, signals: RouterSignals): string {
     return "HyperFrames can work when the video should feel like a browser-native story with panels, cards, and web motion.";
   }
 
-  if (signals.mentionsDataDrivenOrTemplateWorkflow) {
-    return "Template, React, data, props, frame-accurate choreography, or repeatable-render signals make Remotion a strong fit.";
+  if (
+    signals.mentionsDataDrivenOrTemplateWorkflow ||
+    signals.mentionsCodedMotionDesign
+  ) {
+    return "Template, props, kinetic typography, motion design, spring/easing choreography, or repeatable-render signals make Remotion a strong fit.";
   }
   return "Remotion is a good default for coded motion graphics, one-off animated promos, kinetic title sequences, and reusable video templates.";
 }

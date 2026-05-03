@@ -89,6 +89,56 @@ describe("selectEngine", () => {
     );
   });
 
+  describe("signal extraction edge cases (regression)", () => {
+    const cases = [
+      {
+        name: "no-asset prompt does not get false-positive editframe boost from word 素材",
+        prompt: "素材なしで完全に0から動画を作りたい",
+        expected: "remotion"
+      },
+      {
+        name: "URL used only as a reference does not lock in HyperFrames",
+        prompt:
+          "詳細はこちらのURLを参照 https://example.com イベント告知動画を作って",
+        expected: "remotion"
+      },
+      {
+        name: "explicit kinetic typography in a captioned vertical short still routes to Remotion",
+        prompt: "字幕付きの縦型ショート、kinetic typoが中心、素材は無し",
+        expected: "remotion"
+      },
+      {
+        name: "narration + BGM + edit intent routes to Editframe",
+        prompt: "ナレーションをBGMに合わせて編集したい",
+        expected: "editframe"
+      },
+      {
+        name: "product page request routes to HyperFrames via web/page synonym",
+        prompt: "プロダクトページを動画にして",
+        expected: "hyperframes"
+      },
+      {
+        name: "GSAP scroll motion routes to HyperFrames",
+        prompt: "GSAPの既存スクロール演出を動画化したい",
+        expected: "hyperframes"
+      },
+      {
+        name: "JSON brief alone is not enough to score Remotion higher than the default",
+        prompt: "JSONブリーフを読み込んで動画を作る",
+        expected: "remotion"
+      }
+    ] as const;
+
+    for (const testCase of cases) {
+      it(testCase.name, () => {
+        const decision = selectEngine(
+          createVideoSpecFromPrompt({ prompt: testCase.prompt })
+        );
+        expect(decision.engine).toBe(testCase.expected);
+      });
+    }
+  });
+
   it("returns switchHints for the two non-selected engines", () => {
     const spec = createVideoSpecFromPrompt({
       prompt: "イベント告知動画を30秒で作りたい。縦型でタイトルを出したい。"
