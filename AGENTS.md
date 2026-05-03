@@ -1,6 +1,8 @@
 # AGENTS.md - Michibiki Agent Rules
 
-このリポジトリで Claude Code / Codex などのエージェントが作業する際の補助ルールです。上位のシステム・開発者・ユーザー指示を優先します。
+このリポジトリで Claude Code / Codex などのエージェントが作業する際のカノニカルなルールです。Claude Code 用の `CLAUDE.md` はこのファイルへのポインタです。上位のシステム・開発者・ユーザー指示を優先します。
+
+各エンジンの特徴・適用範囲・公式ドキュメント参照は [`docs/ENGINE_PROFILES.md`](docs/ENGINE_PROFILES.md) を参照してください。返答サンプルは [`docs/AGENT_RESPONSE_EXAMPLES.md`](docs/AGENT_RESPONSE_EXAMPLES.md) にあります。
 
 ## Video Request Routing Rule
 
@@ -10,9 +12,9 @@
 
 1. URLや素材がある場合は、ページ本文・素材種別・既存動画ファイル参照を確認する。
 2. 既存MP4や動画素材があると判断した場合は、実際の `.mp4` / `.webm` / `<video>` / `og:video` 参照、またはユーザー提供のローカルファイルを根拠として示す。見出しやテキストだけで「既存MP4がある」と断定しない。
-3. `michibiki generate --engine auto --prompt "<user request>"`、または同等の `selectEngine()` 判定を使い、`engine-decision.json` の `engineFits` と `selectionGuide`、および selected engine / selected proposal 相当の項目を確認する。
+3. 比較・提案だけが目的の場合は `michibiki decide --engine auto --prompt "<user request>"`、または同等の副作用なし `selectEngine()` 判定を使い、`engineFits` と `selectionGuide`、および selected engine / selected proposal 相当の項目を確認する。
 4. Remotion / HyperFrames / Editframe の3つを、相対評価パーセンテージ付きで提示する。
-5. 各エンジンについて「この動画ならどう活かせるか」を1文で説明する。
+5. 各エンジンについて「この動画ならどう活かせるか」を1文で説明する（具体機能の根拠は `docs/ENGINE_PROFILES.md` を参照）。
 6. 自動推奨エンジンを示したうえで、ユーザーが `--engine remotion` / `--engine hyperframes` / `--engine editframe` を選べるようにする。
 7. ユーザーがエンジン選択を明示していない場合、比較提示のあとに「この方針で生成に進めるか」を確認する。「プロモを作って」「動画にして」は、原則としてエンジン比較と制作方針提案までに留める。
 
@@ -38,35 +40,22 @@
 
 生成・レンダー実行の承認境界:
 
+- エンジン比較や制作方針提案のために `michibiki generate` / `michibiki create` / `michibiki render` / `michibiki preview` を実行しない。`generate --dry-run` も判定専用ではないため使わない。
 - 生成プロジェクト作成へ進むには、尺、アスペクト、用途、トーン、CTA、使用エンジンへの合意が揃っていることを確認する。
 - MP4レンダーは「レンダーして」「MP4まで」「完成動画を出して」などの明示依頼がある場合のみ実行する。
 - 「生成まで依頼している場合は推奨エンジンで進めてよい」と解釈できる場面でも、上記の合意が不足している場合は、生成・編集・レンダーへ進まず確認する。
 
-返答例:
+Skill 利用ルール:
 
-```text
-Recommended engine: hyperframes (55%)
-
-- HyperFrames: 55%
-  LP/URL起点なので、ページのセクションをDOM・スクロール・カード表現でプロモ化しやすいです。
-- Remotion: 32%
-  キネティックタイポ、スプリング/イージング、パララックス、3D風アクセントなど、単発でも凝ったフレーム単位のアニメーションに向いています。再利用が必要な場合だけprops化します。
-- Editframe: 13%
-  実写素材がなくても、字幕、BGM/ナレーション同期、トランジション、画像/ページキャプチャの重ね合わせで、タイムライン主導の編集感あるプロモにできます。
-
-既存動画: HTML上の `.mp4` / `<video>` 参照は未検出です。
-```
-
-提案時の注意:
-
-- 3エンジンの特徴は `docs/ENGINE_PROFILES.md` を参照する。
-- `featureHighlights` を使い、各エンジンの具体機能を根拠に提案する。抽象的に「LP向き」「編集向き」とだけ言わない。
-- Remotion を「再利用テンプレート用途」だけに限定しない。単発の高密度なアニメーション、キネティックタイポ、スプリング/イージング、パララックス、Lottie/3D風アクセント、フレーム単位の演出にも向くことを説明する。
-- Editframe を「既存素材の編集用途」だけに限定しない。素材がない場合でも、字幕、BGM/ナレーション同期、トランジション、画像/ページキャプチャの重ね合わせ、タイムライン主導の演出に活かせることを説明する。
+- Remotion 関連の提案、コード生成、編集、プレビュー、レンダー、デバッグを行う場合は、毎回必ず `remotion-best-practices` を先に読む（プラグイン接頭辞付きで表示される場合も同じスキルとして扱う）。
+- その他のエンジン、外部サービス、動画/音声/画像/ドキュメント領域でも、利用可能な公式スキルまたはプロジェクト固有スキルがある場合は、作業前に該当スキルを読む。
+- スキルを使った場合は、返答または進捗でどのスキルを使ったかを短く明記する。
 
 禁止:
 
 - ページ概要だけを返して、エンジン比較を省略する。
+- 比較・提案だけの段階で `generate` / `create` / `render` / `preview` を実行する。
 - `engineFits` を確認せずに「今回は Remotion でよい」など単一エンジンだけを提案する。
 - `engineFits` の最大パーセンテージだけで `Recommended engine` を決める。
 - 動画ファイル参照を確認せずに「既存MP4がある」と断定する。
+- エンジンの特徴を `docs/ENGINE_PROFILES.md` を確認せずに語る（Remotion を「再利用テンプレート専用」、Editframe を「既存素材編集専用」と限定するなど）。
