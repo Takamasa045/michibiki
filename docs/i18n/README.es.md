@@ -18,14 +18,24 @@ La versión actual admite generación y renderizado con Remotion, generación HT
 - Guardar resultados en `outputs/jobs/<job-id>`
 - Mostrar avisos de licencia para motores externos
 
-## Comandos básicos
+## Instalación
 
 ```bash
+git clone https://github.com/Takamasa045/michibiki.git
+cd michibiki
 pnpm install
 pnpm build
 pnpm test
-pnpm michibiki create --prompt "Create a 30-second vertical event promo video."
+```
+
+Requisitos: Node.js 20+, pnpm 9+, ffmpeg (para renderizado MP4 de HyperFrames / Editframe), Chromium / Chrome (detectado automáticamente por `michibiki doctor`).
+
+## Comandos básicos
+
+```bash
 pnpm michibiki doctor
+pnpm michibiki decide --prompt "Create a 30-second vertical event promo video."
+pnpm michibiki create --prompt "Create a 30-second vertical event promo video."
 pnpm michibiki preview --job outputs/jobs/<job-id>
 pnpm michibiki generate --prompt "Create a 30-second vertical event promo video."
 ```

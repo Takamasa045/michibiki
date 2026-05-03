@@ -45,24 +45,28 @@ Michibiki is CLI-first today. The HyperFrames and Editframe adapters generate lo
 
 ## Setup
 
+Michibiki is distributed through GitHub Releases, not npmjs.com. Clone the repository, install dependencies, and build:
+
 ```bash
+git clone https://github.com/Takamasa045/michibiki.git
+cd michibiki
 pnpm install
 pnpm build
 pnpm test
 ```
+
+Requirements: Node.js 20+, pnpm 9+, ffmpeg (for HyperFrames/Editframe MP4 rendering), and Chromium/Chrome (auto-detected by `michibiki doctor`).
 
 ## Quickstart
 
 Run locally from the repository root:
 
 ```bash
-pnpm install
-pnpm build
 pnpm michibiki doctor
 pnpm michibiki decide --prompt "Create a 15-second vertical event promo video."
 ```
 
-Michibiki is currently distributed through GitHub Releases, not npmjs.com. To use the CLI, clone or download the release source, then run the local `pnpm michibiki` commands from the repository root.
+`pnpm michibiki <command>` is how every CLI invocation works in this repo. The legacy `pnpm video-router` script and the `video-router` binary remain available as aliases.
 
 The Remotion adapter runs in `auto` mode by default. If the external Remotion Studio Monorepo is found, Michibiki generates into that monorepo. If it is not found, Michibiki creates a standalone official Remotion project under the job directory instead.
 
@@ -202,14 +206,26 @@ Michibiki は現在 CLI-first です。HyperFrames / Editframe アダプター�
 - `docs/ENGINE_PROFILES.md` と `AGENTS.md` による Codex / Claude Code 向けエンジン提案ルール（`CLAUDE.md` は `AGENTS.md` への薄いポインタ）
 - ライセンス注意の表示
 
-基本コマンド:
+セットアップ:
+
+Michibiki は GitHub Releases で配布しており npmjs.com には公開していません。リポジトリを clone してから依存をインストールします。
 
 ```bash
+git clone https://github.com/Takamasa045/michibiki.git
+cd michibiki
 pnpm install
 pnpm build
 pnpm test
-pnpm michibiki create --prompt "AIエージェント勉強会のプロモ動画を30秒で作りたい。"
+```
+
+必要環境: Node.js 20+、pnpm 9+、ffmpeg（HyperFrames / Editframe の MP4 レンダーに必要）、Chromium / Chrome（`michibiki doctor` で自動検出）。
+
+基本コマンド:
+
+```bash
 pnpm michibiki doctor
+pnpm michibiki decide --prompt "AIエージェント勉強会のプロモ動画を30秒で作りたい。"
+pnpm michibiki create --prompt "AIエージェント勉強会のプロモ動画を30秒で作りたい。"
 pnpm michibiki preview --job outputs/jobs/<job-id>
 pnpm michibiki generate --prompt "AIエージェント勉強会のプロモ動画を30秒で作りたい。"
 ```

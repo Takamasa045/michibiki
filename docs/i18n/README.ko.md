@@ -18,14 +18,24 @@ Michibiki는 자연어 영상 제작 요청을 `VideoSpec`으로 변환하고, R
 - `outputs/jobs/<job-id>`에 결과 저장
 - 외부 엔진 라이선스 안내 표시
 
-## 기본 명령
+## 설치
 
 ```bash
+git clone https://github.com/Takamasa045/michibiki.git
+cd michibiki
 pnpm install
 pnpm build
 pnpm test
-pnpm michibiki create --prompt "Create a 30-second vertical event promo video."
+```
+
+요구 사항: Node.js 20+, pnpm 9+, ffmpeg(HyperFrames / Editframe MP4 렌더링용), Chromium / Chrome (`michibiki doctor` 가 자동 감지).
+
+## 기본 명령
+
+```bash
 pnpm michibiki doctor
+pnpm michibiki decide --prompt "Create a 30-second vertical event promo video."
+pnpm michibiki create --prompt "Create a 30-second vertical event promo video."
 pnpm michibiki preview --job outputs/jobs/<job-id>
 pnpm michibiki generate --prompt "Create a 30-second vertical event promo video."
 ```

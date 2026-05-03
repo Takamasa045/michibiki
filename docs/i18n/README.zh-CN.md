@@ -18,14 +18,24 @@ Michibiki 是一个 AI 视频制作路由器。它会把自然语言视频需求
 - 将结果保存到 `outputs/jobs/<job-id>`
 - 显示第三方引擎的许可证提醒
 
-## 基本命令
+## 安装
 
 ```bash
+git clone https://github.com/Takamasa045/michibiki.git
+cd michibiki
 pnpm install
 pnpm build
 pnpm test
-pnpm michibiki create --prompt "Create a 30-second vertical event promo video."
+```
+
+环境要求：Node.js 20+、pnpm 9+、ffmpeg（用于 HyperFrames / Editframe 的 MP4 渲染）、Chromium / Chrome（由 `michibiki doctor` 自动检测）。
+
+## 基本命令
+
+```bash
 pnpm michibiki doctor
+pnpm michibiki decide --prompt "Create a 30-second vertical event promo video."
+pnpm michibiki create --prompt "Create a 30-second vertical event promo video."
 pnpm michibiki preview --job outputs/jobs/<job-id>
 pnpm michibiki generate --prompt "Create a 30-second vertical event promo video."
 ```
