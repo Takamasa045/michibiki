@@ -126,6 +126,41 @@ describe("selectEngine", () => {
         name: "JSON brief alone is not enough to score Remotion higher than the default",
         prompt: "JSONブリーフを読み込んで動画を作る",
         expected: "remotion"
+      },
+      {
+        name: "explainer/tutorial videos route to Remotion",
+        prompt: "3分の解説動画を作りたい、図解中心",
+        expected: "remotion"
+      },
+      {
+        name: "data visualization (dashboard/KPI) routes to Remotion",
+        prompt: "ダッシュボードのKPIを動画で見せたい",
+        expected: "remotion"
+      },
+      {
+        name: "lyric/MV requests route to Remotion",
+        prompt: "プロダクトのリリックビデオMVを作る",
+        expected: "remotion"
+      },
+      {
+        name: "webinar recap routes to Editframe",
+        prompt: "ウェビナーのリキャップ動画",
+        expected: "editframe"
+      },
+      {
+        name: "avatar / talking-head requests route to HyperFrames",
+        prompt: "アバターが解説するWeb動画",
+        expected: "hyperframes"
+      },
+      {
+        name: "CSV-driven batch render routes to Remotion",
+        prompt: "商品データCSVから100本の動画をバッチレンダ",
+        expected: "remotion"
+      },
+      {
+        name: "slideshow keyword routes to Editframe",
+        prompt: "スライドショー形式で見せたい",
+        expected: "editframe"
       }
     ] as const;
 
@@ -137,6 +172,32 @@ describe("selectEngine", () => {
         expect(decision.engine).toBe(testCase.expected);
       });
     }
+
+    it("multi-image asset attachment routes to Editframe (slideshow)", () => {
+      const decision = selectEngine(
+        createVideoSpecFromPrompt({
+          prompt: "商品画像10枚をスライドショーに",
+          assetSources: ["./img1.png", "./img2.png", "./img3.png"]
+        })
+      );
+      expect(decision.engine).toBe("editframe");
+    });
+
+    it("close-call selectionGuide warns when top vs runner-up margin is small", () => {
+      const decision = selectEngine(
+        createVideoSpecFromPrompt({
+          prompt:
+            "詳細はこちらのURLを参照 https://example.com イベント告知動画を作って"
+        })
+      );
+      const sorted = [...decision.engineFits].sort(
+        (left, right) => right.fitPercent - left.fitPercent
+      );
+      const margin = (sorted[0]?.fitPercent ?? 0) - (sorted[1]?.fitPercent ?? 0);
+      if (margin <= 8) {
+        expect(decision.selectionGuide).toContain("Close call");
+      }
+    });
   });
 
   it("returns switchHints for the two non-selected engines", () => {

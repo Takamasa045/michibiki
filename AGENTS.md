@@ -34,6 +34,8 @@
 - `selectionGuide` の `Recommended engine`、または `engine-decision.json` の selected engine / selected proposal 相当の項目がある場合は、それを最終推奨として使う。
 - 尺、アスペクト、BGM/SFX、ナレーション、字幕同期、ハイテンポ編集など制作条件が追加・変更された場合は、前回の判定を流用せず再度 `selectEngine()` 相当を実行する。
 - `switchHints` は推奨以外の2エンジンに対し、「どの条件が加わればそちらが伸びるか」を返す。提案文ではこれをそのまま読み替えてユーザーに示す。
+- `selectionGuide` に `Close call` 注記が含まれている場合（top と 2nd の差が 8% 以下）は、ユーザーに「微差なので switchHints を読んで方向性を確認してほしい」と必ず伝える。
+- ルーターは以下の signals を見ている: 実アセット種別（video/audio/image/url）、URL の参照文脈（参照/詳細はこちら系）、timeline editing（ナレーション/BGM/字幕/編集/スライドショー）、web/DOM（LP/ページ/GSAP/スクロール）、avatar/talking-head、data-driven/template、data viz（ダッシュボード/KPI/チャート）、explainer/tutorial、lyric/MV、coded motion design（kinetic typo/spring/easing/motion graphics/three.js）、cloud batch render（lambda/バッチ）、webinar recap、format（縦型短尺/長尺）。プロンプト本文を最初に丁寧に読む前提で動く。
 
 生成品質の扱い:
 
