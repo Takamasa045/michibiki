@@ -108,6 +108,11 @@ describe("selectEngine", () => {
         expected: "remotion"
       },
       {
+        name: "BGM and SFX support alone stays visual-first",
+        prompt: "イベント告知動画を作りたい。BGMと効果音も生成する",
+        expected: "remotion"
+      },
+      {
         name: "narration + BGM + edit intent routes to Editframe",
         prompt: "ナレーションをBGMに合わせて編集したい",
         expected: "editframe"
@@ -282,6 +287,26 @@ describe("selectEngine", () => {
       expect(hint.condition.length).toBeGreaterThan(20);
       expect(hint.why.length).toBeGreaterThan(20);
     }
+  });
+
+  it("keeps Editframe as a switch hint when generated audio should drive editing", () => {
+    const spec = createVideoSpecFromPrompt({
+      prompt: "イベント告知動画を作りたい。BGMと効果音も生成する"
+    });
+
+    const decision = selectEngine(spec);
+    const editframeHint = decision.switchHints.find(
+      (hint) => hint.targetEngine === "editframe"
+    );
+
+    expect(decision.engine).toBe("remotion");
+    expect(findFitPercent(decision.engineFits, "remotion")).toBeGreaterThan(
+      findFitPercent(decision.engineFits, "editframe")
+    );
+    expect(editframeHint).toMatchObject({
+      condition: expect.stringContaining("generated BGM/SFX"),
+      why: expect.stringContaining("timeline rhythm")
+    });
   });
 
   it("defaults to Remotion for template motion graphics", () => {

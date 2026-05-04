@@ -13,6 +13,7 @@ type RouterSignals = {
   hasUrlAsset: boolean;
   urlIsReferenceOnly: boolean;
   mentionsTimelineEditing: boolean;
+  mentionsAudioSupport: boolean;
   mentionsTransitionsOrOverlays: boolean;
   mentionsWebDomWorkflow: boolean;
   mentionsAvatarOrTalkingHead: boolean;
@@ -194,6 +195,7 @@ function getRouterSignals(spec: VideoSpec): RouterSignals {
     hasUrlAsset,
     urlIsReferenceOnly: hasUrlAsset && urlIsReferenceOnly(text),
     mentionsTimelineEditing: mentionsTimelineEditing(text),
+    mentionsAudioSupport: mentionsAudioSupport(text),
     mentionsTransitionsOrOverlays: mentionsTransitionsOrOverlays(text),
     mentionsWebDomWorkflow: mentionsWebDomWorkflow(text),
     mentionsAvatarOrTalkingHead: mentionsAvatarOrTalkingHead(text),
@@ -220,7 +222,14 @@ function getRouterSignals(spec: VideoSpec): RouterSignals {
 function mentionsTimelineEditing(text: string): boolean {
   return hasContextualMatch(
     text,
-    /(timeline|タイムライン|字幕|caption|subtitle|b-roll|broll|カット編集|vlog|音声|voice|narration|ナレーション|bgm|背景音楽|sound design|サウンドデザイン|編集する|動画編集|編集動画|video\s+edit(?:ing)?|edit(?:ing)?\s+(?:a\s+)?video|effects? edit|エディトリアル|editorial|スライドショー|slide\s?show|フォトムービー|photo\s?movie)/i
+    /(timeline|タイムライン|字幕|caption|subtitle|b-roll|broll|カット編集|vlog|(?:音|bgm|背景音楽|music|beat|voice|narration|ナレーション)[^、。.!?\n]{0,16}(?:合わせ|同期|sync|beat)|編集する|編集したい|動画編集|編集動画|video\s+edit(?:ing)?|edit(?:ing)?\s+(?:a\s+)?video|effects? edit|エディトリアル|editorial|スライドショー|slide\s?show|フォトムービー|photo\s?movie)/i
+  );
+}
+
+function mentionsAudioSupport(text: string): boolean {
+  return hasContextualMatch(
+    text,
+    /(bgm|背景音楽|効果音|sfx|sound effects?|sound design|サウンドデザイン|音声|voice|narration|ナレーション)/i
   );
 }
 
@@ -338,6 +347,8 @@ function buildSwitchHint(
   if (targetEngine === "editframe") {
     const condition = signals.hasVideoOrAudioAssets
       ? "If you want to edit those clips/voice on a timeline with captions, BGM beats, transitions, and overlays"
+      : signals.mentionsAudioSupport
+        ? "If the generated BGM/SFX, voice, captions, or beat cuts should drive a timeline edit"
       : "If you want narration/voice sync, captions, BGM beats, transitions, or to layer existing media on a timeline";
     return {
       targetEngine,
@@ -385,9 +396,13 @@ function buildEngineFits(spec: VideoSpec, signals: RouterSignals): EngineFit[] {
     scores.hyperframes -= 2;
   }
   if (signals.mentionsTimelineEditing) {
-    scores.editframe += 36;
-    scores.remotion -= 4;
-    scores.hyperframes -= 4;
+    scores.editframe += 30;
+    scores.remotion -= 2;
+    scores.hyperframes -= 3;
+  }
+  if (signals.mentionsAudioSupport) {
+    scores.editframe += 8;
+    scores.remotion += 2;
   }
   if (signals.mentionsTransitionsOrOverlays) {
     scores.editframe += 14;
@@ -501,6 +516,9 @@ function buildFitReason(engine: EngineName, signals: RouterSignals): string {
       signals.hasMultipleImageAssets
     ) {
       return "Source media, multi-image slideshow, transitions, webinar/recap rhythm, or timeline-editing signals make Editframe a strong fit.";
+    }
+    if (signals.mentionsAudioSupport) {
+      return "BGM, SFX, voice, or narration support makes Editframe worth considering, especially if sound starts driving timeline edits.";
     }
     return "Editframe can still shape a polished timeline-driven promo with captions, audio beats, transitions, and generated or static visual layers, but it is less central when no media or editorial signals are present.";
   }
