@@ -14,6 +14,8 @@ type RouterSignals = {
   urlIsReferenceOnly: boolean;
   mentionsTimelineEditing: boolean;
   mentionsAudioSupport: boolean;
+  mentionsAudioTimelineEditing: boolean;
+  mentionsAudioDrivenMotion: boolean;
   mentionsTransitionsOrOverlays: boolean;
   mentionsWebDomWorkflow: boolean;
   mentionsAvatarOrTalkingHead: boolean;
@@ -117,9 +119,9 @@ const PAIR_QUESTIONS: Record<string, string> = {
   "remotion|hyperframes":
     "Two engines tied: should this video feel like (A) a coded React motion piece with custom typography and choreography (Remotion), or (B) a Web/LP-style page captured as motion (HyperFrames)?",
   "remotion|editframe":
-    "Two engines tied: should this video feel like (A) a coded motion piece with kinetic typography and reusable structure (Remotion), or (B) an edited timeline with captions, narration, BGM sync, and layered media (Editframe)?",
+    "Two engines tied: should this video feel like (A) a coded motion piece with sound-timed typography and reusable structure (Remotion), or (B) a waveform/beat-cut timeline with captions and layered media (Editframe)?",
   "hyperframes|editframe":
-    "Two engines tied: should this video feel like (A) a Web/LP page becoming motion with HTML/CSS/JS (HyperFrames), or (B) an edited timeline with captions, narration, BGM sync, and layered media (Editframe)?"
+    "Two engines tied: should this video feel like (A) a Web/LP page becoming motion with HTML/CSS/JS (HyperFrames), or (B) a waveform/beat-cut timeline with captions and layered media (Editframe)?"
 };
 
 function buildClarifyingQuestion(
@@ -196,6 +198,8 @@ function getRouterSignals(spec: VideoSpec): RouterSignals {
     urlIsReferenceOnly: hasUrlAsset && urlIsReferenceOnly(text),
     mentionsTimelineEditing: mentionsTimelineEditing(text),
     mentionsAudioSupport: mentionsAudioSupport(text),
+    mentionsAudioTimelineEditing: mentionsAudioTimelineEditing(text),
+    mentionsAudioDrivenMotion: mentionsAudioDrivenMotion(text),
     mentionsTransitionsOrOverlays: mentionsTransitionsOrOverlays(text),
     mentionsWebDomWorkflow: mentionsWebDomWorkflow(text),
     mentionsAvatarOrTalkingHead: mentionsAvatarOrTalkingHead(text),
@@ -222,7 +226,7 @@ function getRouterSignals(spec: VideoSpec): RouterSignals {
 function mentionsTimelineEditing(text: string): boolean {
   return hasContextualMatch(
     text,
-    /(timeline|タイムライン|字幕|caption|subtitle|b-roll|broll|カット編集|vlog|(?:音|bgm|背景音楽|music|beat|voice|narration|ナレーション)[^、。.!?\n]{0,16}(?:合わせ|同期|sync|beat)|編集する|編集したい|動画編集|編集動画|video\s+edit(?:ing)?|edit(?:ing)?\s+(?:a\s+)?video|effects? edit|エディトリアル|editorial|スライドショー|slide\s?show|フォトムービー|photo\s?movie)/i
+    /(timeline|タイムライン|b-roll|broll|カット編集|vlog|編集する|編集したい|動画編集|編集動画|video\s+edit(?:ing)?|edit(?:ing)?\s+(?:a\s+)?video|effects? edit|エディトリアル|editorial|スライドショー|slide\s?show|フォトムービー|photo\s?movie)/i
   );
 }
 
@@ -230,6 +234,20 @@ function mentionsAudioSupport(text: string): boolean {
   return hasContextualMatch(
     text,
     /(bgm|背景音楽|効果音|sfx|sound effects?|sound design|サウンドデザイン|音声|voice|narration|ナレーション)/i
+  );
+}
+
+function mentionsAudioTimelineEditing(text: string): boolean {
+  return hasContextualMatch(
+    text,
+    /(波形|waveform|beat marker|beat markers|ビートマーカー|(?:bgm|背景音楽|music|beat|ビート|音)[^、。.!?\n]{0,18}(?:カット|cut|切る|尺|シーン尺|timegroup|タイムライン|timeline)|(?:カット|cut|尺|シーン尺|timegroup|タイムライン|timeline)[^、。.!?\n]{0,18}(?:bgm|背景音楽|music|beat|ビート|音))/i
+  );
+}
+
+function mentionsAudioDrivenMotion(text: string): boolean {
+  return hasContextualMatch(
+    text,
+    /((?:効果音|sfx|sound effects?|音|voice|narration|ナレーション)[^、。.!?\n]{0,24}(?:タイミング|合わせ|同期|sync|文節)[^、。.!?\n]{0,24}(?:ズーム|zoom|切り替え|transition|テロップ|字幕|caption|subtitle|画面要素|表示|出す|motion|モーション|アニメーション)|(?:ズーム|zoom|切り替え|transition|テロップ|字幕|caption|subtitle|画面要素|表示|出す|motion|モーション|アニメーション)[^、。.!?\n]{0,24}(?:効果音|sfx|sound effects?|音|voice|narration|ナレーション))/i
   );
 }
 
@@ -347,6 +365,10 @@ function buildSwitchHint(
   if (targetEngine === "editframe") {
     const condition = signals.hasVideoOrAudioAssets
       ? "If you want to edit those clips/voice on a timeline with captions, BGM beats, transitions, and overlays"
+      : signals.mentionsAudioTimelineEditing
+        ? "If waveform, beat markers, BGM cuts, or scene durations should drive the timeline edit"
+      : signals.mentionsAudioDrivenMotion
+        ? "If the sound cues become timeline edits with captions, layered media, and beat-cut scene timing"
       : signals.mentionsAudioSupport
         ? "If the generated BGM/SFX, voice, captions, or beat cuts should drive a timeline edit"
       : "If you want narration/voice sync, captions, BGM beats, transitions, or to layer existing media on a timeline";
@@ -401,8 +423,16 @@ function buildEngineFits(spec: VideoSpec, signals: RouterSignals): EngineFit[] {
     scores.hyperframes -= 3;
   }
   if (signals.mentionsAudioSupport) {
-    scores.editframe += 8;
+    scores.editframe += 6;
+    scores.remotion += 3;
+  }
+  if (signals.mentionsAudioTimelineEditing) {
+    scores.editframe += 28;
     scores.remotion += 2;
+  }
+  if (signals.mentionsAudioDrivenMotion) {
+    scores.remotion += 18;
+    scores.editframe += 4;
   }
   if (signals.mentionsTransitionsOrOverlays) {
     scores.editframe += 14;
@@ -510,15 +540,18 @@ function buildFitReason(engine: EngineName, signals: RouterSignals): string {
   if (engine === "editframe") {
     if (
       signals.hasVideoOrAudioAssets ||
+      signals.mentionsAudioTimelineEditing ||
       signals.mentionsTimelineEditing ||
       signals.mentionsWebinarRecap ||
-      signals.mentionsTransitionsOrOverlays ||
       signals.hasMultipleImageAssets
     ) {
       return "Source media, multi-image slideshow, transitions, webinar/recap rhythm, or timeline-editing signals make Editframe a strong fit.";
     }
+    if (signals.mentionsTransitionsOrOverlays) {
+      return "Transitions and overlays can fit Editframe, especially in a layered timeline, but frame-accurate sound-cued motion may still fit Remotion better.";
+    }
     if (signals.mentionsAudioSupport) {
-      return "BGM, SFX, voice, or narration support makes Editframe worth considering, especially if sound starts driving timeline edits.";
+      return "BGM, SFX, voice, or narration support makes Editframe worth considering, especially if waveform, beat cuts, or timeline edits become central.";
     }
     return "Editframe can still shape a polished timeline-driven promo with captions, audio beats, transitions, and generated or static visual layers, but it is less central when no media or editorial signals are present.";
   }
@@ -538,11 +571,12 @@ function buildFitReason(engine: EngineName, signals: RouterSignals): string {
     signals.mentionsDataDrivenOrTemplateWorkflow ||
     signals.mentionsCodedMotionDesign ||
     signals.mentionsDataVisualization ||
+    signals.mentionsAudioDrivenMotion ||
     signals.mentionsExplainerOrTutorial ||
     signals.mentionsLyricOrMusicVideo ||
     signals.mentionsCloudBatchRender
   ) {
-    return "Template, props, kinetic typography, motion design, data viz, explainer, lyric/MV, or cloud/batch-render signals make Remotion a strong fit.";
+    return "Template, props, kinetic typography, sound-timed motion, data viz, explainer, lyric/MV, or cloud/batch-render signals make Remotion a strong fit.";
   }
   return "Remotion is a good default for coded motion graphics, one-off animated promos, kinetic title sequences, and reusable video templates.";
 }

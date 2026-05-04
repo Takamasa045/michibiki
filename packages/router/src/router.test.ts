@@ -118,6 +118,26 @@ describe("selectEngine", () => {
         expected: "editframe"
       },
       {
+        name: "BGM beat cuts route to Editframe",
+        prompt: "BGMのビートや盛り上がりでカットを切る動画",
+        expected: "editframe"
+      },
+      {
+        name: "waveform and beat markers route to Editframe",
+        prompt: "音声波形や beat marker を基準にシーン尺を決める",
+        expected: "editframe"
+      },
+      {
+        name: "narration phrase timed visual elements stay Remotion-friendly",
+        prompt: "ナレーションの文節に合わせて字幕や画面要素を出す",
+        expected: "remotion"
+      },
+      {
+        name: "SFX timed zooms and titles stay Remotion-friendly",
+        prompt: "効果音のタイミングでズーム、切り替え、テロップを当てる",
+        expected: "remotion"
+      },
+      {
         name: "product page request routes to HyperFrames via web/page synonym",
         prompt: "プロダクトページを動画にして",
         expected: "hyperframes"
