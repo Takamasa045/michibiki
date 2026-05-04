@@ -108,9 +108,34 @@ describe("selectEngine", () => {
         expected: "remotion"
       },
       {
+        name: "BGM and SFX support alone stays visual-first",
+        prompt: "イベント告知動画を作りたい。BGMと効果音も生成する",
+        expected: "remotion"
+      },
+      {
         name: "narration + BGM + edit intent routes to Editframe",
         prompt: "ナレーションをBGMに合わせて編集したい",
         expected: "editframe"
+      },
+      {
+        name: "BGM beat cuts route to Editframe",
+        prompt: "BGMのビートや盛り上がりでカットを切る動画",
+        expected: "editframe"
+      },
+      {
+        name: "waveform and beat markers route to Editframe",
+        prompt: "音声波形や beat marker を基準にシーン尺を決める",
+        expected: "editframe"
+      },
+      {
+        name: "narration phrase timed visual elements stay Remotion-friendly",
+        prompt: "ナレーションの文節に合わせて字幕や画面要素を出す",
+        expected: "remotion"
+      },
+      {
+        name: "SFX timed zooms and titles stay Remotion-friendly",
+        prompt: "効果音のタイミングでズーム、切り替え、テロップを当てる",
+        expected: "remotion"
       },
       {
         name: "product page request routes to HyperFrames via web/page synonym",
@@ -282,6 +307,26 @@ describe("selectEngine", () => {
       expect(hint.condition.length).toBeGreaterThan(20);
       expect(hint.why.length).toBeGreaterThan(20);
     }
+  });
+
+  it("keeps Editframe as a switch hint when generated audio should drive editing", () => {
+    const spec = createVideoSpecFromPrompt({
+      prompt: "イベント告知動画を作りたい。BGMと効果音も生成する"
+    });
+
+    const decision = selectEngine(spec);
+    const editframeHint = decision.switchHints.find(
+      (hint) => hint.targetEngine === "editframe"
+    );
+
+    expect(decision.engine).toBe("remotion");
+    expect(findFitPercent(decision.engineFits, "remotion")).toBeGreaterThan(
+      findFitPercent(decision.engineFits, "editframe")
+    );
+    expect(editframeHint).toMatchObject({
+      condition: expect.stringContaining("generated BGM/SFX"),
+      why: expect.stringContaining("timeline rhythm")
+    });
   });
 
   it("defaults to Remotion for template motion graphics", () => {
