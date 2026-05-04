@@ -342,9 +342,9 @@ Recommended sequence (the steps the agent rules expect):
 
 function printEngines(): void {
   console.log(`Available engines:
-  remotion     Best for coded templates, React/TypeScript motion graphics, data-driven variants, and repeatable renders.
+  remotion     Best for coded templates, React/TypeScript motion graphics, HTML-in-canvas effects, data-driven variants, and repeatable renders.
                Uses an external monorepo when found; otherwise creates a standalone official Remotion project.
-               Watch for commercial/team license requirements.
+               Watch for experimental HTML-in-canvas browser requirements and commercial/team license requirements.
   hyperframes  Best for Web, DOM, CSS, JavaScript, URL, and LP-style browser-native motion.
                Watch for footage-heavy edits and official SDK gaps in the current draft adapter.
   editframe    Best for source footage, audio, captions, B-roll, and timeline handoff workflows.

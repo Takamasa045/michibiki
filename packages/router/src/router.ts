@@ -18,6 +18,7 @@ type RouterSignals = {
   mentionsAudioDrivenMotion: boolean;
   mentionsTransitionsOrOverlays: boolean;
   mentionsWebDomWorkflow: boolean;
+  mentionsHtmlInCanvasWorkflow: boolean;
   mentionsAvatarOrTalkingHead: boolean;
   mentionsDataDrivenOrTemplateWorkflow: boolean;
   mentionsDataVisualization: boolean;
@@ -111,13 +112,15 @@ function orderEnginePair(
   b: EngineName
 ): readonly [EngineName, EngineName] {
   const order: EngineName[] = ["remotion", "hyperframes", "editframe"];
-  const sorted = [a, b].sort((left, right) => order.indexOf(left) - order.indexOf(right));
+  const sorted = [a, b].sort(
+    (left, right) => order.indexOf(left) - order.indexOf(right)
+  );
   return [sorted[0]!, sorted[1]!] as const;
 }
 
 const PAIR_QUESTIONS: Record<string, string> = {
   "remotion|hyperframes":
-    "Two engines tied: should this video feel like (A) a coded React motion piece with custom typography and choreography (Remotion), or (B) a Web/LP-style page captured as motion (HyperFrames)?",
+    "Two engines tied: should this video feel like (A) a coded React motion piece with custom typography, choreography, and optional HTML-in-canvas effects (Remotion), or (B) a Web/LP-style page captured as motion (HyperFrames)?",
   "remotion|editframe":
     "Two engines tied: should this video feel like (A) a coded motion piece with sound-timed typography and reusable structure (Remotion), or (B) a waveform/beat-cut timeline with captions and layered media (Editframe)?",
   "hyperframes|editframe":
@@ -202,6 +205,7 @@ function getRouterSignals(spec: VideoSpec): RouterSignals {
     mentionsAudioDrivenMotion: mentionsAudioDrivenMotion(text),
     mentionsTransitionsOrOverlays: mentionsTransitionsOrOverlays(text),
     mentionsWebDomWorkflow: mentionsWebDomWorkflow(text),
+    mentionsHtmlInCanvasWorkflow: mentionsHtmlInCanvasWorkflow(text),
     mentionsAvatarOrTalkingHead: mentionsAvatarOrTalkingHead(text),
     mentionsDataDrivenOrTemplateWorkflow:
       mentionsDataDrivenOrTemplateWorkflow(text),
@@ -262,6 +266,13 @@ function mentionsWebDomWorkflow(text: string): boolean {
   return hasContextualMatch(
     text,
     /(webサイト|website|web\s?page|webページ|landing page|ランディングページ|\blp\b|dom|html|css|javascript|gsap|スクロール|セクション|section|サイト動画化|page-to-video|プロダクトページ|商品ページ|webflow|framer)/i
+  );
+}
+
+function mentionsHtmlInCanvasWorkflow(text: string): boolean {
+  return hasContextualMatch(
+    text,
+    /(html[- ]?in[- ]?canvas|htmlincanvas|drawelement(?:image)?|canvas-draw-element|dom[^、。.!?\n]{0,24}(?:canvas|キャンバス|post[- ]?process|ポスト処理|shader|シェーダー|webgl|webgpu|blur|glitch|グリッチ)|(?:canvas|キャンバス)[^、。.!?\n]{0,24}(?:dom|html|webgl|webgpu|shader|シェーダー|blur|glitch|グリッチ|vintage|magnifying|拡大鏡))/i
   );
 }
 
@@ -392,11 +403,13 @@ function buildSwitchHint(
 
   const condition = signals.mentionsDataDrivenOrTemplateWorkflow
     ? "If you want to template this and render many data-driven variants (props/JSON/CSV) at once"
+    : signals.mentionsHtmlInCanvasWorkflow || signals.mentionsWebDomWorkflow
+      ? "If DOM/page visuals should become React-controlled motion with HTML-in-canvas post-processing, shader/glitch/blur effects, or reusable props"
     : "If you want frame-accurate React motion, kinetic typography, spring/easing choreography, or to template the same video for many data variants";
   return {
     targetEngine,
     condition,
-    why: "Remotion becomes the strongest fit because React/TSX gives precise frame-by-frame control and reusable, prop-driven variants."
+    why: "Remotion becomes the strongest fit because React/TSX gives precise frame-by-frame control, HTML-in-canvas effects, and reusable prop-driven variants."
   };
 }
 
@@ -448,6 +461,11 @@ function buildEngineFits(spec: VideoSpec, signals: RouterSignals): EngineFit[] {
     scores.editframe -= 6;
   } else if (signals.hasUrlAsset && signals.urlIsReferenceOnly) {
     scores.hyperframes += 12;
+  }
+  if (signals.mentionsHtmlInCanvasWorkflow) {
+    scores.remotion += 42;
+    scores.hyperframes += 4;
+    scores.editframe -= 8;
   }
   if (signals.mentionsAvatarOrTalkingHead) {
     scores.hyperframes += 24;
@@ -570,13 +588,14 @@ function buildFitReason(engine: EngineName, signals: RouterSignals): string {
   if (
     signals.mentionsDataDrivenOrTemplateWorkflow ||
     signals.mentionsCodedMotionDesign ||
+    signals.mentionsHtmlInCanvasWorkflow ||
     signals.mentionsDataVisualization ||
     signals.mentionsAudioDrivenMotion ||
     signals.mentionsExplainerOrTutorial ||
     signals.mentionsLyricOrMusicVideo ||
     signals.mentionsCloudBatchRender
   ) {
-    return "Template, props, kinetic typography, sound-timed motion, data viz, explainer, lyric/MV, or cloud/batch-render signals make Remotion a strong fit.";
+    return "Template, props, kinetic typography, HTML-in-canvas post-processing, sound-timed motion, data viz, explainer, lyric/MV, or cloud/batch-render signals make Remotion a strong fit.";
   }
   return "Remotion is a good default for coded motion graphics, one-off animated promos, kinetic title sequences, and reusable video templates.";
 }
@@ -589,7 +608,7 @@ function buildBestUse(engine: EngineName, spec: VideoSpec): string {
   if (engine === "hyperframes") {
     return `Use HyperFrames for this ${format} video if you want the concept to feel like a web page or LP turning into motion with plain HTML/CSS/JS, GSAP/Lottie/CSS animations, frame-seekable timing, browser-native sections, and deterministic page-to-video rendering.`;
   }
-  return `Use Remotion for this ${format} video if you want a one-off, frame-accurate React motion piece with Sequence-based timing, useCurrentFrame choreography, kinetic typography, custom easing/spring motion, layered transitions, captions/audio, Lottie or Three.js-style flourishes, and optional props for later reuse.`;
+  return `Use Remotion for this ${format} video if you want a one-off, frame-accurate React motion piece with Sequence-based timing, useCurrentFrame choreography, kinetic typography, custom easing/spring motion, layered transitions, captions/audio, HTML-in-canvas DOM post-processing, Lottie or Three.js-style flourishes, and optional props for later reuse.`;
 }
 
 function buildFeatureHighlights(engine: EngineName): string[] {
@@ -614,6 +633,7 @@ function buildFeatureHighlights(engine: EngineName): string[] {
   return [
     "React/TypeScript composition model for frame-accurate videos rendered to MP4/WebM with browser preview.",
     "Sequence, Series, useCurrentFrame, interpolate, spring, and animation utilities enable precise choreographed motion.",
+    "HTML-in-canvas can draw live DOM nodes into canvas for blur, glitch, shader, WebGL/WebGPU-style post-processing, and custom scene blending.",
     "Rich ecosystem for captions, audio, Lottie, Three.js/React Three Fiber, transitions, shapes, fonts, and cloud rendering.",
     "Works for both one-off high-polish animations and prop-driven/programmatic variants."
   ];
@@ -711,14 +731,16 @@ function buildEngineRecommendation(
       "Use Remotion when the request benefits from frame-accurate coded animation, custom motion design, React/TypeScript control, or reusable variants.",
     strengths: [
       "frame-accurate choreography for kinetic typography, custom easing, springs, and scene transitions",
+      "HTML-in-canvas effects for DOM-to-canvas blur, glitch, shader-style processing, and custom scene blends",
       "single-use high-polish animations as well as repeatable data/props variants and batch renders",
       "strong fit for event promos, product explainers, dashboards, title-heavy pieces, Lottie-style motion, and 3D-like flourishes"
     ],
     tradeoffs: [
       "uses an external Remotion Studio Monorepo when available, otherwise generates a standalone Remotion project that needs dependency install",
+      "HTML-in-canvas is experimental; Studio preview needs Chrome Canary with the canvas draw-element flag, and WebGL effects may need --gl=angle",
       "commercial automation, team use, SaaS, or client work may require a Remotion Company License",
       "less natural for raw footage timelines than a media-editing engine"
     ],
-    creativeDirection: `Build a ${format} animated promo with an opening hook, kinetic title reveal, staggered detail callouts, custom easing/spring transitions, depth/parallax or Lottie/3D-style accents, and a final CTA lockup.${cta} Expose text, dates, and colors as props only when reuse is useful.`
+    creativeDirection: `Build a ${format} animated promo with an opening hook, kinetic title reveal, staggered detail callouts, custom easing/spring transitions, optional HTML-in-canvas post-processing for DOM/shader effects, depth/parallax or Lottie/3D-style accents, and a final CTA lockup.${cta} Expose text, dates, and colors as props only when reuse is useful.`
   };
 }
