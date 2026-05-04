@@ -74,6 +74,33 @@ describe("selectEngine", () => {
     });
   });
 
+  it("routes HTML-in-canvas DOM post-processing to Remotion", () => {
+    const spec = createVideoSpecFromPrompt({
+      prompt:
+        "LPのDOMをHTML-in-canvasでcanvas化してグリッチとblur shaderをかける動画"
+    });
+
+    const decision = selectEngine(spec);
+    const remotionFit = decision.engineFits.find(
+      (fit) => fit.engine === "remotion"
+    );
+
+    expect(decision.engine).toBe("remotion");
+    expect(findFitPercent(decision.engineFits, "remotion")).toBeGreaterThan(
+      findFitPercent(decision.engineFits, "hyperframes")
+    );
+    expect(remotionFit).toMatchObject({
+      reason: expect.stringContaining("HTML-in-canvas"),
+      bestUse: expect.stringContaining("HTML-in-canvas"),
+      featureHighlights: expect.arrayContaining([
+        expect.stringContaining("HTML-in-canvas")
+      ])
+    });
+    expect(decision.recommendation.strengths).toEqual(
+      expect.arrayContaining([expect.stringContaining("HTML-in-canvas")])
+    );
+  });
+
   it("uses score-based selection so asset attachment alone does not lock Editframe in", () => {
     const spec = createVideoSpecFromPrompt({
       prompt:

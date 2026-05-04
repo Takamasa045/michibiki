@@ -2,7 +2,7 @@
 
 This document summarizes the practical strengths of Remotion, HyperFrames, and Editframe for Michibiki routing and agent responses. Use it with `engineFits`, `selectionGuide`, and the root agent rules.
 
-Sources checked: 2026-05-02.
+Sources checked: 2026-05-04.
 
 ## Remotion
 
@@ -12,6 +12,7 @@ Good uses:
 
 - One-off high-polish motion graphics, not only reusable templates.
 - Kinetic typography, animated callouts, spring/easing driven transitions, title sequences, and scene choreography.
+- HTML-in-canvas DOM post-processing: draw live DOM nodes into canvas for blur, glitch, shader/WebGL/WebGPU-style effects, magnifier/vintage-screen treatments, and custom transition blending.
 - React component reuse, typed props, API-driven content, data-driven variants, and batch rendering.
 - Audio/captions, Lottie-style motion, Three.js / React Three Fiber flourishes, transitions, shapes, fonts, and cloud rendering.
 
@@ -22,8 +23,10 @@ Proposal angle:
 Watch-outs:
 
 - React/TypeScript and bundling add project structure.
+- HTML-in-canvas is experimental. Studio preview needs Chrome Canary 149+ with `chrome://flags/#canvas-draw-element` enabled; renders are supported by Remotion v4.0.455+ through Remotion's bundled Canary path, and WebGL shader effects may need `--gl=angle` or `Config.setChromiumOpenGlRenderer("angle")`.
+- Do not nest `<HtmlInCanvas>` inside another `<HtmlInCanvas>`; combine effects into one paint callback instead.
 - Company/commercial use may need current Remotion license review.
-- Existing web/LP DOM or GSAP-heavy work may be faster to express in HyperFrames.
+- Existing web/LP DOM or GSAP-heavy work may still be faster to express in HyperFrames unless the request specifically needs React-controlled canvas post-processing or shader-style DOM effects.
 
 Official references:
 
@@ -34,6 +37,7 @@ Official references:
 - https://www.remotion.dev/docs/transitions
 - https://www.remotion.dev/docs/captions
 - https://www.remotion.dev/docs/lottie
+- https://www.remotion.dev/docs/html-in-canvas
 
 ## HyperFrames
 
