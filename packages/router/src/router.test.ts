@@ -130,6 +130,12 @@ describe("selectEngine", () => {
         expected: "remotion"
       },
       {
+        name: "URL page content-only request does not route to HyperFrames",
+        prompt:
+          "このPeatixページの内容を使って、ページ自体は映さずに30秒の縦型告知動画を作りたい https://example.com",
+        expected: "remotion"
+      },
+      {
         name: "explicit kinetic typography in a captioned vertical short still routes to Remotion",
         prompt: "字幕付きの縦型ショート、kinetic typoが中心、素材は無し",
         expected: "remotion"

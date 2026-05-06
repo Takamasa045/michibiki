@@ -333,8 +333,16 @@ function mentionsWebinarRecap(text: string): boolean {
 }
 
 function urlIsReferenceOnly(text: string): boolean {
-  return /(参照|詳細はこちら|詳しくは|reference|see\s+(here|below|the link)|details? at|詳しい情報|リンクは)/i.test(
-    text
+  return (
+    /(参照|詳細はこちら|詳しくは|reference|see\s+(here|below|the link)|details? at|詳しい情報|リンクは)/i.test(
+      text
+    ) ||
+    /(?:ページ|サイト|web\s?page|website|\blp\b|url|リンク)[^、。.!?\n]{0,24}(?:内容|情報|本文|テキスト|コピー|文章)[^、。.!?\n]{0,24}(?:使|元に|もとに|基に|参照|拾|抽出)/i.test(
+      text
+    ) ||
+    /(?:ページ|サイト|web\s?page|website|\blp\b|dom|url|リンク)[^、。.!?\n]{0,24}(?:自体|そのもの)?[^、。.!?\n]{0,8}(?:映さ(?:ない|ず)|見せ(?:ない|ず)|出さ(?:ない|ず)|使わ(?:ない|ず)|キャプチャしない|スクショしない|captureしない|recordしない)/i.test(
+      text
+    )
   );
 }
 
