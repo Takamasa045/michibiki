@@ -12,7 +12,7 @@ Michibiki is an AI video production router. It turns a natural-language video re
 
 The name comes from the Japanese word "導き" (michibiki), meaning guidance. It reflects the agent's role: guiding each video request toward the most suitable path by choosing the right engine, workflow, and output shape.
 
-Current execution supports Remotion project generation/rendering, HyperFrames HTML/CSS/JS project generation with local MP4 rendering, and Editframe timeline handoff project generation with local MP4 timeline previews. Remotion runs in `auto` mode by default: it uses an existing Remotion Studio Monorepo when available, then falls back to a standalone official Remotion project when no monorepo is present. HyperFrames renders through headless Chrome plus ffmpeg; Editframe renders timeline previews through the same local browser/ffmpeg path.
+Current execution supports Remotion project generation/rendering, HyperFrames HTML/CSS/JS project generation with official HyperFrames CLI / producer / engine render backends, and Editframe timeline handoff project generation with local MP4 timeline previews. Remotion runs in `auto` mode by default: it uses an existing Remotion Studio Monorepo when available, then falls back to a standalone official Remotion project when no monorepo is present. HyperFrames renders through the official CLI by default and can also use the official producer package, the low-level engine package, or the legacy local browser renderer. Editframe renders timeline previews through the local browser/ffmpeg path.
 
 ```text
 User Prompt / CLI / Studio UI
@@ -29,7 +29,7 @@ Generated Project / Preview / Render
 
 ### Current Scope
 
-Michibiki is CLI-first today. The HyperFrames and Editframe adapters generate local draft projects and MP4 previews; they do not bundle or replace the official HyperFrames/Editframe SDKs. The Remotion adapter uses an external Remotion Studio Monorepo checkout when available, or creates a standalone official Remotion project inside the job directory when it is not. Generated jobs may contain prompts, asset paths, and rendered files, and are ignored by default under `outputs/jobs/`.
+Michibiki is CLI-first today. The HyperFrames adapter generates a HyperFrames-compatible HTML project and renders through selectable official backends: `official-cli` (default), `official-producer`, `official-engine`, or `local` for the legacy browser renderer. The Editframe adapter still generates local timeline handoff projects and MP4 previews; it does not bundle or replace the official Editframe SDK. The Remotion adapter uses an external Remotion Studio Monorepo checkout when available, or creates a standalone official Remotion project inside the job directory when it is not. Generated jobs may contain prompts, asset paths, and rendered files, and are ignored by default under `outputs/jobs/`.
 
 ## Packages
 
@@ -39,7 +39,7 @@ Michibiki is CLI-first today. The HyperFrames and Editframe adapters generate lo
 - `packages/render-jobs` - shared job directory, manifest, and preview-result management
 - `packages/browser-renderer` - shared headless Chrome + ffmpeg renderer for browser-preview engines
 - `packages/engine-remotion` - adapter for external Remotion Studio Monorepo projects and standalone official Remotion projects
-- `packages/engine-hyperframes` - adapter for Web/DOM/CSS/JS motion projects and local MP4 rendering
+- `packages/engine-hyperframes` - adapter for Web/DOM/CSS/JS motion projects with official HyperFrames CLI / producer / engine rendering
 - `packages/engine-editframe` - adapter for timeline/media handoff projects and local MP4 timeline previews
 - `apps/cli` - `michibiki` CLI (`video-router` remains available as an alias)
 
@@ -55,7 +55,7 @@ pnpm build
 pnpm test
 ```
 
-Requirements: Node.js 20+, pnpm 9+, ffmpeg (for HyperFrames/Editframe MP4 rendering), and Chromium/Chrome (auto-detected by `michibiki doctor`).
+Requirements: Node.js 22+, pnpm 10+, ffmpeg (for HyperFrames/Editframe MP4 rendering), and Chromium/Chrome (auto-detected by `michibiki doctor`).
 
 ## Quickstart
 
@@ -137,6 +137,26 @@ pnpm michibiki render --job outputs/jobs/<id> --confirm-render         # 4. fina
 
 `generate` no longer auto-runs preview. Pass `--preview` to opt in. `--render` requires `--confirm-render` to actually run an MP4 — this prevents agents from rendering without explicit user approval.
 
+HyperFrames rendering uses the official CLI by default. Select another backend when needed:
+
+```bash
+pnpm michibiki render --job outputs/jobs/<id> --confirm-render --hyperframes-renderer official-producer
+pnpm michibiki render --job outputs/jobs/<id> --confirm-render --hyperframes-renderer official-engine
+pnpm michibiki render --job outputs/jobs/<id> --confirm-render --hyperframes-renderer local
+```
+
+Useful HyperFrames render options:
+
+```bash
+--hyperframes-quality draft|standard|high
+--hyperframes-format mp4|webm|mov
+--hyperframes-workers 2
+--hyperframes-docker
+--hyperframes-gpu
+```
+
+`official-engine` attempts the low-level `@hyperframes/engine` capture API first. If the installed package cannot be loaded directly by Node, Michibiki falls back to `@hyperframes/producer`, which is the official complete MP4 pipeline built on top of the engine.
+
 Force a specific engine:
 
 ```bash
@@ -192,11 +212,11 @@ Michibiki は、自然言語の動画制作リクエストを `VideoSpec` に変
 
 名前は日本語の「導き」に由来します。Agent が動画制作リクエストを読み取り、最適なエンジン・ワークフロー・出力形式へ導く存在であることを表しています。
 
-現在は、Remotion のプロジェクト生成・レンダリングに加え、HyperFrames の HTML/CSS/JS 生成とローカルMP4レンダー、Editframe の `timeline.json` 生成とローカルMP4タイムラインプレビューに対応しています。Remotion は標準で `auto` モードです。外部の Remotion Studio Monorepo があればそれを利用し、無ければジョブディレクトリ内に standalone の公式Remotion最小プロジェクトを生成します。HyperFrames/Editframe は headless Chrome と ffmpeg でMP4化します。
+現在は、Remotion のプロジェクト生成・レンダリングに加え、HyperFrames の HTML/CSS/JS 生成と公式 HyperFrames CLI / producer / engine 経由のレンダー、Editframe の `timeline.json` 生成とローカルMP4タイムラインプレビューに対応しています。Remotion は標準で `auto` モードです。外部の Remotion Studio Monorepo があればそれを利用し、無ければジョブディレクトリ内に standalone の公式Remotion最小プロジェクトを生成します。HyperFrames は標準で公式 CLI を使い、必要に応じて公式 producer package、低レベル engine package、従来の local browser renderer へ切り替えられます。
 
 ### 現在の範囲
 
-Michibiki は現在 CLI-first です。HyperFrames / Editframe アダプターはローカルのドラフトプロジェクトと MP4 プレビューを生成しますが、公式 SDK の同梱や代替実装ではありません。Remotion アダプターは外部の Remotion Studio Monorepo があればそれを呼び出し、無ければジョブディレクトリ内に standalone の公式Remotionプロジェクトを生成します。生成ジョブにはプロンプト、素材パス、レンダー結果が含まれる可能性があり、標準では `outputs/jobs/` 配下として git 管理外にしています。
+Michibiki は現在 CLI-first です。HyperFrames アダプターは HyperFrames 互換の HTML プロジェクトを生成し、`official-cli`（標準）、`official-producer`、`official-engine`、または従来の `local` renderer で MP4 化できます。Editframe アダプターはまだローカルの timeline handoff と MP4 プレビューの範囲です。Remotion アダプターは外部の Remotion Studio Monorepo があればそれを呼び出し、無ければジョブディレクトリ内に standalone の公式Remotionプロジェクトを生成します。生成ジョブにはプロンプト、素材パス、レンダー結果が含まれる可能性があり、標準では `outputs/jobs/` 配下として git 管理外にしています。
 
 主な機能:
 
@@ -204,9 +224,9 @@ Michibiki は現在 CLI-first です。HyperFrames / Editframe アダプター�
 - Engine Router によるエンジン選択と、3エンジンの `engineFits` 相対評価
 - `selectionGuide` / `bestUse` / `featureHighlights` による自然言語の提案
 - Remotion auto モードによる Monorepo / standalone 公式プロジェクト生成
-- HyperFrames HTML/CSS/JS プロジェクト生成とMP4レンダー
+- HyperFrames HTML/CSS/JS プロジェクト生成と公式 CLI / producer / engine 経由のMP4レンダー
 - Editframe timeline handoff 生成とMP4タイムラインプレビュー
-- HyperFrames/Editframe 共通の headless Chrome + ffmpeg レンダー基盤
+- HyperFrames の従来 local backend と Editframe で使う headless Chrome + ffmpeg レンダー基盤
 - `outputs/jobs/<job-id>` への成果物保存
 - `docs/ENGINE_PROFILES.md` と `AGENTS.md` による Codex / Claude Code 向けエンジン提案ルール（`CLAUDE.md` は `AGENTS.md` への薄いポインタ）
 - ライセンス注意の表示

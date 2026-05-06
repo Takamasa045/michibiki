@@ -2,7 +2,12 @@
 import path from "node:path";
 import { validateLicense } from "@michibiki/compliance";
 import { createEditframeEngine } from "@michibiki/engine-editframe";
-import { createHyperFramesEngine } from "@michibiki/engine-hyperframes";
+import {
+  createHyperFramesEngine,
+  type HyperFramesRenderBackend,
+  type HyperFramesRenderFormat,
+  type HyperFramesRenderQuality
+} from "@michibiki/engine-hyperframes";
 import {
   createRemotionEngine,
   type RemotionProjectMode
@@ -113,7 +118,19 @@ async function generate(args: ReturnType<typeof parseArgs>): Promise<void> {
   } else {
     const engine = createEngine(decision.engine, {
       remotionRepoPath: getValue(args, "remotion-repo"),
-      remotionMode: parseRemotionMode(getValue(args, "remotion-mode"))
+      remotionMode: parseRemotionMode(getValue(args, "remotion-mode")),
+      hyperframesRenderBackend: parseHyperFramesRenderBackend(
+        getValue(args, "hyperframes-renderer")
+      ),
+      hyperframesRenderQuality: parseHyperFramesRenderQuality(
+        getValue(args, "hyperframes-quality")
+      ),
+      hyperframesRenderFormat: parseHyperFramesRenderFormat(
+        getValue(args, "hyperframes-format")
+      ),
+      hyperframesRenderWorkers: parseNumber(getValue(args, "hyperframes-workers")),
+      hyperframesUseDocker: hasFlag(args, "hyperframes-docker"),
+      hyperframesUseGpu: hasFlag(args, "hyperframes-gpu")
     });
     project = await engine.generateProject(spec, {
       jobId: paths.jobId,
@@ -244,7 +261,19 @@ async function render(args: ReturnType<typeof parseArgs>): Promise<void> {
   const { jobDir, manifest, project } = await loadGeneratedProject(job);
   const engine = createEngine(manifest.decision.engine, {
     remotionRepoPath: getValue(args, "remotion-repo"),
-    remotionMode: parseRemotionMode(getValue(args, "remotion-mode"))
+    remotionMode: parseRemotionMode(getValue(args, "remotion-mode")),
+    hyperframesRenderBackend: parseHyperFramesRenderBackend(
+      getValue(args, "hyperframes-renderer")
+    ),
+    hyperframesRenderQuality: parseHyperFramesRenderQuality(
+      getValue(args, "hyperframes-quality")
+    ),
+    hyperframesRenderFormat: parseHyperFramesRenderFormat(
+      getValue(args, "hyperframes-format")
+    ),
+    hyperframesRenderWorkers: parseNumber(getValue(args, "hyperframes-workers")),
+    hyperframesUseDocker: hasFlag(args, "hyperframes-docker"),
+    hyperframesUseGpu: hasFlag(args, "hyperframes-gpu")
   });
   const result = await engine.render(project, {
     outputDir: jobDir,
@@ -270,7 +299,19 @@ async function preview(args: ReturnType<typeof parseArgs>): Promise<void> {
   const { jobDir, manifest, project } = await loadGeneratedProject(job);
   const engine = createEngine(manifest.decision.engine, {
     remotionRepoPath: getValue(args, "remotion-repo"),
-    remotionMode: parseRemotionMode(getValue(args, "remotion-mode"))
+    remotionMode: parseRemotionMode(getValue(args, "remotion-mode")),
+    hyperframesRenderBackend: parseHyperFramesRenderBackend(
+      getValue(args, "hyperframes-renderer")
+    ),
+    hyperframesRenderQuality: parseHyperFramesRenderQuality(
+      getValue(args, "hyperframes-quality")
+    ),
+    hyperframesRenderFormat: parseHyperFramesRenderFormat(
+      getValue(args, "hyperframes-format")
+    ),
+    hyperframesRenderWorkers: parseNumber(getValue(args, "hyperframes-workers")),
+    hyperframesUseDocker: hasFlag(args, "hyperframes-docker"),
+    hyperframesUseGpu: hasFlag(args, "hyperframes-gpu")
   });
   const result = await engine.preview(project);
   const previewPath = await writePreviewResult(jobDir, result);
@@ -325,6 +366,14 @@ Decide/generate options:
   --output-type <type>        mp4, webm, project, code, preview
   --remotion-repo <path>      Override Remotion monorepo path
   --remotion-mode <mode>      auto, monorepo, standalone
+  --hyperframes-renderer <mode>
+                              official-cli, official-producer, official-engine, or local
+  --hyperframes-quality <mode>
+                              draft, standard, or high
+  --hyperframes-format <type> mp4, webm, or mov
+  --hyperframes-workers <n>   Official HyperFrames worker count
+  --hyperframes-docker        Use official HyperFrames Docker rendering where supported
+  --hyperframes-gpu           Use official HyperFrames GPU acceleration where supported
   --preview                   Run preview after project generation (opt-in; HyperFrames/Editframe preview launches headless Chrome + ffmpeg)
   --render                    Render the final MP4 after project generation (still requires --confirm-render to actually run)
   --confirm-render            Required acknowledgement that MP4 rendering is intended; protects against accidental render runs by agents
@@ -346,7 +395,7 @@ function printEngines(): void {
                Uses an external monorepo when found; otherwise creates a standalone official Remotion project.
                Watch for experimental HTML-in-canvas browser requirements and commercial/team license requirements.
   hyperframes  Best for Web, DOM, CSS, JavaScript, URL, and LP-style browser-native motion.
-               Watch for footage-heavy edits and official SDK gaps in the current draft adapter.
+               Renders through the official HyperFrames CLI by default; producer, engine, and legacy local renderers are selectable.
   editframe    Best for source footage, audio, captions, B-roll, and timeline handoff workflows.
                Watch for current timeline-preview limits and Editframe plan/terms requirements.
 `);
@@ -542,6 +591,12 @@ function createEngine(
   options: {
     remotionRepoPath?: string;
     remotionMode?: RemotionProjectMode;
+    hyperframesRenderBackend?: HyperFramesRenderBackend;
+    hyperframesRenderQuality?: HyperFramesRenderQuality;
+    hyperframesRenderFormat?: HyperFramesRenderFormat;
+    hyperframesRenderWorkers?: number;
+    hyperframesUseDocker?: boolean;
+    hyperframesUseGpu?: boolean;
   } = {}
 ): VideoEngine {
   if (engine === "remotion") {
@@ -551,7 +606,14 @@ function createEngine(
     });
   }
   if (engine === "hyperframes") {
-    return createHyperFramesEngine();
+    return createHyperFramesEngine({
+      renderBackend: options.hyperframesRenderBackend,
+      renderQuality: options.hyperframesRenderQuality,
+      renderFormat: options.hyperframesRenderFormat,
+      renderWorkers: options.hyperframesRenderWorkers,
+      useDocker: options.hyperframesUseDocker,
+      useGpu: options.hyperframesUseGpu
+    });
   }
   return createEditframeEngine();
 }
@@ -597,6 +659,38 @@ function parseRemotionMode(
   value: string | undefined
 ): RemotionProjectMode | undefined {
   if (value === "auto" || value === "monorepo" || value === "standalone") {
+    return value;
+  }
+  return undefined;
+}
+
+function parseHyperFramesRenderBackend(
+  value: string | undefined
+): HyperFramesRenderBackend | undefined {
+  if (
+    value === "official-cli" ||
+    value === "official-producer" ||
+    value === "official-engine" ||
+    value === "local"
+  ) {
+    return value;
+  }
+  return undefined;
+}
+
+function parseHyperFramesRenderQuality(
+  value: string | undefined
+): HyperFramesRenderQuality | undefined {
+  if (value === "draft" || value === "standard" || value === "high") {
+    return value;
+  }
+  return undefined;
+}
+
+function parseHyperFramesRenderFormat(
+  value: string | undefined
+): HyperFramesRenderFormat | undefined {
+  if (value === "mp4" || value === "webm" || value === "mov") {
     return value;
   }
   return undefined;

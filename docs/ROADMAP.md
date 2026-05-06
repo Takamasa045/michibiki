@@ -23,6 +23,7 @@
 - HTML/CSS/JS draft project generation - done
 - local MP4 rendering with headless Chrome + ffmpeg - done
 - shared browser renderer extraction - done
+- official HyperFrames CLI / producer / engine render backends - done
 - URL/LP video templates
 - Apache-2.0 NOTICE handling
 
