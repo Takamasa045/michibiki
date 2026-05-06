@@ -47,6 +47,83 @@ type CommandRunner = (
 
 type ModuleLoader = (specifier: string) => Promise<unknown>;
 
+type HyperFramesRegistryInstallResult = {
+  name: string;
+  command: string;
+  installed: string[];
+};
+
+type HtmlInCanvasRegistryBlock = {
+  id: string;
+  src: string;
+  title: string;
+  durationSec: number;
+  width: number;
+  height: number;
+};
+
+const HTML_IN_CANVAS_REGISTRY_NAME = "html-in-canvas";
+
+const HTML_IN_CANVAS_REGISTRY_BLOCKS: Record<string, HtmlInCanvasRegistryBlock> =
+  {
+    "vfx-text-cursor": {
+      id: "vfx-text-cursor",
+      src: "compositions/vfx-text-cursor.html",
+      title: "VFX Text Cursor",
+      durationSec: 8,
+      width: 1920,
+      height: 1080
+    },
+    "vfx-liquid-background": {
+      id: "vfx-liquid-background",
+      src: "compositions/vfx-liquid-background.html",
+      title: "Liquid Background",
+      durationSec: 12,
+      width: 1920,
+      height: 1080
+    },
+    "vfx-iphone-device": {
+      id: "vfx-iphone-device",
+      src: "compositions/vfx-iphone-device.html",
+      title: "iPhone & MacBook 3D Showcase",
+      durationSec: 15,
+      width: 1920,
+      height: 1080
+    },
+    "vfx-magnetic": {
+      id: "vfx-magnetic",
+      src: "compositions/vfx-magnetic.html",
+      title: "Magnetic",
+      durationSec: 15,
+      width: 1920,
+      height: 1080
+    },
+    "vfx-portal": {
+      id: "vfx-portal",
+      src: "compositions/vfx-portal.html",
+      title: "Portal",
+      durationSec: 10,
+      width: 1920,
+      height: 1080
+    },
+    "vfx-liquid-glass": {
+      id: "vfx-liquid-glass",
+      src: "compositions/vfx-liquid-glass.html",
+      title: "Liquid Glass",
+      durationSec: 20,
+      width: 1920,
+      height: 1080
+    },
+    "vfx-shatter": {
+      id: "vfx-shatter",
+      src: "compositions/vfx-shatter.html",
+      title: "Shatter",
+      durationSec: 12,
+      width: 1920,
+      height: 1080
+    }
+  };
+
 export type HyperFramesEngineOptions = {
   renderBackend?: HyperFramesRenderBackend;
   renderQuality?: HyperFramesRenderQuality;
@@ -161,19 +238,31 @@ async function generateHyperFramesProject(
   const projectRoot = context.outputDir
     ? path.join(context.outputDir, "project", "hyperframes")
     : path.resolve("outputs", "hyperframes", projectName);
+  const htmlInCanvasBlock = selectHtmlInCanvasRegistryBlock(spec);
 
   await fs.mkdir(projectRoot, { recursive: true });
 
   const files = {
     "video-spec.json": `${JSON.stringify(spec, null, 2)}\n`,
-    "index.html": buildHtml(spec),
+    "index.html": buildHtml(spec, htmlInCanvasBlock),
     "styles.css": buildCss(spec),
     "motion.js": buildMotionJs(spec),
-    "README.md": buildReadme(spec)
+    "README.md": buildReadme(spec, htmlInCanvasBlock)
   };
 
   for (const [fileName, content] of Object.entries(files)) {
     await fs.writeFile(path.join(projectRoot, fileName), content, "utf8");
+  }
+
+  const registryInstalls: HyperFramesRegistryInstallResult[] = [];
+  if (htmlInCanvasBlock) {
+    registryInstalls.push(
+      await installHyperFramesRegistryItem(
+        HTML_IN_CANVAS_REGISTRY_NAME,
+        projectRoot,
+        options
+      )
+    );
   }
 
   const manifest = {
@@ -186,6 +275,9 @@ async function generateHyperFramesProject(
     renderBackend: options.renderBackend ?? "official-cli",
     renderQuality: options.renderQuality,
     renderFormat: options.renderFormat ?? inferRenderFormat(spec),
+    htmlInCanvasBlock: htmlInCanvasBlock?.id,
+    registryInstalls:
+      registryInstalls.length > 0 ? registryInstalls : undefined,
     generatedAt: new Date().toISOString()
   };
 
@@ -200,7 +292,13 @@ async function generateHyperFramesProject(
   await writeLog(
     context.logDir,
     "generate.log",
-    `Generated HyperFrames project at ${projectRoot}\n`
+    [
+      `Generated HyperFrames project at ${projectRoot}`,
+      ...registryInstalls.map(
+        (install) =>
+          `Installed HyperFrames registry item ${install.name}: ${install.installed.join(", ")}`
+      )
+    ].join("\n") + "\n"
   );
 
   return {
@@ -522,17 +620,33 @@ async function renderWithOfficialEngine(
   }
 }
 
-function buildHtml(spec: VideoSpec): string {
+function buildHtml(
+  spec: VideoSpec,
+  htmlInCanvasBlock?: HtmlInCanvasRegistryBlock
+): string {
   const scenes = spec.content.scenes ?? [];
   const sceneMarkup = scenes
     .map(
-      (scene) => `<section class="scene" data-duration="${scene.durationSec}">
+      (scene) => `<section class="scene">
   <p class="scene-kicker">Scene ${scene.order}</p>
   <h2>${escapeHtml(scene.text ?? scene.description)}</h2>
   <p>${escapeHtml(scene.motion ?? "DOM motion")}</p>
 </section>`
     )
     .join("\n");
+  const htmlInCanvasMarkup = htmlInCanvasBlock
+    ? `<div
+      class="registry-block registry-block--html-in-canvas"
+      data-composition-id="${htmlInCanvasBlock.id}"
+      data-composition-src="${htmlInCanvasBlock.src}"
+      data-start="0"
+      data-duration="${Math.min(spec.format.durationSec, htmlInCanvasBlock.durationSec)}"
+      data-track-index="1"
+      data-width="${htmlInCanvasBlock.width}"
+      data-height="${htmlInCanvasBlock.height}"
+      aria-hidden="true"
+    ></div>`
+    : "";
 
   return `<!doctype html>
 <html lang="en">
@@ -543,7 +657,8 @@ function buildHtml(spec: VideoSpec): string {
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body data-aspect="${spec.format.aspectRatio}">
-  <main id="root" class="stage" data-composition-id="root" data-start="0" data-duration="${spec.format.durationSec}" data-width="${spec.format.width}" data-height="${spec.format.height}" data-track-index="0">
+  <main id="root" class="stage" data-has-html-in-canvas="${htmlInCanvasBlock ? "true" : "false"}" data-composition-id="root" data-start="0" data-duration="${spec.format.durationSec}" data-width="${spec.format.width}" data-height="${spec.format.height}" data-track-index="0">
+    ${htmlInCanvasMarkup}
     <section class="hero">
       <p class="eyebrow">HyperFrames Draft</p>
       <h1>${escapeHtml(spec.title)}</h1>
@@ -552,6 +667,14 @@ function buildHtml(spec: VideoSpec): string {
     </section>
     ${sceneMarkup}
   </main>
+  <script>
+    window.__timelines = window.__timelines || {};
+    window.__timelines["root"] = window.__timelines["root"] || {
+      duration: () => ${spec.format.durationSec},
+      time: () => window.__timelines["root"],
+      pause: () => window.__timelines["root"]
+    };
+  </script>
   <script src="./motion.js"></script>
 </body>
 </html>
@@ -602,11 +725,27 @@ body {
   align-content: center;
   gap: 18px;
   padding: 8%;
+  z-index: 2;
 }
 
 .scene {
   opacity: 0;
   transform: translateY(42px) scale(0.98);
+}
+
+.registry-block--html-in-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.stage[data-has-html-in-canvas="true"] .hero,
+.stage[data-has-html-in-canvas="true"] .scene {
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.55), transparent 70%);
+  text-shadow: 0 3px 22px rgba(0, 0, 0, 0.55);
 }
 
 .eyebrow,
@@ -684,6 +823,25 @@ window.__hf = {
     renderAt(Math.max(0, Math.min(${durationSec}, time)) * 1000);
   }
 };
+window.__timelines = window.__timelines || {};
+window.__timelines.root = {
+  duration() {
+    return ${durationSec};
+  },
+  time(value) {
+    renderAt(Math.max(0, Math.min(${durationSec}, Number(value) || 0)) * 1000);
+    return this;
+  },
+  seek(value) {
+    return this.time(value);
+  },
+  progress(value) {
+    return this.time((Number(value) || 0) * ${durationSec});
+  },
+  pause() {
+    return this;
+  }
+};
 window.__playerReady = true;
 window.__renderReady = true;
 renderAt(0);
@@ -709,7 +867,26 @@ if (frameParam !== null) {
 `;
 }
 
-function buildReadme(spec: VideoSpec): string {
+function buildReadme(
+  spec: VideoSpec,
+  htmlInCanvasBlock?: HtmlInCanvasRegistryBlock
+): string {
+  const htmlInCanvasNotes = htmlInCanvasBlock
+    ? `
+## HyperFrames HTML-in-Canvas
+
+Michibiki detected an HTML-in-Canvas request and installed the official HyperFrames registry bundle with:
+
+\`\`\`bash
+npx hyperframes add html-in-canvas --no-clipboard --json
+\`\`\`
+
+Wired block: \`${htmlInCanvasBlock.id}\` (${htmlInCanvasBlock.title}).
+
+Live Studio preview needs Chrome or Brave with \`chrome://flags/#canvas-draw-element\` enabled. Official HyperFrames rendering enables \`CanvasDrawElement\` automatically.
+`
+    : "";
+
   return `# ${spec.title}
 
 Generated by Michibiki's HyperFrames adapter.
@@ -720,7 +897,115 @@ Generated by Michibiki's HyperFrames adapter.
 - Duration: ${spec.format.durationSec}s
 
 Open \`index.html\` to preview the DOM/CSS/JS motion draft.
+${htmlInCanvasNotes}
 `;
+}
+
+async function installHyperFramesRegistryItem(
+  name: string,
+  projectRoot: string,
+  options: ResolvedHyperFramesOptions
+): Promise<HyperFramesRegistryInstallResult> {
+  const cliPath = options.cliPath ?? (await resolveOfficialCliPath());
+  const args = [
+    cliPath,
+    "add",
+    name,
+    "--dir",
+    projectRoot,
+    "--no-clipboard",
+    "--json"
+  ];
+  const runner = options.commandRunner ?? runCommand;
+  const commandResult = await runner(process.execPath, args, {
+    cwd: projectRoot,
+    env: {
+      ...process.env,
+      HYPERFRAMES_NO_UPDATE_CHECK:
+        process.env.HYPERFRAMES_NO_UPDATE_CHECK ?? "1"
+    }
+  });
+
+  if (commandResult.code !== 0) {
+    throw new Error(
+      [
+        `HyperFrames registry install failed for ${name}.`,
+        `$ ${commandResult.command}`,
+        commandResult.stdout,
+        commandResult.stderr
+      ]
+        .filter(Boolean)
+        .join("\n")
+    );
+  }
+
+  return {
+    name,
+    command: commandResult.command,
+    installed: parseRegistryInstalledItems(commandResult.stdout, name)
+  };
+}
+
+function parseRegistryInstalledItems(
+  stdout: string,
+  fallbackName: string
+): string[] {
+  try {
+    const parsed = JSON.parse(stdout) as {
+      installed?: unknown;
+      written?: unknown;
+      name?: unknown;
+    };
+    if (Array.isArray(parsed.installed)) {
+      return parsed.installed.filter((item): item is string => typeof item === "string");
+    }
+    if (Array.isArray(parsed.written)) {
+      return parsed.written
+        .filter((item): item is string => typeof item === "string")
+        .map((item) => path.basename(item, path.extname(item)));
+    }
+    if (typeof parsed.name === "string") {
+      return [parsed.name];
+    }
+  } catch {
+    // Fall back to the registry name when the CLI output is not JSON.
+  }
+  return [fallbackName];
+}
+
+function selectHtmlInCanvasRegistryBlock(
+  spec: VideoSpec
+): HtmlInCanvasRegistryBlock | undefined {
+  const text = [spec.goal, spec.title, spec.style.motionStyle, spec.style.visualTone]
+    .join(" ")
+    .toLowerCase();
+  if (!mentionsHtmlInCanvasRegistry(text)) return undefined;
+
+  if (/(iphone|macbook|device|デバイス|スマホ|スマートフォン|phone|3d|gltf)/i.test(text)) {
+    return HTML_IN_CANVAS_REGISTRY_BLOCKS["vfx-iphone-device"];
+  }
+  if (/(liquid glass|glass|ガラス|voronoi|parallax|パララックス)/i.test(text)) {
+    return HTML_IN_CANVAS_REGISTRY_BLOCKS["vfx-liquid-glass"];
+  }
+  if (/(liquid|fluid|background|背景|波|wave|ripple)/i.test(text)) {
+    return HTML_IN_CANVAS_REGISTRY_BLOCKS["vfx-liquid-background"];
+  }
+  if (/(portal|ポータル|dimension|次元)/i.test(text)) {
+    return HTML_IN_CANVAS_REGISTRY_BLOCKS["vfx-portal"];
+  }
+  if (/(shatter|break|破片|割れ|砕け|ガラス片)/i.test(text)) {
+    return HTML_IN_CANVAS_REGISTRY_BLOCKS["vfx-shatter"];
+  }
+  if (/(magnetic|磁場|磁力|particle|粒子)/i.test(text)) {
+    return HTML_IN_CANVAS_REGISTRY_BLOCKS["vfx-magnetic"];
+  }
+  return HTML_IN_CANVAS_REGISTRY_BLOCKS["vfx-text-cursor"];
+}
+
+function mentionsHtmlInCanvasRegistry(text: string): boolean {
+  return /(html[- ]?in[- ]?canvas|drawElementImage|canvas-draw-element|canvasdrawelement|layoutsubtree|dom[^、。.!?\n]{0,24}(?:canvas|キャンバス|webgl|shader|シェーダー)|html[^、。.!?\n]{0,24}(?:canvas|キャンバス|webgl|shader|シェーダー)|(?:canvas|キャンバス)[^、。.!?\n]{0,24}(?:dom|html))/i.test(
+    text
+  );
 }
 
 function createProjectName(spec: VideoSpec): string {

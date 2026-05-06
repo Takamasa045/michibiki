@@ -2,7 +2,7 @@
 
 This document summarizes the practical strengths of Remotion, HyperFrames, and Editframe for Michibiki routing and agent responses. Use it with `engineFits`, `selectionGuide`, and the root agent rules.
 
-Sources checked: 2026-05-04.
+Sources checked: 2026-05-07.
 
 ## Remotion
 
@@ -26,7 +26,7 @@ Watch-outs:
 - HTML-in-canvas is experimental. Studio preview needs Chrome Canary 149+ with `chrome://flags/#canvas-draw-element` enabled; renders are supported by Remotion v4.0.455+ through Remotion's bundled Canary path, and WebGL shader effects may need `--gl=angle` or `Config.setChromiumOpenGlRenderer("angle")`.
 - Do not nest `<HtmlInCanvas>` inside another `<HtmlInCanvas>`; combine effects into one paint callback instead.
 - Company/commercial use may need current Remotion license review.
-- Existing web/LP DOM or GSAP-heavy work may still be faster to express in HyperFrames unless the request specifically needs React-controlled canvas post-processing or shader-style DOM effects.
+- Existing web/LP DOM, GSAP-heavy work, or HyperFrames official HTML-in-Canvas registry blocks may be faster to express in HyperFrames unless the request specifically needs React-controlled canvas post-processing or strongly typed reusable props.
 
 Official references:
 
@@ -48,6 +48,7 @@ Good uses:
 - Website/LP-to-video work where page structure, design tokens, typography, sections, and UI states should become motion.
 - HTML-first agent workflows: plain HTML/CSS/JS with timing data attributes, no React rewrite, no custom DSL.
 - GSAP, Lottie, CSS, Motion One, CodePen-style browser effects, and seekable animation runtimes.
+- Official HTML-in-Canvas registry blocks installed with `npx hyperframes add html-in-canvas`: Liquid Glass, iPhone/MacBook device showcase, VFX Text Cursor, Portal, Shatter, Magnetic, and Liquid Background.
 - Deterministic frame-by-frame capture in headless Chrome and FFmpeg encoding.
 
 Proposal angle:
@@ -58,11 +59,15 @@ Watch-outs:
 
 - Less natural for React component reuse or strongly typed TSX motion systems.
 - Current Michibiki adapter generates the HTML project itself, then renders through official HyperFrames CLI / producer / engine backends.
+- HTML-in-Canvas live preview needs Chrome/Brave with `chrome://flags/#canvas-draw-element` enabled; official HyperFrames rendering enables the required flag automatically.
 - Footage-heavy timelines, caption/audio editorial rhythm, and NLE-like workflows may fit Editframe better.
 
 Official references:
 
 - https://hyperframes.heygen.com/introduction
+- https://hyperframes.heygen.com/packages/cli
+- https://hyperframes.heygen.com/guides/html-in-canvas
+- https://hyperframes.heygen.com/catalog/blocks/vfx-iphone-device
 - https://hyperframes.heygen.com/guides/website-to-video
 - https://hyperframes.heygen.com/guides/hyperframes-vs-remotion
 - https://hyperframes.heygen.com/packages/engine

@@ -399,13 +399,17 @@ function buildSwitchHint(
   }
 
   if (targetEngine === "hyperframes") {
-    const condition = signals.hasUrlAsset
+    const condition = signals.mentionsHtmlInCanvasWorkflow
+      ? "If you want official HyperFrames HTML-in-Canvas registry blocks, WebGL textures, live DOM capture, or page-native VFX without a React rewrite"
+      : signals.hasUrlAsset
       ? "If you want the page itself to become the video (sections, scroll, GSAP/Lottie/CSS motion captured from the DOM)"
       : "If you'd rather author the video as a web page (HTML/CSS/JS), reuse an existing LP/DOM, or use GSAP/Lottie/CSS motion";
     return {
       targetEngine,
       condition,
-      why: "HyperFrames becomes the strongest fit because it captures DOM/CSS/JS motion deterministically through headless Chrome and ffmpeg."
+      why: signals.mentionsHtmlInCanvasWorkflow
+        ? "HyperFrames becomes the strongest fit because its official HTML-in-Canvas blocks capture live DOM into canvas/WebGL scenes and the CLI enables the required render flag automatically."
+        : "HyperFrames becomes the strongest fit because it captures DOM/CSS/JS motion deterministically through headless Chrome and ffmpeg."
     };
   }
 
@@ -471,8 +475,8 @@ function buildEngineFits(spec: VideoSpec, signals: RouterSignals): EngineFit[] {
     scores.hyperframes += 12;
   }
   if (signals.mentionsHtmlInCanvasWorkflow) {
-    scores.remotion += 42;
-    scores.hyperframes += 4;
+    scores.remotion += 24;
+    scores.hyperframes += 30;
     scores.editframe -= 8;
   }
   if (signals.mentionsAvatarOrTalkingHead) {
@@ -614,7 +618,7 @@ function buildBestUse(engine: EngineName, spec: VideoSpec): string {
     return `Use Editframe for this ${format} video if you want a timeline-shaped promo with explicit scene timegroups, caption or word-level text beats, voice/music sync, waveform-informed pacing, transitions, overlays, and B-roll or generated visual layers. It is not only for existing footage; it is strongest when the edit rhythm, audio, subtitles, and layered media should drive the piece.`;
   }
   if (engine === "hyperframes") {
-    return `Use HyperFrames for this ${format} video if you want the concept to feel like a web page or LP turning into motion with plain HTML/CSS/JS, GSAP/Lottie/CSS animations, frame-seekable timing, browser-native sections, and deterministic page-to-video rendering.`;
+    return `Use HyperFrames for this ${format} video if you want the concept to feel like a web page or LP turning into motion with plain HTML/CSS/JS, GSAP/Lottie/CSS animations, official HTML-in-Canvas registry VFX blocks, frame-seekable timing, browser-native sections, and deterministic page-to-video rendering.`;
   }
   return `Use Remotion for this ${format} video if you want a one-off, frame-accurate React motion piece with Sequence-based timing, useCurrentFrame choreography, kinetic typography, custom easing/spring motion, layered transitions, captions/audio, HTML-in-canvas DOM post-processing, Lottie or Three.js-style flourishes, and optional props for later reuse.`;
 }
@@ -633,6 +637,7 @@ function buildFeatureHighlights(engine: EngineName): string[] {
     return [
       "HTML-first authoring: compositions are plain HTML/CSS/JS with data attributes for timing and layout.",
       "Seek-driven deterministic capture: each frame is positioned independently in headless Chrome and encoded through FFmpeg.",
+      "Official HTML-in-Canvas registry blocks can capture live DOM into canvas/WebGL scenes for liquid glass, portal, shatter, device, and text-cursor VFX.",
       "Strong with GSAP, Lottie, CSS, Motion One, CodePen-style effects, and existing website/LP DOM that should become motion.",
       "Agent-friendly and low-friction: no React rewrite, no custom DSL, non-interactive CLI, and strong website-to-video workflows."
     ];
@@ -722,15 +727,17 @@ function buildEngineRecommendation(
         "Use HyperFrames when the video should feel like a web page becoming motion: DOM, CSS, JavaScript, URLs, and LP structure are the source material.",
       strengths: [
         "DOM/CSS/JavaScript motion from URL, LP, and Web UI content",
+        "official HTML-in-Canvas registry blocks for DOM-to-canvas/WebGL VFX",
         "official HyperFrames CLI / producer / engine render backends",
         "low license-risk path for browser-native motion"
       ],
       tradeoffs: [
         "generated output is still a Michibiki-authored HTML project, not a full HyperFrames Studio project",
+        "HTML-in-Canvas live preview needs the CanvasDrawElement browser flag; official CLI rendering enables it automatically",
         "less suited to footage-heavy edits, complex audio timelines, or source clip assembly",
         "browser rendering is best for deterministic motion, not advanced media compositing"
       ],
-      creativeDirection: `Create a browser-native ${format} piece: animate DOM sections as scroll beats, turn the page content into cards or panels, and use CSS/JS transitions for rhythm.${cta}`
+      creativeDirection: `Create a browser-native ${format} piece: animate DOM sections as scroll beats, turn the page content into cards or panels, and use CSS/JS transitions for rhythm. If HTML-in-Canvas is requested, install the official registry bundle and choose the closest VFX block as a scene or background.${cta}`
     };
   }
 

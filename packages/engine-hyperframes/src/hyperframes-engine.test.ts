@@ -38,7 +38,71 @@ describe("HyperFrames engine", () => {
     await expect(
       fs.readFile(path.join(project.rootPath, "motion.js"), "utf8")
     ).resolves.toContain("window.__hf");
+    await expect(
+      fs.readFile(path.join(project.rootPath, "motion.js"), "utf8")
+    ).resolves.toContain("window.__timelines");
     expect(existsSync(path.join(tempDir, "project", "project.json"))).toBe(true);
+  });
+
+  it("installs and wires official HTML-in-Canvas registry blocks when requested", async () => {
+    const tempDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "hyperframes-html-canvas-")
+    );
+    const spec = createVideoSpecFromPrompt({
+      prompt:
+        "HyperFramesでHTML-in-CanvasのLiquid Glass風VFXを使ったWeb動画にしたい"
+    });
+    const commandRunner: NonNullable<HyperFramesEngineOptions["commandRunner"]> =
+      vi.fn(async (_command, args) => ({
+        code: 0,
+        command: `node ${args.join(" ")}`,
+        stdout: JSON.stringify({
+          ok: true,
+          tag: "html-in-canvas",
+          installed: ["vfx-liquid-glass"]
+        }),
+        stderr: ""
+      }));
+    const engine = createHyperFramesEngine({
+      cliPath: "/tmp/hyperframes-cli.js",
+      commandRunner
+    });
+
+    const project = await engine.generateProject(spec, {
+      outputDir: tempDir,
+      logDir: path.join(tempDir, "logs")
+    });
+
+    await expect(
+      fs.readFile(path.join(project.rootPath, "index.html"), "utf8")
+    ).resolves.toContain(
+      'data-composition-src="compositions/vfx-liquid-glass.html"'
+    );
+    await expect(
+      fs.readFile(path.join(project.rootPath, "README.md"), "utf8")
+    ).resolves.toContain("npx hyperframes add html-in-canvas");
+    expect(commandRunner).toHaveBeenCalledWith(
+      process.execPath,
+      expect.arrayContaining([
+        "/tmp/hyperframes-cli.js",
+        "add",
+        "html-in-canvas",
+        "--dir",
+        project.rootPath,
+        "--no-clipboard",
+        "--json"
+      ]),
+      expect.objectContaining({ cwd: project.rootPath })
+    );
+    expect(project.metadata).toMatchObject({
+      htmlInCanvasBlock: "vfx-liquid-glass",
+      registryInstalls: [
+        expect.objectContaining({
+          name: "html-in-canvas",
+          installed: ["vfx-liquid-glass"]
+        })
+      ]
+    });
   });
 
   it("renders through the official HyperFrames CLI backend", async () => {

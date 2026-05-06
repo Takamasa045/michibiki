@@ -74,30 +74,29 @@ describe("selectEngine", () => {
     });
   });
 
-  it("routes HTML-in-canvas DOM post-processing to Remotion", () => {
+  it("routes HTML-in-canvas DOM VFX to HyperFrames registry blocks", () => {
     const spec = createVideoSpecFromPrompt({
       prompt:
         "LPのDOMをHTML-in-canvasでcanvas化してグリッチとblur shaderをかける動画"
     });
 
     const decision = selectEngine(spec);
-    const remotionFit = decision.engineFits.find(
-      (fit) => fit.engine === "remotion"
+    const hyperframesFit = decision.engineFits.find(
+      (fit) => fit.engine === "hyperframes"
     );
 
-    expect(decision.engine).toBe("remotion");
-    expect(findFitPercent(decision.engineFits, "remotion")).toBeGreaterThan(
-      findFitPercent(decision.engineFits, "hyperframes")
+    expect(decision.engine).toBe("hyperframes");
+    expect(findFitPercent(decision.engineFits, "hyperframes")).toBeGreaterThan(
+      findFitPercent(decision.engineFits, "remotion")
     );
-    expect(remotionFit).toMatchObject({
-      reason: expect.stringContaining("HTML-in-canvas"),
-      bestUse: expect.stringContaining("HTML-in-canvas"),
+    expect(hyperframesFit).toMatchObject({
+      bestUse: expect.stringContaining("HTML-in-Canvas"),
       featureHighlights: expect.arrayContaining([
-        expect.stringContaining("HTML-in-canvas")
+        expect.stringContaining("HTML-in-Canvas")
       ])
     });
     expect(decision.recommendation.strengths).toEqual(
-      expect.arrayContaining([expect.stringContaining("HTML-in-canvas")])
+      expect.arrayContaining([expect.stringContaining("HTML-in-Canvas")])
     );
   });
 
