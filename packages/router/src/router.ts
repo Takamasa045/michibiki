@@ -714,11 +714,11 @@ function buildEngineRecommendation(
         "Use HyperFrames when the video should feel like a web page becoming motion: DOM, CSS, JavaScript, URLs, and LP structure are the source material.",
       strengths: [
         "DOM/CSS/JavaScript motion from URL, LP, and Web UI content",
-        "fast local browser preview and MP4 rendering path",
-        "low license-risk path for browser-native drafts"
+        "official HyperFrames CLI / producer / engine render backends",
+        "low license-risk path for browser-native motion"
       ],
       tradeoffs: [
-        "draft adapter output is HTML/CSS/JS and does not bundle the official HyperFrames SDK",
+        "generated output is still a Michibiki-authored HTML project, not a full HyperFrames Studio project",
         "less suited to footage-heavy edits, complex audio timelines, or source clip assembly",
         "browser rendering is best for deterministic motion, not advanced media compositing"
       ],

@@ -95,14 +95,21 @@ Standalone preview uses `pnpm exec remotion studio src/index.ts`; standalone ren
 
 ### `packages/engine-hyperframes`
 
-Generates a browser-previewable project:
+Generates a HyperFrames-compatible browser project:
 
 - `index.html`
 - `styles.css`
 - `motion.js`
 - `video-spec.json`
 
-Rendering delegates to `packages/browser-renderer`.
+The generated page exposes the `window.__hf` seek protocol and root composition
+metadata so official HyperFrames tooling can capture it deterministically.
+Rendering uses the official `hyperframes` CLI by default and can be switched to
+`@hyperframes/producer`, low-level `@hyperframes/engine`, or the legacy
+`packages/browser-renderer` path.
+The `official-engine` backend attempts the low-level package directly and falls
+back to `@hyperframes/producer` when the installed engine package cannot be
+loaded by the current Node runtime.
 
 ### `packages/engine-editframe`
 

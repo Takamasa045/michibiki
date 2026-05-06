@@ -47,8 +47,11 @@
     "test": "vitest run src"
   },
   "dependencies": {
+    "@hyperframes/engine": "^0.4.45",
+    "@hyperframes/producer": "^0.4.45",
     "@michibiki/browser-renderer": "workspace:*",
     "@michibiki/compliance": "workspace:*",
-    "@michibiki/video-spec": "workspace:*"
+    "@michibiki/video-spec": "workspace:*",
+    "hyperframes": "^0.4.45"
   }
 }

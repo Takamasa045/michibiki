@@ -57,7 +57,7 @@ Proposal angle:
 Watch-outs:
 
 - Less natural for React component reuse or strongly typed TSX motion systems.
-- Current Michibiki adapter is a draft HTML/CSS/JS project generator and does not bundle the official SDK.
+- Current Michibiki adapter generates the HTML project itself, then renders through official HyperFrames CLI / producer / engine backends.
 - Footage-heavy timelines, caption/audio editorial rhythm, and NLE-like workflows may fit Editframe better.
 
 Official references:
