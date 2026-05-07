@@ -38,11 +38,11 @@ Selects the best engine from a `VideoSpec`.
 
 The router intentionally does not call engine internals. It returns only an `EngineDecision`.
 
-`EngineDecision` includes the selected engine plus `engineFits`, a three-engine relative fit comparison whose percentages sum to 100. Each fit includes the reason, best use for this specific video, and the engine-specific recommendation. `selectionGuide` is a natural-language summary intended for CLI output and agent responses in Claude Code or Codex.
+`EngineDecision` includes the selected engine plus `engineFits`, a three-engine relative fit comparison whose percentages sum to 100. Each fit includes the reason, best use for this specific video, and the engine-specific recommendation. `selectionGuide` is a natural-language summary intended for CLI output and agent responses in Claude Code, Codex, or Antigravity.
 
 Engine-specific proposal language should use `docs/ENGINE_PROFILES.md` so the response reflects each engine's real strengths instead of reducing them to "template", "LP", or "asset editing" labels.
 
-For natural-language agent workflows, see the root `AGENTS.md` (canonical agent rules; `CLAUDE.md` is a thin pointer to it). Agents should not stop after summarizing a URL or page; they must surface `engineFits`, `selectionGuide`, and the evidence for any existing video assets before asking the user to choose or proceeding with generation.
+For natural-language agent workflows, see the root `AGENTS.md` (canonical agent rules; `CLAUDE.md` and `GEMINI.md` are thin compatibility pointers to it). Agents should not stop after summarizing a URL or page; they must surface `engineFits`, `selectionGuide`, and the evidence for any existing video assets before asking the user to choose or proceeding with generation.
 
 ### `packages/compliance`
 

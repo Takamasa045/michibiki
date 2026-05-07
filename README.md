@@ -110,9 +110,14 @@ Every generated job writes `engine-decision.json` with the same selected engine,
 Engine behavior, recommendation rules, and agent contracts are documented in:
 
 - [`docs/ENGINE_PROFILES.md`](docs/ENGINE_PROFILES.md) — Remotion / HyperFrames / Editframe strengths, tradeoffs, and best-use patterns
-- [`AGENTS.md`](AGENTS.md) — canonical agent rules for natural-language video requests and URL promo requests (Codex / Claude Code both read this)
+- [`AGENTS.md`](AGENTS.md) — canonical agent rules for natural-language video requests and URL promo requests (Codex / Claude Code / Antigravity shared rules)
 - [`CLAUDE.md`](CLAUDE.md) — Claude Code compatibility pointer to `AGENTS.md`
+- [`GEMINI.md`](GEMINI.md) — Antigravity / Gemini compatibility pointer to `AGENTS.md`
 - [`docs/AGENT_RESPONSE_EXAMPLES.md`](docs/AGENT_RESPONSE_EXAMPLES.md) — agent response samples
+
+### Agent Compatibility
+
+`AGENTS.md` is the single source of truth for agent behavior in this repository. Codex reads it directly, Claude Code reaches it through `CLAUDE.md`, and Antigravity / Gemini agents reach it through `GEMINI.md`. Keep tool-specific files as thin pointers so video-routing rules, approval gates, and engine guidance do not drift.
 
 Useful commands:
 
@@ -230,8 +235,12 @@ Michibiki は現在 CLI-first です。HyperFrames アダプターは HyperFrame
 - Editframe timeline handoff 生成とMP4タイムラインプレビュー
 - HyperFrames の従来 local backend と Editframe で使う headless Chrome + ffmpeg レンダー基盤
 - `outputs/jobs/<job-id>` への成果物保存
-- `docs/ENGINE_PROFILES.md` と `AGENTS.md` による Codex / Claude Code 向けエンジン提案ルール（`CLAUDE.md` は `AGENTS.md` への薄いポインタ）
+- `docs/ENGINE_PROFILES.md` と `AGENTS.md` による Codex / Claude Code / Antigravity 向けエンジン提案ルール（`CLAUDE.md` と `GEMINI.md` は `AGENTS.md` への薄いポインタ）
 - ライセンス注意の表示
+
+### エージェント互換性
+
+このリポジトリでは `AGENTS.md` をエージェント動作ルールの唯一の本文として扱います。Codex は `AGENTS.md` を直接読み、Claude Code は `CLAUDE.md` 経由、Antigravity / Gemini 系は `GEMINI.md` 経由で同じルールを参照します。動画ルーティング、承認ゲート、エンジン説明の drift を避けるため、ツール別ファイルには本文を複製しません。
 
 セットアップ:
 

@@ -1,8 +1,15 @@
 # AGENTS.md - Michibiki Agent Rules
 
-このリポジトリで Claude Code / Codex などのエージェントが作業する際のカノニカルなルールです。Claude Code 用の `CLAUDE.md` はこのファイルへのポインタです。上位のシステム・開発者・ユーザー指示を優先します。
+このリポジトリで Claude Code / Codex / Antigravity などのエージェントが作業する際のカノニカルなルールです。Claude Code 用の `CLAUDE.md` と Antigravity / Gemini 系用の `GEMINI.md` はこのファイルへのポインタです。上位のシステム・開発者・ユーザー指示を優先します。
 
 各エンジンの特徴・適用範囲・公式ドキュメント参照は [`docs/ENGINE_PROFILES.md`](docs/ENGINE_PROFILES.md) を参照してください。返答サンプルは [`docs/AGENT_RESPONSE_EXAMPLES.md`](docs/AGENT_RESPONSE_EXAMPLES.md) にあります。
+
+## Agent Entry Points
+
+- `AGENTS.md` が canonical です。Video Request Routing Rule、承認境界、Skill 利用ルールはここだけを更新します。
+- `CLAUDE.md` は Claude Code 互換の薄いポインタです。ルール本文は重複させません。
+- `GEMINI.md` は Antigravity / Gemini 系互換の薄いポインタです。ルール本文は重複させません。
+- Antigravity の workspace rules ディレクトリを使う場合も、追加するのは `AGENTS.md` への参照だけにし、Michibiki 固有ルールを複製しないでください。
 
 ## Video Request Routing Rule
 

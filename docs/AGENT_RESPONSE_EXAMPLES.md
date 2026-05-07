@@ -1,6 +1,6 @@
 # Agent Response Examples
 
-エージェント（Claude Code / Codex）が Michibiki の `Video Request Routing Rule`（root `AGENTS.md`）に従って返答する際の参考例です。実際のパーセンテージ・本文は、`michibiki decide` または `selectEngine()` の出力で置き換えてください。
+エージェント（Claude Code / Codex / Antigravity）が Michibiki の `Video Request Routing Rule`（root `AGENTS.md`）に従って返答する際の参考例です。実際のパーセンテージ・本文は、`michibiki decide` または `selectEngine()` の出力で置き換えてください。
 
 ## URL/LP起点のプロモ動画リクエスト
 
