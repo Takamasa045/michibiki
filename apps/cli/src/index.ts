@@ -10,12 +10,14 @@ import {
 } from "@michibiki/engine-hyperframes";
 import {
   createRemotionEngine,
+  resolveRemotionRepoPath,
   type RemotionProjectMode
 } from "@michibiki/engine-remotion";
 import {
   createJobPaths,
   readJobManifest,
   resolveJobDir,
+  validateGeneratedProjectPath,
   writeJobFiles,
   writePreviewResult
 } from "@michibiki/render-jobs";
@@ -258,7 +260,9 @@ async function render(args: ReturnType<typeof parseArgs>): Promise<void> {
     return;
   }
 
-  const { jobDir, manifest, project } = await loadGeneratedProject(job);
+  const { jobDir, manifest, project } = await loadGeneratedProject(job, {
+    remotionRepoPath: getValue(args, "remotion-repo")
+  });
   const engine = createEngine(manifest.decision.engine, {
     remotionRepoPath: getValue(args, "remotion-repo"),
     remotionMode: parseRemotionMode(getValue(args, "remotion-mode")),
@@ -296,7 +300,9 @@ async function preview(args: ReturnType<typeof parseArgs>): Promise<void> {
     throw new Error("Missing job. Use michibiki preview --job outputs/jobs/<job-id>.");
   }
 
-  const { jobDir, manifest, project } = await loadGeneratedProject(job);
+  const { jobDir, manifest, project } = await loadGeneratedProject(job, {
+    remotionRepoPath: getValue(args, "remotion-repo")
+  });
   const engine = createEngine(manifest.decision.engine, {
     remotionRepoPath: getValue(args, "remotion-repo"),
     remotionMode: parseRemotionMode(getValue(args, "remotion-mode")),
@@ -548,7 +554,10 @@ function printAmbiguityBlock(params: {
   );
 }
 
-async function loadGeneratedProject(job: string): Promise<{
+async function loadGeneratedProject(
+  job: string,
+  options: { remotionRepoPath?: string } = {}
+): Promise<{
   jobDir: string;
   manifest: Awaited<ReturnType<typeof readJobManifest>>;
   project: GeneratedProject;
@@ -564,6 +573,17 @@ async function loadGeneratedProject(job: string): Promise<{
   if (!rootPath) {
     throw new Error("project/project.json is missing projectPath.");
   }
+  const validatedRootPath = await validateGeneratedProjectPath({
+    jobDir,
+    engine: manifest.decision.engine,
+    projectPath: rootPath,
+    remotionMode: readString(projectRecord.remotionMode),
+    remotionRepoPath: readString(projectRecord.remotionRepoPath),
+    expectedRemotionRepoPath:
+      manifest.decision.engine === "remotion"
+        ? resolveRemotionRepoPath(options.remotionRepoPath)
+        : undefined
+  });
 
   return {
     jobDir,
@@ -572,7 +592,7 @@ async function loadGeneratedProject(job: string): Promise<{
       id: readString(projectRecord.id) ?? "project_unknown",
       engine: manifest.decision.engine,
       name: readProjectName(projectRecord),
-      rootPath,
+      rootPath: validatedRootPath,
       files: [],
       metadata: projectRecord
     }

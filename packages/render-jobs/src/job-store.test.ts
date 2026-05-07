@@ -7,6 +7,7 @@ import {
   createJobPaths,
   readJobManifest,
   resolveJobDir,
+  validateGeneratedProjectPath,
   writeJobFiles,
   writePreviewResult
 } from "./job-store.js";
@@ -127,5 +128,77 @@ describe("render job store", () => {
     expect(resolveJobDir("job_1", "/repo")).toBe(
       path.resolve("/repo", "outputs", "jobs", "job_1")
     );
+  });
+
+  it("keeps generated browser projects inside the job project directory", async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "michibiki-job-"));
+    const jobDir = path.join(tempDir, "outputs", "jobs", "job_1");
+    const projectPath = path.join(jobDir, "project", "hyperframes");
+    const outsidePath = path.join(tempDir, "outside-project");
+    await fs.mkdir(projectPath, { recursive: true });
+    await fs.mkdir(outsidePath, { recursive: true });
+
+    await expect(
+      validateGeneratedProjectPath({
+        jobDir,
+        engine: "hyperframes",
+        projectPath
+      })
+    ).resolves.toBe(await fs.realpath(projectPath));
+
+    await expect(
+      validateGeneratedProjectPath({
+        jobDir,
+        engine: "hyperframes",
+        projectPath: outsidePath
+      })
+    ).rejects.toThrow(/outside the generated job project directory/);
+  });
+
+  it("allows only the expected Remotion monorepo apps directory", async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "michibiki-job-"));
+    const jobDir = path.join(tempDir, "outputs", "jobs", "job_1");
+    const repoDir = path.join(tempDir, "remotion-studio-monorepo");
+    const appPath = path.join(repoDir, "apps", "video-app");
+    const packagePath = path.join(repoDir, "packages", "not-an-app");
+    const otherRepoDir = path.join(tempDir, "other-remotion-repo");
+    const otherAppPath = path.join(otherRepoDir, "apps", "video-app");
+    await fs.mkdir(path.join(jobDir, "project"), { recursive: true });
+    await fs.mkdir(appPath, { recursive: true });
+    await fs.mkdir(packagePath, { recursive: true });
+    await fs.mkdir(otherAppPath, { recursive: true });
+
+    await expect(
+      validateGeneratedProjectPath({
+        jobDir,
+        engine: "remotion",
+        remotionMode: "monorepo",
+        remotionRepoPath: repoDir,
+        expectedRemotionRepoPath: repoDir,
+        projectPath: appPath
+      })
+    ).resolves.toBe(await fs.realpath(appPath));
+
+    await expect(
+      validateGeneratedProjectPath({
+        jobDir,
+        engine: "remotion",
+        remotionMode: "monorepo",
+        remotionRepoPath: repoDir,
+        expectedRemotionRepoPath: repoDir,
+        projectPath: packagePath
+      })
+    ).rejects.toThrow(/outside the Remotion apps directory/);
+
+    await expect(
+      validateGeneratedProjectPath({
+        jobDir,
+        engine: "remotion",
+        remotionMode: "monorepo",
+        remotionRepoPath: otherRepoDir,
+        expectedRemotionRepoPath: repoDir,
+        projectPath: otherAppPath
+      })
+    ).rejects.toThrow(/does not match the resolved Remotion repo/);
   });
 });

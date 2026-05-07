@@ -4,6 +4,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import type {
   EngineDecision,
+  EngineName,
   PreviewResult,
   VideoSpec
 } from "@michibiki/video-spec";
@@ -92,6 +93,67 @@ export function resolveJobDir(job: string, cwd = process.cwd()): string {
   return path.resolve(cwd, "outputs", "jobs", job);
 }
 
+export async function validateGeneratedProjectPath(params: {
+  jobDir: string;
+  engine: EngineName;
+  projectPath: string;
+  remotionMode?: string;
+  remotionRepoPath?: string;
+  expectedRemotionRepoPath?: string;
+}): Promise<string> {
+  const projectPath = await realpathOrResolve(params.projectPath);
+  if (params.engine === "remotion" && params.remotionMode === "monorepo") {
+    const remotionRepoPath = params.remotionRepoPath
+      ? await realpathOrResolve(params.remotionRepoPath)
+      : undefined;
+    const expectedRemotionRepoPath = params.expectedRemotionRepoPath
+      ? await realpathOrResolve(params.expectedRemotionRepoPath)
+      : undefined;
+
+    if (!remotionRepoPath) {
+      throw new Error("Remotion monorepo project manifest is missing remotionRepoPath.");
+    }
+    if (expectedRemotionRepoPath && remotionRepoPath !== expectedRemotionRepoPath) {
+      throw new Error(
+        `Remotion monorepo path ${remotionRepoPath} does not match the resolved Remotion repo ${expectedRemotionRepoPath}.`
+      );
+    }
+
+    const appsDir = await realpathOrResolve(path.join(remotionRepoPath, "apps"));
+    if (!isPathInside(projectPath, appsDir)) {
+      throw new Error(
+        `Generated Remotion project path ${projectPath} is outside the Remotion apps directory ${appsDir}.`
+      );
+    }
+
+    return projectPath;
+  }
+
+  const jobProjectDir = await realpathOrResolve(
+    path.join(await realpathOrResolve(params.jobDir), "project")
+  );
+  if (!isPathInside(projectPath, jobProjectDir)) {
+    throw new Error(
+      `Generated project path ${projectPath} is outside the generated job project directory ${jobProjectDir}.`
+    );
+  }
+
+  return projectPath;
+}
+
 async function writeJson(filePath: string, value: unknown): Promise<void> {
   await fs.writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
+}
+
+async function realpathOrResolve(filePath: string): Promise<string> {
+  try {
+    return await fs.realpath(filePath);
+  } catch {
+    return path.resolve(filePath);
+  }
+}
+
+function isPathInside(childPath: string, parentPath: string): boolean {
+  const relative = path.relative(parentPath, childPath);
+  return relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative));
 }

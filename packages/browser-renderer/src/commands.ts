@@ -7,10 +7,21 @@ export type CommandResult = {
   command: string;
 };
 
+export type CommandOptions = {
+  detached?: boolean;
+  timeoutMs?: number;
+};
+
+export type CommandRunner = (
+  command: string,
+  args: string[],
+  options?: CommandOptions
+) => Promise<CommandResult>;
+
 export function runCommand(
   command: string,
   args: string[],
-  options: { detached?: boolean; timeoutMs?: number } = {}
+  options: CommandOptions = {}
 ): Promise<CommandResult> {
   return new Promise((resolve) => {
     const child = spawn(command, args, {
@@ -76,4 +87,3 @@ export function runCommand(
     });
   });
 }
-
