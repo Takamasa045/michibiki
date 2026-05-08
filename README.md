@@ -117,7 +117,16 @@ Engine behavior, recommendation rules, and agent contracts are documented in:
 
 ### Agent Compatibility
 
-`AGENTS.md` is the single source of truth for agent behavior in this repository. Codex reads it directly, Claude Code reaches it through `CLAUDE.md`, and Antigravity / Gemini agents reach it through `GEMINI.md`. Keep tool-specific files as thin pointers so video-routing rules, approval gates, and engine guidance do not drift.
+`AGENTS.md` is the single source of truth for agent behavior in this repository. **Codex CLI, Codex Cloud, and Antigravity all read `AGENTS.md` natively** with no extra setup. Claude Code reaches the same rules through `CLAUDE.md`, and Antigravity additionally reads `GEMINI.md`. Tool-specific files stay as thin pointers so video-routing rules, approval gates, and engine guidance do not drift.
+
+| Engine | AGENTS.md auto-load | Skill execution | CLI execution | Setup |
+|---|---|---|---|---|
+| Claude Code | ✅ via `CLAUDE.md` | ✅ full | ✅ | clone only |
+| Codex CLI | ✅ native | ❌ | ✅ | clone only |
+| Codex Cloud | ✅ native | ❌ | ⚠️ ffmpeg/headless Chrome may be restricted | clone + sandbox check |
+| Antigravity | ✅ native + `GEMINI.md` | ❌ | ⚠️ pair with terminal | clone only |
+
+Skill execution refers to Claude Code-specific custom skills (e.g. `mv-production-pipeline`, `remotion-best-practices`). Codex and Antigravity still get the full `AGENTS.md` routing rules and CLI workflow.
 
 Useful commands:
 
