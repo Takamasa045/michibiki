@@ -244,7 +244,7 @@ async function generateHyperFramesProject(
 
   const files = {
     "video-spec.json": `${JSON.stringify(spec, null, 2)}\n`,
-    "index.html": buildHtml(spec, htmlInCanvasBlock),
+    "index.html": buildHtml(spec),
     "styles.css": buildCss(spec),
     "motion.js": buildMotionJs(spec),
     "README.md": buildReadme(spec, htmlInCanvasBlock)
@@ -655,6 +655,7 @@ function buildHtml(
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${escapeHtml(spec.title)}</title>
   <link rel="stylesheet" href="./styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
 </head>
 <body data-aspect="${spec.format.aspectRatio}">
   <main id="root" class="stage" data-has-html-in-canvas="${htmlInCanvasBlock ? "true" : "false"}" data-composition-id="root" data-start="0" data-duration="${spec.format.durationSec}" data-width="${spec.format.width}" data-height="${spec.format.height}" data-track-index="0">
@@ -666,15 +667,8 @@ function buildHtml(
       ${spec.content.cta ? `<strong class="cta">${escapeHtml(spec.content.cta)}</strong>` : ""}
     </section>
     ${sceneMarkup}
+    <div id="driver" class="clip" data-start="0" data-duration="${spec.format.durationSec}" data-track-index="9" aria-hidden="true"></div>
   </main>
-  <script>
-    window.__timelines = window.__timelines || {};
-    window.__timelines["root"] = window.__timelines["root"] || {
-      duration: () => ${spec.format.durationSec},
-      time: () => window.__timelines["root"],
-      pause: () => window.__timelines["root"]
-    };
-  </script>
   <script src="./motion.js"></script>
 </body>
 </html>
@@ -731,6 +725,14 @@ body {
 .scene {
   opacity: 0;
   transform: translateY(42px) scale(0.98);
+}
+
+#driver {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .registry-block--html-in-canvas {
@@ -792,65 +794,51 @@ h2 {
 }
 
 function buildMotionJs(spec: VideoSpec): string {
-  const durationMs = spec.format.durationSec * 1000;
   const durationSec = spec.format.durationSec;
 
   return `const scenes = [...document.querySelectorAll(".scene")];
 const hero = document.querySelector(".hero");
-const duration = ${durationMs};
-const sceneDuration = duration / Math.max(1, scenes.length + 1);
+const panels = [hero, ...scenes].filter(Boolean);
+const panelCount = Math.max(1, panels.length);
+const durationSec = ${durationSec};
+const panelDuration = durationSec / panelCount;
 
-function renderAt(now) {
-  const t = now % duration;
-  const heroProgress = Math.min(1, t / sceneDuration);
-  if (hero) {
-    hero.style.opacity = String(Math.max(0, 1 - heroProgress * 1.2));
-    hero.style.transform = \`translateY(\${-heroProgress * 36}px)\`;
-  }
-
-  scenes.forEach((scene, index) => {
-    const local = (t - sceneDuration * (index + 1)) / sceneDuration;
-    const visible = local >= 0 && local <= 1;
-    const eased = Math.max(0, Math.min(1, local));
-    scene.style.opacity = visible ? String(1 - Math.abs(eased - 0.5) * 1.5) : "0";
-    scene.style.transform = \`translateY(\${(1 - eased) * 42}px) scale(\${0.98 + eased * 0.02})\`;
-  });
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
 }
 
-window.__hf = {
-  duration: ${durationSec},
-  seek(time) {
-    renderAt(Math.max(0, Math.min(${durationSec}, time)) * 1000);
-  }
-};
+gsap.set(panels, {
+  opacity: 0,
+  y: 42,
+  scale: 0.985,
+  pointerEvents: "none"
+});
+
+const tl = gsap.timeline({ paused: true });
+
+panels.forEach((panel, index) => {
+  const pad = Math.min(0.22, panelDuration * 0.04);
+  const start = index * panelDuration + pad;
+  const end = (index + 1) * panelDuration - pad;
+  const holdEnd = Math.max(start + 0.9, end - 0.48);
+
+  tl.set(panel, { pointerEvents: "auto" }, start);
+  tl.to(panel, { opacity: 1, y: 0, scale: 1, duration: 0.62, ease: "power3.out" }, start);
+  tl.to(panel, { opacity: 0, y: -34, scale: 0.988, duration: 0.48, ease: "power2.in" }, holdEnd);
+  tl.set(panel, { pointerEvents: "none" }, end);
+});
+
 window.__timelines = window.__timelines || {};
-window.__timelines.root = {
-  duration() {
-    return ${durationSec};
-  },
-  time(value) {
-    renderAt(Math.max(0, Math.min(${durationSec}, Number(value) || 0)) * 1000);
-    return this;
-  },
-  seek(value) {
-    return this.time(value);
-  },
-  progress(value) {
-    return this.time((Number(value) || 0) * ${durationSec});
-  },
-  pause() {
-    return this;
+window.__timelines.root = tl;
+window.__hf = {
+  duration: durationSec,
+  seek(time) {
+    tl.time(clamp(Number(time) || 0, 0, durationSec));
   }
 };
 window.__playerReady = true;
 window.__renderReady = true;
-renderAt(0);
-
-function tick(now) {
-  renderAt(now);
-
-  requestAnimationFrame(tick);
-}
+tl.time(0);
 
 const params = new URLSearchParams(window.location.search);
 const frameParam = params.get("frame");
@@ -859,9 +847,14 @@ const fpsParam = Number(params.get("fps") || "${spec.format.fps}");
 if (frameParam !== null) {
   const frame = Number(frameParam);
   const fps = Number.isFinite(fpsParam) && fpsParam > 0 ? fpsParam : ${spec.format.fps};
-  renderAt((Number.isFinite(frame) ? frame : 0) * 1000 / fps);
+  tl.time(clamp((Number.isFinite(frame) ? frame : 0) / fps, 0, durationSec));
   document.documentElement.dataset.videoRouterFrame = String(frame);
-} else {
+} else if (params.get("play") === "1") {
+  const startTime = performance.now();
+  function tick(now) {
+    tl.time(((now - startTime) / 1000) % durationSec);
+    requestAnimationFrame(tick);
+  }
   requestAnimationFrame(tick);
 }
 `;
@@ -875,15 +868,15 @@ function buildReadme(
     ? `
 ## HyperFrames HTML-in-Canvas
 
-Michibiki detected an HTML-in-Canvas request and installed the official HyperFrames registry bundle with:
+Michibiki detected an HTML-in-Canvas request and installed the official HyperFrames registry bundle as a reference with:
 
 \`\`\`bash
 npx hyperframes add html-in-canvas --no-clipboard --json
 \`\`\`
 
-Wired block: \`${htmlInCanvasBlock.id}\` (${htmlInCanvasBlock.title}).
+Suggested block: \`${htmlInCanvasBlock.id}\` (${htmlInCanvasBlock.title}).
 
-Live Studio preview needs Chrome or Brave with \`chrome://flags/#canvas-draw-element\` enabled. Official HyperFrames rendering enables \`CanvasDrawElement\` automatically.
+The registry demo block is not wired into \`index.html\` automatically because official examples can include provider branding and heavy WebGL effects. Copy the relevant technique into a brand-neutral composition before rendering.
 `
     : "";
 

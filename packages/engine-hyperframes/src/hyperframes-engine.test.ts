@@ -44,7 +44,7 @@ describe("HyperFrames engine", () => {
     expect(existsSync(path.join(tempDir, "project", "project.json"))).toBe(true);
   });
 
-  it("installs and wires official HTML-in-Canvas registry blocks when requested", async () => {
+  it("installs official HTML-in-Canvas registry blocks as references", async () => {
     const tempDir = await fs.mkdtemp(
       path.join(os.tmpdir(), "hyperframes-html-canvas-")
     );
@@ -73,14 +73,17 @@ describe("HyperFrames engine", () => {
       logDir: path.join(tempDir, "logs")
     });
 
-    await expect(
-      fs.readFile(path.join(project.rootPath, "index.html"), "utf8")
-    ).resolves.toContain(
-      'data-composition-src="compositions/vfx-liquid-glass.html"'
+    const html = await fs.readFile(
+      path.join(project.rootPath, "index.html"),
+      "utf8"
     );
+    expect(html).toContain('data-has-html-in-canvas="false"');
+    expect(html).not.toContain("data-composition-src=");
     await expect(
       fs.readFile(path.join(project.rootPath, "README.md"), "utf8")
-    ).resolves.toContain("npx hyperframes add html-in-canvas");
+    ).resolves.toContain(
+      "installed the official HyperFrames registry bundle as a reference"
+    );
     expect(commandRunner).toHaveBeenCalledWith(
       process.execPath,
       expect.arrayContaining([
