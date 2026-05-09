@@ -68,11 +68,11 @@ importers:
   packages/engine-hyperframes:
     dependencies:
       '@hyperframes/engine':
-        specifier: ^0.5.3
-        version: 0.5.3(typescript@5.9.3)
+        specifier: ^0.5.5
+        version: 0.5.5(typescript@5.9.3)
       '@hyperframes/producer':
-        specifier: ^0.5.3
-        version: 0.5.3(typescript@5.9.3)
+        specifier: ^0.5.5
+        version: 0.5.5(typescript@5.9.3)
       '@michibiki/browser-renderer':
         specifier: workspace:*
         version: link:../browser-renderer
@@ -83,8 +83,8 @@ importers:
         specifier: workspace:*
         version: link:../video-spec
       hyperframes:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: ^0.5.5
+        version: 0.5.5
 
   packages/engine-remotion:
     dependencies:
@@ -485,20 +485,20 @@ packages:
     peerDependencies:
       hono: ^4
 
-  '@hyperframes/core@0.5.3':
-    resolution: {integrity: sha512-ezChBRy4yDyHJIQzUucrdSlDtVNgABiOMQxTVFN++aSCeuPqjFotlxmq4MinuOjd8l9hYjXQYoiOMIQpmiMgTA==}
+  '@hyperframes/core@0.5.5':
+    resolution: {integrity: sha512-XXEgxQ0Dbzx961B04B4d2l7nfZx/Etc1bS5NE4KiR/cX8MRYiyd/P2u2RAEu5HXHEjHeIjAODh+ZtzebOHTCLQ==}
     peerDependencies:
       hono: ^4.0.0
     peerDependenciesMeta:
       hono:
         optional: true
 
-  '@hyperframes/engine@0.5.3':
-    resolution: {integrity: sha512-DKQwtGrzn/X19xH3ge+2JwniBDsS/EjBTetvzwLehg1sGPS1EF1k+bqcn1cpUARsEl+Fyej5iHf/wFzL8hjDHA==}
+  '@hyperframes/engine@0.5.5':
+    resolution: {integrity: sha512-A8zEAbIuY+YaJwUU47Yq0+LSczv8aANLx7zT9ZTMe7H4o1EZi75HFpbMdH8dHs9OfwOaPKoDgo9bT4IEg7tFnA==}
     engines: {node: '>=22'}
 
-  '@hyperframes/producer@0.5.3':
-    resolution: {integrity: sha512-xPnOt9TWtiXBFaukx0LEeaKbSkXjY+7wKGP/G6sC4MWhaW+h7w0QEzLvJQ87BD6PLRxirPS+P0Im+V8RsZeb6g==}
+  '@hyperframes/producer@0.5.5':
+    resolution: {integrity: sha512-1NCe3Fzh/3k5LqQ4ar3ORwkWG961lsFXtJovQyiYZp8PBU920w4SLlfEmC/pIMjvvigNt6QEwoAcZ8FEFLNhJQ==}
     engines: {node: '>=22'}
 
   '@img/colour@1.1.0':
@@ -844,6 +844,9 @@ packages:
 
   '@types/node@22.19.17':
     resolution: {integrity: sha512-wGdMcf+vPYM6jikpS/qhg6WiqSV/OhG+jeeHT/KlVqxYfD40iYJf9/AE1uQxVWFvU7MipKRkRv8NSHiCGgPr8Q==}
+
+  '@types/node@25.6.2':
+    resolution: {integrity: sha512-sokuT28dxf9JT5Kady1fsXOvI4HVpjZa95NKT5y9PNTIrs2AsobR4GFAA90ZG8M+nxVRLysCXsVj6eGC7Vbrlw==}
 
   '@types/retry@0.12.0':
     resolution: {integrity: sha512-wWKOClTTiizcZhXnPY4wikVAwmdYHp8q6DmC+EJUzAMsycb7HB32Kh9RN4+0gExjmPmZSAQjgURXIGATPegAvA==}
@@ -1265,8 +1268,8 @@ packages:
   has-property-descriptors@1.0.2:
     resolution: {integrity: sha512-55JNKuIW+vq4Ke1BjOTjM2YctQIvCT7GFzHwmfZPGo5wnrgkid0YQtnAleFSqumZm4az3n2BS+erby5ipJdgrg==}
 
-  hono@4.12.17:
-    resolution: {integrity: sha512-FbJJNb/XgX7YW0hX/V8w5oYLztKEsRLykCMZWt1WdLtsfjzMvmoqWBA4H4t5norinq8/rh20oiZYr+WSl4UzAQ==}
+  hono@4.12.18:
+    resolution: {integrity: sha512-RWzP96k/yv0PQfyXnWjs6zot20TqfpfsNXhOnev8d1InAxubW93L11/oNUc3tQqn2G0bSdAOBpX+2uDFHV7kdQ==}
     engines: {node: '>=16.9.0'}
 
   html-escaper@3.0.3:
@@ -1283,8 +1286,8 @@ packages:
     resolution: {integrity: sha512-vK9P5/iUfdl95AI+JVyUuIcVtd4ofvtrOr3HNtM2yxC9bnMbEdp3x01OhQNnjb8IJYi38VlTE3mBXwcfvywuSw==}
     engines: {node: '>= 14'}
 
-  hyperframes@0.5.3:
-    resolution: {integrity: sha512-xDzecK08/SzZZPdXVsol20ahV0hJDvhlmAhe0WS8fdxMrnkJwrmKmDixV160iKvvVA/wakCWBShvHQimGwbe1g==}
+  hyperframes@0.5.5:
+    resolution: {integrity: sha512-PMy6eFAKKkmeYMUnU4cMjGgQ4kj+TPdd//BJ3STXa6xcUnI7gqJ6n7BJODspCrWe3yswMdLBObUlRSe8bu6Rvg==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -1410,11 +1413,11 @@ packages:
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
 
-  onnxruntime-common@1.25.1:
-    resolution: {integrity: sha512-kKvYQFdos4LWJqhZ+nmKu3NT8NXzw8I5x9fNUKe1rNKcPfNKnYXUtW7JBpcKFsvLtrJashRgVYSbFap4cHxvNg==}
+  onnxruntime-common@1.26.0:
+    resolution: {integrity: sha512-qVyMR4lcWgbkc4getFV+GQijsTnbg/siteoqcDwa3sI/LxbrMSNw4ePyvCq/ymdQaRomCA7YuWmhzsswxvymdw==}
 
-  onnxruntime-node@1.25.1:
-    resolution: {integrity: sha512-N0M58CGTiTsLkPpx9bxmRFi24GT6r67Qei/GrBEIiDyntcYdXU5vQZp112ypydG9vEKRFgbgUYQJnEi+jll8dg==}
+  onnxruntime-node@1.26.0:
+    resolution: {integrity: sha512-OHl6PiOEOqxaLHL0N9eFrbzS7IGmu3BtJNH3RTEnRAheCIkfc3gjcjl4sGcjp9C22ZC9YTquDOxSdT/stBQ6BQ==}
     os: [win32, darwin, linux]
 
   open@10.2.0:
@@ -1462,6 +1465,10 @@ packages:
     resolution: {integrity: sha512-qif0+jGGZoLWdHey3UFHHWP0H7Gbmsk8T5VEqyYFbWqPr1XqvLGBbk/sl8V5exGmcYJklJOhOQq1pV9IcsiFag==}
     engines: {node: ^10 || ^12 || >=14}
 
+  postcss@8.5.14:
+    resolution: {integrity: sha512-SoSL4+OSEtR99LHFZQiJLkT59C5B1amGO1NzTwj7TT1qCUgUO6hxOvzkOYxD+vMrXBM3XJIKzokoERdqQq/Zmg==}
+    engines: {node: ^10 || ^12 || >=14}
+
   prettier@3.8.3:
     resolution: {integrity: sha512-7igPTM53cGHMW8xWuVTydi2KO233VFiTNyF5hLJqpilHfmn8C8gPf+PS7dUT64YcXFbiMGZxS9pCSxL/Dxm/Jw==}
     engines: {node: '>=14'}
@@ -1471,8 +1478,8 @@ packages:
     resolution: {integrity: sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==}
     engines: {node: '>=0.4.0'}
 
-  protobufjs@7.5.6:
-    resolution: {integrity: sha512-M71sTMB146U3u0di3yup8iM+zv8yPRNQVr1KK4tyBitl3qFvEGucq/rGDRShD2rsJhtN02RJaJ7j5X5hmy8SJg==}
+  protobufjs@7.5.7:
+    resolution: {integrity: sha512-NGnrxS/nLKUo5nkbVQxlC71sB4hdfImdYIbFeSCidxtwATx0AHRPcANSLd0q5Bb2BkoSWo2iisQhGg5/r+ihbA==}
     engines: {node: '>=12.0.0'}
 
   proxy-agent@6.5.0:
@@ -1518,8 +1525,8 @@ packages:
   safe-buffer@5.2.1:
     resolution: {integrity: sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==}
 
-  semver@7.7.4:
-    resolution: {integrity: sha512-vFKC2IEtQnVhpT78h1Yp8wzwrf8CM+MzKMHGJZfBtzhZNycRFnXsHk6E5TxIkkMsgNS7mdX3AGB7x2QM2di4lA==}
+  semver@7.8.0:
+    resolution: {integrity: sha512-AcM7dV/5ul4EekoQ29Agm5vri8JNqRyj39o0qpX6vDF2GZrtutZl5RwgD1XnZjiTAfncsJhMI48QQH3sN87YNA==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -1542,8 +1549,8 @@ packages:
     resolution: {integrity: sha512-HehCEsotFqbPW9sJ8WVYB6UbmIMv7kUUORIF2Nncq4VQvBfNBLibW9YZR5dlYCSUhwcD628pRllm7n+E+YTzJw==}
     engines: {node: '>= 14'}
 
-  socks@2.8.8:
-    resolution: {integrity: sha512-NlGELfPrgX2f1TAAcz0WawlLn+0r3FyhhCRpFFK2CemXenPYvzMWWZINv3eDNo9ucdwme7oCHRY0Jnbs4aIkog==}
+  socks@2.8.9:
+    resolution: {integrity: sha512-LJhUYUvItdQ0LkJTmPeaEObWXAqFyfmP85x0tch/ez9cahmhlBBLbIqDFnvBnUJGagb0JbIQrkBs1wJ+yRYpEw==}
     engines: {node: '>= 10.0.0', npm: '>= 3.0.0'}
 
   source-map-js@1.2.1:
@@ -1628,6 +1635,9 @@ packages:
 
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
+
+  undici-types@7.19.2:
+    resolution: {integrity: sha512-qYVnV5OEm2AW8cJMCpdV20CDyaN3g0AjDlOGf1OW4iaDEx8MwdtChUp4zu4H0VP3nDRF/8RKWH+IPp9uW0YGZg==}
 
   vite-node@3.2.4:
     resolution: {integrity: sha512-EbKSKh+bh1E1IFxeO0pg1n4dvoOTt0UDiXMd/qn++r98+jPO1xtJilvXldeuQ8giIB5IkpjCgMleHMNEsGH6pg==}
@@ -1954,7 +1964,7 @@ snapshots:
     dependencies:
       google-auth-library: 10.6.2
       p-retry: 4.6.2
-      protobufjs: 7.5.6
+      protobufjs: 7.5.7
       ws: 8.20.0
     transitivePeerDependencies:
       - bufferutil
@@ -1962,26 +1972,26 @@ snapshots:
       - utf-8-validate
     optional: true
 
-  '@hono/node-server@1.19.14(hono@4.12.17)':
+  '@hono/node-server@1.19.14(hono@4.12.18)':
     dependencies:
-      hono: 4.12.17
+      hono: 4.12.18
 
-  '@hyperframes/core@0.5.3(hono@4.12.17)':
+  '@hyperframes/core@0.5.5(hono@4.12.18)':
     dependencies:
       '@chenglou/pretext': 0.0.5
-      postcss: 8.5.13
+      postcss: 8.5.14
     optionalDependencies:
       esbuild: 0.25.12
-      hono: 4.12.17
+      hono: 4.12.18
       linkedom: 0.18.12
     transitivePeerDependencies:
       - canvas
 
-  '@hyperframes/engine@0.5.3(typescript@5.9.3)':
+  '@hyperframes/engine@0.5.5(typescript@5.9.3)':
     dependencies:
-      '@hono/node-server': 1.19.14(hono@4.12.17)
-      '@hyperframes/core': 0.5.3(hono@4.12.17)
-      hono: 4.12.17
+      '@hono/node-server': 1.19.14(hono@4.12.18)
+      '@hyperframes/core': 0.5.5(hono@4.12.18)
+      hono: 4.12.18
       linkedom: 0.18.12
       puppeteer: 24.43.0(typescript@5.9.3)
       puppeteer-core: 24.43.0
@@ -1995,7 +2005,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@hyperframes/producer@0.5.3(typescript@5.9.3)':
+  '@hyperframes/producer@0.5.5(typescript@5.9.3)':
     dependencies:
       '@fontsource/archivo-black': 5.2.8
       '@fontsource/eb-garamond': 5.2.7
@@ -2008,12 +2018,12 @@ snapshots:
       '@fontsource/oswald': 5.2.8
       '@fontsource/outfit': 5.2.8
       '@fontsource/space-mono': 5.2.9
-      '@hono/node-server': 1.19.14(hono@4.12.17)
-      '@hyperframes/core': 0.5.3(hono@4.12.17)
-      '@hyperframes/engine': 0.5.3(typescript@5.9.3)
-      hono: 4.12.17
+      '@hono/node-server': 1.19.14(hono@4.12.18)
+      '@hyperframes/core': 0.5.5(hono@4.12.18)
+      '@hyperframes/engine': 0.5.5(typescript@5.9.3)
+      hono: 4.12.18
       linkedom: 0.18.12
-      postcss: 8.5.13
+      postcss: 8.5.14
       puppeteer: 24.43.0(typescript@5.9.3)
       puppeteer-core: 24.43.0
     transitivePeerDependencies:
@@ -2163,7 +2173,7 @@ snapshots:
       extract-zip: 2.0.1
       progress: 2.0.3
       proxy-agent: 6.5.0
-      semver: 7.7.4
+      semver: 7.8.0
       tar-fs: 3.1.2
       yargs: 17.7.2
     transitivePeerDependencies:
@@ -2262,12 +2272,17 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
+  '@types/node@25.6.2':
+    dependencies:
+      undici-types: 7.19.2
+    optional: true
+
   '@types/retry@0.12.0':
     optional: true
 
   '@types/yauzl@2.10.3':
     dependencies:
-      '@types/node': 22.19.17
+      '@types/node': 25.6.2
     optional: true
 
   '@vitest/expect@3.2.4':
@@ -2690,7 +2705,7 @@ snapshots:
     dependencies:
       globalthis: 1.0.4
       matcher: 4.0.0
-      semver: 7.7.4
+      semver: 7.8.0
       serialize-error: 8.1.0
 
   globalthis@1.0.4:
@@ -2719,7 +2734,7 @@ snapshots:
     dependencies:
       es-define-property: 1.0.1
 
-  hono@4.12.17: {}
+  hono@4.12.18: {}
 
   html-escaper@3.0.3: {}
 
@@ -2744,20 +2759,20 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  hyperframes@0.5.3:
+  hyperframes@0.5.5:
     dependencies:
-      '@hono/node-server': 1.19.14(hono@4.12.17)
+      '@hono/node-server': 1.19.14(hono@4.12.18)
       '@puppeteer/browsers': 2.13.1
       adm-zip: 0.5.17
       citty: 0.2.2
       compare-versions: 6.1.1
       esbuild: 0.25.12
       giget: 3.2.0
-      hono: 4.12.17
+      hono: 4.12.18
       mime-types: 3.0.2
-      onnxruntime-node: 1.25.1
+      onnxruntime-node: 1.26.0
       open: 10.2.0
-      postcss: 8.5.13
+      postcss: 8.5.14
       prettier: 3.8.3
       puppeteer-core: 24.43.0
       sharp: 0.34.5
@@ -2880,13 +2895,13 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
-  onnxruntime-common@1.25.1: {}
+  onnxruntime-common@1.26.0: {}
 
-  onnxruntime-node@1.25.1:
+  onnxruntime-node@1.26.0:
     dependencies:
       adm-zip: 0.5.17
       global-agent: 4.1.3
-      onnxruntime-common: 1.25.1
+      onnxruntime-common: 1.26.0
 
   open@10.2.0:
     dependencies:
@@ -2946,11 +2961,17 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
+  postcss@8.5.14:
+    dependencies:
+      nanoid: 3.3.12
+      picocolors: 1.1.1
+      source-map-js: 1.2.1
+
   prettier@3.8.3: {}
 
   progress@2.0.3: {}
 
-  protobufjs@7.5.6:
+  protobufjs@7.5.7:
     dependencies:
       '@protobufjs/aspromise': 1.1.2
       '@protobufjs/base64': 1.1.2
@@ -2962,7 +2983,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.1
-      '@types/node': 22.19.17
+      '@types/node': 25.6.2
       long: 5.3.2
     optional: true
 
@@ -3063,7 +3084,7 @@ snapshots:
   safe-buffer@5.2.1:
     optional: true
 
-  semver@7.7.4: {}
+  semver@7.8.0: {}
 
   serialize-error@8.1.0:
     dependencies:
@@ -3073,7 +3094,7 @@ snapshots:
     dependencies:
       '@img/colour': 1.1.0
       detect-libc: 2.1.2
-      semver: 7.7.4
+      semver: 7.8.0
     optionalDependencies:
       '@img/sharp-darwin-arm64': 0.34.5
       '@img/sharp-darwin-x64': 0.34.5
@@ -3108,11 +3129,11 @@ snapshots:
     dependencies:
       agent-base: 7.1.4
       debug: 4.4.3
-      socks: 2.8.8
+      socks: 2.8.9
     transitivePeerDependencies:
       - supports-color
 
-  socks@2.8.8:
+  socks@2.8.9:
     dependencies:
       ip-address: 10.2.0
       smart-buffer: 4.2.0
@@ -3211,6 +3232,9 @@ snapshots:
   uhyphen@0.2.0: {}
 
   undici-types@6.21.0: {}
+
+  undici-types@7.19.2:
+    optional: true
 
   vite-node@3.2.4(@types/node@22.19.17):
     dependencies:

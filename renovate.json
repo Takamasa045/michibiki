@@ -1,0 +1,53 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    ":maintainLockFilesWeekly"
+  ],
+  "timezone": "Asia/Tokyo",
+  "schedule": ["before 9am every weekday"],
+  "rangeStrategy": "bump",
+  "packageRules": [
+    {
+      "description": "Keep video engine packages and generated project runtime versions updated together.",
+      "matchDatasources": ["npm"],
+      "matchPackageNames": [
+        "hyperframes",
+        "@hyperframes/engine",
+        "@hyperframes/producer",
+        "remotion",
+        "@remotion/cli",
+        "@remotion/renderer",
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom",
+        "@editframe/api",
+        "@editframe/cli",
+        "@editframe/create",
+        "@editframe/elements",
+        "@editframe/react"
+      ],
+      "groupName": "video engines",
+      "groupSlug": "video-engines",
+      "minimumReleaseAge": "1 day",
+      "prPriority": 10,
+      "rangeStrategy": "bump"
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update Remotion standalone project dependency constants.",
+      "managerFilePatterns": [
+        "/(^|/)packages/engine-remotion/src/remotion-engine\\.ts$/"
+      ],
+      "matchStrings": [
+        "// renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>[^\\s]+)(?: versioning=(?<versioning>[^\\s]+))?\\s+const [A-Z_]+_VERSION = \"(?<currentValue>[^\"]+)\";"
+      ],
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}npm{{/if}}"
+    }
+  ]
+}

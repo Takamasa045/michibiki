@@ -12,6 +12,7 @@ type RouterSignals = {
   hasMultipleImageAssets: boolean;
   hasUrlAsset: boolean;
   urlIsReferenceOnly: boolean;
+  capabilityMatches: EngineCapability[];
   mentionsTimelineEditing: boolean;
   mentionsAudioSupport: boolean;
   mentionsAudioTimelineEditing: boolean;
@@ -31,6 +32,18 @@ type RouterSignals = {
   mentionsWebinarRecap: boolean;
   isVerticalShortFormat: boolean;
   isLongFormFormat: boolean;
+};
+
+type EngineCapability = {
+  id: string;
+  engine: EngineName;
+  label: string;
+  pattern: RegExp;
+  scoreDelta: Partial<Record<EngineName, number>>;
+  reason: string;
+  featureHighlight: string;
+  switchCondition: string;
+  switchWhy: string;
 };
 
 export function selectEngine(spec: VideoSpec): EngineDecision {
@@ -199,6 +212,7 @@ function getRouterSignals(spec: VideoSpec): RouterSignals {
     hasMultipleImageAssets: !hasVideoOrAudioAssets && imageAssetCount >= 2,
     hasUrlAsset,
     urlIsReferenceOnly: hasUrlAsset && urlIsReferenceOnly(text),
+    capabilityMatches: getCapabilityMatches(text),
     mentionsTimelineEditing: mentionsTimelineEditing(text),
     mentionsAudioSupport: mentionsAudioSupport(text),
     mentionsAudioTimelineEditing: mentionsAudioTimelineEditing(text),
@@ -346,6 +360,74 @@ function urlIsReferenceOnly(text: string): boolean {
   );
 }
 
+const ENGINE_CAPABILITY_CATALOG: EngineCapability[] = [
+  {
+    id: "remotion-html-in-canvas-transitions",
+    engine: "remotion",
+    label: "Remotion HTML-in-canvas transitions/client renderer",
+    pattern:
+      /(<htmlincanvas>|remotion[^、。.!?\n]{0,36}(?:html[- ]?in[- ]?canvas|htmlincanvas|drawelementimage|transitionseries|zoomblur|zoominout|web-renderer|client[- ]side renderer|クライアント側レンダ)|makehtmlincanvaspresentation|zoomblur|zoominout|@remotion\/transitions|transitionseries|@remotion\/web-renderer|client[- ]side renderer|クライアント側レンダ)/i,
+    scoreDelta: {
+      remotion: 16,
+      hyperframes: -2,
+      editframe: -4
+    },
+    reason:
+      "Remotion now has first-class <HtmlInCanvas>, HTML-in-canvas transition presentations, and client-side rendering hooks for React-controlled DOM post-processing.",
+    featureHighlight:
+      "Current Remotion capability: <HtmlInCanvas>, HTML-in-canvas transition presentations such as zoomBlur/zoomInOut, and client-side rendering paths for React-controlled DOM post-processing.",
+    switchCondition:
+      "If the new requirement is React-controlled DOM-to-canvas post-processing, zoomBlur/zoomInOut transitions, or client-side renderer fidelity",
+    switchWhy:
+      "Remotion becomes stronger because the effect can stay inside typed React composition code while using the latest HTML-in-canvas rendering path."
+  },
+  {
+    id: "hyperframes-website-capture-registry",
+    engine: "hyperframes",
+    label: "HyperFrames website capture, registry, snapshot, and inspect",
+    pattern:
+      /(hyperframes\s+(?:capture|snapshot|inspect|registry|add)|website[- ]?to[- ]?video|サイト(?:を)?(?:capture|キャプチャ|動画化)|capture[^、。.!?\n]{0,30}(?:brand|design|font|asset|section|animation|ブランド|デザイン|フォント|素材|セクション)|snapshot[^、。.!?\n]{0,24}(?:frame|png|検証)|inspect[^、。.!?\n]{0,24}(?:overflow|layout|text|レイアウト|文字)|registry[^、。.!?\n]{0,24}(?:block|component|shader|transition)|shader[- ]?wipe|tailwind v4|data-layout-allow-overflow)/i,
+    scoreDelta: {
+      hyperframes: 18,
+      remotion: 2,
+      editframe: -4
+    },
+    reason:
+      "HyperFrames has current website-capture, registry block/component, snapshot, inspect, and Tailwind-oriented CLI capabilities that directly support page-to-video workflows.",
+    featureHighlight:
+      "Current HyperFrames capability: website capture extracts brand/design/assets/sections, registry add installs blocks/components, and snapshot/inspect help verify frames and layout before render.",
+    switchCondition:
+      "If the new requirement is website capture, registry blocks/components, frame snapshots, layout inspection, or Tailwind-based HTML video authoring",
+    switchWhy:
+      "HyperFrames becomes stronger because the official CLI already treats HTML as the source of truth and includes capture, add, snapshot, inspect, lint, preview, and render workflows."
+  },
+  {
+    id: "editframe-elements-render-api",
+    engine: "editframe",
+    label: "Editframe elements, waveform/captions, React, and Render API",
+    pattern:
+      /(@editframe\/(?:cli|elements|react|api|create)|ef-(?:timegroup|waveform|captions|audio|video|text|preview|controls)|timegroup|word_segments|caption segments|render api|editor ui|preview components|waveform[^、。.!?\n]{0,24}(?:audio|video|音声|動画)|(?:字幕|captions?|transcription|文字起こし)[^、。.!?\n]{0,30}(?:word|単語|highlight|ハイライト|segments?))/i,
+    scoreDelta: {
+      editframe: 18,
+      remotion: 2
+    },
+    reason:
+      "Editframe exposes official HTML elements, React components, waveform/caption primitives, editor UI concepts, and Render API/package surfaces for timeline-first composition.",
+    featureHighlight:
+      "Current Editframe capability: ef-timegroup/ef-waveform/ef-captions elements, @editframe/react, editor UI primitives, and Render API paths for timeline-first media composition.",
+    switchCondition:
+      "If the new requirement is Editframe elements, React timeline components, waveform/caption primitives, editor UI, or Render API handoff",
+    switchWhy:
+      "Editframe becomes stronger because those features map directly to a timegroup-based editing model with media, captions, waveform, preview controls, and render workflows."
+  }
+];
+
+function getCapabilityMatches(text: string): EngineCapability[] {
+  return ENGINE_CAPABILITY_CATALOG.filter((capability) =>
+    hasContextualMatch(text, capability.pattern)
+  );
+}
+
 function selectAutoEngine(engineFits: EngineFit[]): EngineName {
   const sorted = [...engineFits].sort((left, right) => {
     if (right.fitPercent !== left.fitPercent) {
@@ -381,6 +463,9 @@ function buildSwitchHint(
   targetEngine: EngineName,
   signals: RouterSignals
 ): SwitchHint {
+  const capabilityHint = buildCapabilitySwitchHint(targetEngine, signals);
+  if (capabilityHint) return capabilityHint;
+
   if (targetEngine === "editframe") {
     const condition = signals.hasVideoOrAudioAssets
       ? "If you want to edit those clips/voice on a timeline with captions, BGM beats, transitions, and overlays"
@@ -422,6 +507,27 @@ function buildSwitchHint(
     targetEngine,
     condition,
     why: "Remotion becomes the strongest fit because React/TSX gives precise frame-by-frame control, HTML-in-canvas effects, and reusable prop-driven variants."
+  };
+}
+
+function buildCapabilitySwitchHint(
+  targetEngine: EngineName,
+  signals: RouterSignals
+): SwitchHint | undefined {
+  const matches = getCapabilitiesForEngine(signals, targetEngine);
+  if (matches.length === 0) return undefined;
+  const primary = matches[0]!;
+  const labels = matches.map((match) => match.label).join(", ");
+  return {
+    targetEngine,
+    condition:
+      matches.length === 1
+        ? primary.switchCondition
+        : `If you want to lean harder into ${labels}`,
+    why:
+      matches.length === 1
+        ? primary.switchWhy
+        : `${engineDisplayName(targetEngine)} becomes stronger because these current capabilities are explicitly present in the request.`
   };
 }
 
@@ -529,6 +635,13 @@ function buildEngineFits(spec: VideoSpec, signals: RouterSignals): EngineFit[] {
     scores.editframe += 4;
     scores.hyperframes -= 4;
   }
+  for (const capability of signals.capabilityMatches) {
+    for (const [engine, delta] of Object.entries(capability.scoreDelta) as Array<
+      [EngineName, number]
+    >) {
+      scores[engine] += delta;
+    }
+  }
 
   const normalized = normalizeFitPercents(scores);
   return (["remotion", "hyperframes", "editframe"] as const)
@@ -537,7 +650,7 @@ function buildEngineFits(spec: VideoSpec, signals: RouterSignals): EngineFit[] {
       fitPercent: normalized[engine],
       reason: buildFitReason(engine, signals),
       bestUse: buildBestUse(engine, spec),
-      featureHighlights: buildFeatureHighlights(engine),
+      featureHighlights: buildFeatureHighlights(engine, signals),
       recommendation: buildEngineRecommendation(engine, spec)
     }))
     .sort((left, right) => right.fitPercent - left.fitPercent);
@@ -567,6 +680,9 @@ function normalizeFitPercents(
 }
 
 function buildFitReason(engine: EngineName, signals: RouterSignals): string {
+  const capabilityReason = buildCapabilityFitReason(engine, signals);
+  if (capabilityReason) return capabilityReason;
+
   if (engine === "editframe") {
     if (
       signals.hasVideoOrAudioAssets ||
@@ -612,6 +728,16 @@ function buildFitReason(engine: EngineName, signals: RouterSignals): string {
   return "Remotion is a good default for coded motion graphics, one-off animated promos, kinetic title sequences, and reusable video templates.";
 }
 
+function buildCapabilityFitReason(
+  engine: EngineName,
+  signals: RouterSignals
+): string | undefined {
+  const matches = getCapabilitiesForEngine(signals, engine);
+  if (matches.length === 0) return undefined;
+  const labels = matches.map((match) => match.label).join(", ");
+  return `Current ${engineDisplayName(engine)} capability signals (${labels}) make ${engineDisplayName(engine)} a stronger fit. ${matches[0]!.reason}`;
+}
+
 function buildBestUse(engine: EngineName, spec: VideoSpec): string {
   const format = `${spec.format.durationSec}-second ${spec.format.aspectRatio}`;
   if (engine === "editframe") {
@@ -623,13 +749,20 @@ function buildBestUse(engine: EngineName, spec: VideoSpec): string {
   return `Use Remotion for this ${format} video if you want a one-off, frame-accurate React motion piece with Sequence-based timing, useCurrentFrame choreography, kinetic typography, custom easing/spring motion, layered transitions, captions/audio, HTML-in-canvas DOM post-processing, Lottie or Three.js-style flourishes, and optional props for later reuse.`;
 }
 
-function buildFeatureHighlights(engine: EngineName): string[] {
+function buildFeatureHighlights(
+  engine: EngineName,
+  signals: RouterSignals
+): string[] {
+  const capabilityHighlights = getCapabilitiesForEngine(signals, engine).map(
+    (capability) => capability.featureHighlight
+  );
   if (engine === "editframe") {
     return [
       "HTML web components or React compositions built from timegroups, so scenes can be sequence, fixed, or layered.",
       "First-class media elements for video, audio, images, text, captions, waveform, and transitions.",
       "Text can split by word, character, or line with stagger, easing, custom animations, and deterministic CSS variables.",
-      "Good fit for editor-like workflows: timeline, scrubber, preview, transform handles, render API, and cloud/local rendering paths."
+      "Good fit for editor-like workflows: timeline, scrubber, preview, transform handles, render API, and cloud/local rendering paths.",
+      ...capabilityHighlights
     ];
   }
 
@@ -639,7 +772,8 @@ function buildFeatureHighlights(engine: EngineName): string[] {
       "Seek-driven deterministic capture: each frame is positioned independently in headless Chrome and encoded through FFmpeg.",
       "Official HTML-in-Canvas registry blocks can capture live DOM into canvas/WebGL scenes for liquid glass, portal, shatter, device, and text-cursor VFX.",
       "Strong with GSAP, Lottie, CSS, Motion One, CodePen-style effects, and existing website/LP DOM that should become motion.",
-      "Agent-friendly and low-friction: no React rewrite, no custom DSL, non-interactive CLI, and strong website-to-video workflows."
+      "Agent-friendly and low-friction: no React rewrite, no custom DSL, non-interactive CLI, and strong website-to-video workflows.",
+      ...capabilityHighlights
     ];
   }
 
@@ -648,8 +782,24 @@ function buildFeatureHighlights(engine: EngineName): string[] {
     "Sequence, Series, useCurrentFrame, interpolate, spring, and animation utilities enable precise choreographed motion.",
     "HTML-in-canvas can draw live DOM nodes into canvas for blur, glitch, shader, WebGL/WebGPU-style post-processing, and custom scene blending.",
     "Rich ecosystem for captions, audio, Lottie, Three.js/React Three Fiber, transitions, shapes, fonts, and cloud rendering.",
-    "Works for both one-off high-polish animations and prop-driven/programmatic variants."
+    "Works for both one-off high-polish animations and prop-driven/programmatic variants.",
+    ...capabilityHighlights
   ];
+}
+
+function getCapabilitiesForEngine(
+  signals: RouterSignals,
+  engine: EngineName
+): EngineCapability[] {
+  return signals.capabilityMatches.filter(
+    (capability) => capability.engine === engine
+  );
+}
+
+function engineDisplayName(engine: EngineName): string {
+  if (engine === "hyperframes") return "HyperFrames";
+  if (engine === "editframe") return "Editframe";
+  return "Remotion";
 }
 
 function getEngineFit(engineFits: EngineFit[], engine: EngineName): EngineFit {

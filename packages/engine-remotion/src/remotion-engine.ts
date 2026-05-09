@@ -34,10 +34,15 @@ type CommandResult = {
   command: string;
 };
 
-const REMOTION_VERSION = "^4.0.455";
-const REACT_VERSION = "^19.2.5";
+// renovate: datasource=npm depName=remotion versioning=npm
+const REMOTION_VERSION = "^4.0.459";
+// renovate: datasource=npm depName=react versioning=npm
+const REACT_VERSION = "^19.2.6";
+// renovate: datasource=npm depName=@types/react versioning=npm
 const REACT_TYPES_VERSION = "^19.2.14";
+// renovate: datasource=npm depName=@types/react-dom versioning=npm
 const REACT_DOM_TYPES_VERSION = "^19.2.3";
+// renovate: datasource=npm depName=typescript versioning=npm
 const TYPESCRIPT_VERSION = "^5.8.3";
 
 export function createRemotionEngine(

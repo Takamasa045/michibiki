@@ -2,7 +2,15 @@
 
 This document summarizes the practical strengths of Remotion, HyperFrames, and Editframe for Michibiki routing and agent responses. Use it with `engineFits`, `selectionGuide`, and the root agent rules.
 
-Sources checked: 2026-05-07.
+Sources checked: 2026-05-09.
+
+## Capability Catalog Signals
+
+Michibiki's router also tracks current engine capabilities as routing signals. When these appear in the user prompt, they can shift `engineFits`, fit reasons, feature highlights, and `switchHints`.
+
+- Remotion: `<HtmlInCanvas>`, `makeHtmlInCanvasPresentation`, `zoomBlur`, `zoomInOut`, `@remotion/transitions`, `@remotion/web-renderer`, client-side renderer fidelity, React-controlled DOM-to-canvas post-processing.
+- HyperFrames: website capture, brand/design/asset/section extraction, registry `add` blocks/components, `snapshot`, `inspect`, Tailwind v4 HTML video workflows, shader/transition registry items.
+- Editframe: `ef-timegroup`, `ef-waveform`, `ef-captions`, `@editframe/react`, `@editframe/api`, Render API, Editor UI/preview controls, caption `word_segments`, waveform-led timeline composition.
 
 ## Remotion
 
@@ -13,6 +21,7 @@ Good uses:
 - One-off high-polish motion graphics, not only reusable templates.
 - Kinetic typography, animated callouts, spring/easing driven transitions, title sequences, and scene choreography.
 - HTML-in-canvas DOM post-processing: draw live DOM nodes into canvas for blur, glitch, shader/WebGL/WebGPU-style effects, magnifier/vintage-screen treatments, and custom transition blending.
+- HTML-in-canvas transition presentations such as `zoomBlur` / `zoomInOut`, and client-side rendering paths when React-controlled capture fidelity matters.
 - React component reuse, typed props, API-driven content, data-driven variants, and batch rendering.
 - Audio/captions, Lottie-style motion, Three.js / React Three Fiber flourishes, transitions, shapes, fonts, and cloud rendering.
 
@@ -49,6 +58,8 @@ Good uses:
 - HTML-first agent workflows: plain HTML/CSS/JS with timing data attributes, no React rewrite, no custom DSL.
 - GSAP, Lottie, CSS, Motion One, CodePen-style browser effects, and seekable animation runtimes.
 - Official HTML-in-Canvas registry blocks installed with `npx hyperframes add html-in-canvas`: Liquid Glass, iPhone/MacBook device showcase, VFX Text Cursor, Portal, Shatter, Magnetic, and Liquid Background.
+- Website capture and agent workflows that extract brand identity, text, fonts, assets, animations, sections, and CTAs before building compositions.
+- Registry `add` blocks/components, `snapshot`, `inspect`, `lint`, preview, and render workflows for validating HTML video structure before MP4 output.
 - Deterministic frame-by-frame capture in headless Chrome and FFmpeg encoding.
 
 Proposal angle:
@@ -82,6 +93,7 @@ Good uses:
 - Timeline-first promos with scene sequencing, overlaps, crossfades, zooms, lower thirds, captions, and B-roll or generated visual layers.
 - HTML web components or React compositions built from timegroups: sequence, fixed, and layered sections.
 - Media-heavy composition with video, audio, images, text, captions, waveform, transitions, render API, and editor UI concepts.
+- Official element/package signals such as `ef-timegroup`, `ef-waveform`, `ef-captions`, `@editframe/react`, `@editframe/api`, preview controls, Render API, and word-level caption segments.
 - Text animation split by word, character, or line with stagger, easing, deterministic CSS variables, and custom animations.
 
 Proposal angle:
@@ -97,6 +109,10 @@ Watch-outs:
 Official references:
 
 - https://editframe.com/docs
+- https://editframe.com/docs/getting-started/packages
+- https://editframe.com/docs/elements
+- https://editframe.com/docs/elements/waveform
+- https://editframe.com/docs/elements/captions
 - https://editframe.com/skills/editframe-composition/getting-started
 - https://editframe.com/skills/editframe-composition/text
 - https://editframe.com/skills/editframe-composition/captions

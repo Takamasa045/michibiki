@@ -100,6 +100,69 @@ describe("selectEngine", () => {
     );
   });
 
+  it("uses current Remotion HTML-in-canvas transition capabilities as routing evidence", () => {
+    const spec = createVideoSpecFromPrompt({
+      prompt:
+        "RemotionのTransitionSeriesとmakeHtmlInCanvasPresentationでzoomBlurのシーンブレンドを作りたい"
+    });
+
+    const decision = selectEngine(spec);
+    const remotionFit = decision.engineFits.find(
+      (fit) => fit.engine === "remotion"
+    );
+
+    expect(decision.engine).toBe("remotion");
+    expect(remotionFit).toMatchObject({
+      reason: expect.stringContaining("Current Remotion capability signals"),
+      featureHighlights: expect.arrayContaining([
+        expect.stringContaining("Current Remotion capability")
+      ])
+    });
+    expect(findFitPercent(decision.engineFits, "remotion")).toBeGreaterThan(
+      findFitPercent(decision.engineFits, "hyperframes")
+    );
+  });
+
+  it("uses current HyperFrames capture and registry capabilities as routing evidence", () => {
+    const spec = createVideoSpecFromPrompt({
+      prompt:
+        "https://example.com をHyperFrames captureしてブランド情報を抽出し、registry blockとsnapshot、inspectで検証するサイト動画"
+    });
+
+    const decision = selectEngine(spec);
+    const hyperframesFit = decision.engineFits.find(
+      (fit) => fit.engine === "hyperframes"
+    );
+
+    expect(decision.engine).toBe("hyperframes");
+    expect(hyperframesFit).toMatchObject({
+      reason: expect.stringContaining("Current HyperFrames capability signals"),
+      featureHighlights: expect.arrayContaining([
+        expect.stringContaining("Current HyperFrames capability")
+      ])
+    });
+  });
+
+  it("uses current Editframe elements and caption capabilities as routing evidence", () => {
+    const spec = createVideoSpecFromPrompt({
+      prompt:
+        "ef-timegroupとef-waveform、ef-captionsのword_segmentsで音声に合わせたタイムライン編集を作りたい"
+    });
+
+    const decision = selectEngine(spec);
+    const editframeFit = decision.engineFits.find(
+      (fit) => fit.engine === "editframe"
+    );
+
+    expect(decision.engine).toBe("editframe");
+    expect(editframeFit).toMatchObject({
+      reason: expect.stringContaining("Current Editframe capability signals"),
+      featureHighlights: expect.arrayContaining([
+        expect.stringContaining("Current Editframe capability")
+      ])
+    });
+  });
+
   it("uses score-based selection so asset attachment alone does not lock Editframe in", () => {
     const spec = createVideoSpecFromPrompt({
       prompt:
