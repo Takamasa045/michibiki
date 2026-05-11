@@ -4,6 +4,13 @@ All notable changes to Michibiki will be documented in this file.
 
 This project follows semantic versioning for public releases.
 
+## [0.1.5](https://github.com/Takamasa045/michibiki/compare/v0.1.4...v0.1.5) (2026-05-09)
+
+
+### Bug Fixes
+
+* stabilize HyperFrames generated renders ([34eb85a](https://github.com/Takamasa045/michibiki/commit/34eb85a6599a9176922f39bf8385edc1285af4af))
+
 ## [0.1.4](https://github.com/Takamasa045/michibiki/compare/v0.1.3...v0.1.4) (2026-05-09)
 
 
