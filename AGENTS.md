@@ -72,6 +72,54 @@
 - ステージ 4（`render`）は「レンダーして」「MP4まで」「完成動画を出して」などの明示依頼があり、かつ preview の結果に問題がない場合のみ実行する。`--confirm-render` を必ず付ける。CLI ゲートが exit 2 で止めるが、エージェントはユーザー合意なくこのフラグを付けてはならない。
 - 「生成まで依頼している場合は推奨エンジンで進めてよい」と解釈できる場面でも、上記の合意が不足している場合は、生成・編集・レンダーへ進まず確認する。
 
+## Editframe 直接制作セットアップ
+
+ユーザーが明示的に "Let's build a video with Editframe."、`--engine editframe`、または Editframe で動画・テンプレート・編集ツール・自動生成ワークフローを作りたいと依頼した場合の補助ルールです。これは Michibiki のエンジン比較・承認境界を上書きしません。エンジン未選択の自然言語依頼では、先に `michibiki decide` または同等の `selectEngine()` 判定を使います。
+
+### 先にユーザーへ伝える
+
+制作に入る前に、「Node.js / FFmpeg の確認、Editframe agent skills の導入、プロジェクト作成準備をこちらで進めます」と短く伝える。
+
+### セットアップ確認
+
+1. Node.js が入っているか確認する: `command -v node && node --version`
+2. FFmpeg が入っているか確認する: `command -v ffmpeg && ffmpeg -version`
+3. Editframe agent skills を入れる: `npx skills add editframe/skills`
+4. 要件が固まってから新規 Editframe プロジェクトを作成する
+
+Node.js または FFmpeg が無い場合は、可能なら CLI で導入する。macOS では Homebrew が使えるなら `brew install node ffmpeg` を優先する。CLI 導入が難しい場合だけ、ユーザーに公式ページを案内する:
+
+- Node.js: https://nodejs.org/en/download/
+- FFmpeg: https://ffmpeg.org/download.html
+
+### 制作前に必ず聞くこと
+
+プロジェクト作成・素材取得・実装を始める前に、ユーザーの意図を先に揃える。
+
+- 作りたいもの: Single video / Video template / Video editing tool / Video workflow automation / Something else
+- 既存素材: 動画、画像、音声のローカルパスまたは URL
+- Web サイト URL を素材元にするか
+- 使いたい Node.js / React ライブラリがあるか
+- React か vanilla HTML/CSS/JS の希望
+
+Web サイト URL が提供された場合は、構築前に HTML、リンクされた CSS、画像、動画、音声を取得してローカルにキャッシュし、コンポジションは live URL ではなくローカルパスを参照する。取得した内容は、実装前に短く要約してユーザーへ共有する。
+
+### Composition Skill と作成コマンド
+
+提案・設計・実装の前に `composition` または `editframe-composition` Skill を読む。HTML と React のどちらを使うか、root timegroup に明示寸法があるか、必要なメディア要素・字幕・transition・render 手段を確認する。
+
+ユーザーが React / HTML の希望を明示した場合は、必要に応じて次のショートカットを使う:
+
+```bash
+# React
+npm create @editframe@latest -- react --global
+
+# HTML / vanilla CSS / JS
+npm create @editframe@latest -- html --global
+```
+
+プロジェクト作成後、こちらでバックグラウンドプロセスを管理できる環境なら `npm start` を起動し、出力された localhost URL を開く、またはユーザーに提示する。管理できない環境では、ユーザーに `npm start` を実行して表示された URL を開くよう伝える。
+
 Skill 利用ルール:
 
 - Remotion 関連の提案、コード生成、編集、プレビュー、レンダー、デバッグを行う場合は、毎回必ず `remotion-best-practices` を先に読む（プラグイン接頭辞付きで表示される場合も同じスキルとして扱う）。
