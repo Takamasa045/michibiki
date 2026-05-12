@@ -871,7 +871,7 @@ function buildReadme(
 Michibiki detected an HTML-in-Canvas request and installed the official HyperFrames registry bundle as a reference with:
 
 \`\`\`bash
-npx hyperframes add html-in-canvas --no-clipboard --json
+pnpm --filter @michibiki/engine-hyperframes exec hyperframes add html-in-canvas --dir <generated-project> --no-clipboard --json
 \`\`\`
 
 Suggested block: \`${htmlInCanvasBlock.id}\` (${htmlInCanvasBlock.title}).

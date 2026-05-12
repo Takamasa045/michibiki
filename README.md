@@ -171,7 +171,7 @@ Useful HyperFrames render options:
 
 `official-engine` attempts the low-level `@hyperframes/engine` capture API first. If the installed package cannot be loaded directly by Node, Michibiki falls back to `@hyperframes/producer`, which is the official complete MP4 pipeline built on top of the engine.
 
-When a HyperFrames prompt asks for HTML-in-Canvas / `drawElementImage` / DOM-to-canvas VFX, Michibiki installs the official registry bundle into the generated project with `npx hyperframes add html-in-canvas --no-clipboard --json` and wires the closest block as a scene/background. Live Studio preview needs `chrome://flags/#canvas-draw-element`; official HyperFrames rendering enables that flag automatically.
+When a HyperFrames prompt asks for HTML-in-Canvas / `drawElementImage` / DOM-to-canvas VFX, Michibiki installs the official registry bundle into the generated project with the workspace-pinned HyperFrames CLI, equivalent to `pnpm --filter @michibiki/engine-hyperframes exec hyperframes add html-in-canvas --dir <generated-project> --no-clipboard --json`. Live Studio preview needs `chrome://flags/#canvas-draw-element`; official HyperFrames rendering enables that flag automatically.
 
 Force a specific engine:
 
@@ -276,7 +276,7 @@ pnpm michibiki generate --prompt "AIエージェント勉強会のプロモ動�
 ```
 
 実行例は `examples/` にあります。自然言語、URL/LP、構成JSON、素材ありの入力タイプを含み、どの入口でも `engineFits`、`selectionGuide`、`bestUse`、`featureHighlights` が出ることを確認できます。
-HyperFrames で HTML-in-Canvas / `drawElementImage` / DOM-to-canvas VFX を指定した場合は、生成プロジェクト内で公式 registry bundle（`npx hyperframes add html-in-canvas --no-clipboard --json`）を追加し、近い block をシーン/背景として組み込みます。Studio の live preview は `chrome://flags/#canvas-draw-element` が必要ですが、公式レンダー時は自動で有効化されます。
+HyperFrames で HTML-in-Canvas / `drawElementImage` / DOM-to-canvas VFX を指定した場合は、ワークスペースで固定された HyperFrames CLI を使い、`pnpm --filter @michibiki/engine-hyperframes exec hyperframes add html-in-canvas --dir <generated-project> --no-clipboard --json` 相当で公式 registry bundle を生成プロジェクトに追加します。Studio の live preview は `chrome://flags/#canvas-draw-element` が必要ですが、公式レンダー時は自動で有効化されます。
 公開手順は `docs/PUBLISHING.md`、今後の計画は `docs/ROADMAP.md` を確認してください。
 
 ライセンス:

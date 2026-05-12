@@ -2,3 +2,13 @@ packages:
   - "apps/*"
   - "packages/*"
 
+minimumReleaseAge: 1440
+blockExoticSubdeps: true
+strictDepBuilds: true
+allowBuilds:
+  '@google/genai': false
+  esbuild: false
+  onnxruntime-node: false
+  protobufjs: false
+  puppeteer: false
+  sharp: false

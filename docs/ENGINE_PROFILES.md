@@ -57,7 +57,7 @@ Good uses:
 - Website/LP-to-video work where page structure, design tokens, typography, sections, and UI states should become motion.
 - HTML-first agent workflows: plain HTML/CSS/JS with timing data attributes, no React rewrite, no custom DSL.
 - GSAP, Lottie, CSS, Motion One, CodePen-style browser effects, and seekable animation runtimes.
-- Official HTML-in-Canvas registry blocks installed with `npx hyperframes add html-in-canvas`: Liquid Glass, iPhone/MacBook device showcase, VFX Text Cursor, Portal, Shatter, Magnetic, and Liquid Background.
+- Official HTML-in-Canvas registry blocks installed with the workspace-pinned HyperFrames CLI (`pnpm --filter @michibiki/engine-hyperframes exec hyperframes add html-in-canvas --dir <generated-project> --no-clipboard --json`): Liquid Glass, iPhone/MacBook device showcase, VFX Text Cursor, Portal, Shatter, Magnetic, and Liquid Background.
 - Website capture and agent workflows that extract brand identity, text, fonts, assets, animations, sections, and CTAs before building compositions.
 - Registry `add` blocks/components, `snapshot`, `inspect`, `lint`, preview, and render workflows for validating HTML video structure before MP4 output.
 - Deterministic frame-by-frame capture in headless Chrome and FFmpeg encoding.

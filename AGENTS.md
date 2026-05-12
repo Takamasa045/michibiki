@@ -84,7 +84,7 @@
 
 1. Node.js が入っているか確認する: `command -v node && node --version`
 2. FFmpeg が入っているか確認する: `command -v ffmpeg && ffmpeg -version`
-3. Editframe agent skills を入れる: `npx skills add editframe/skills`
+3. Editframe agent skills が未導入なら、使用する `skills` CLI のバージョンを確認して `pnpm dlx skills@<version> add editframe/skills` で入れる。未確認の `npx` / `latest` 実行は避ける。
 4. 要件が固まってから新規 Editframe プロジェクトを作成する
 
 Node.js または FFmpeg が無い場合は、可能なら CLI で導入する。macOS では Homebrew が使えるなら `brew install node ffmpeg` を優先する。CLI 導入が難しい場合だけ、ユーザーに公式ページを案内する:
