@@ -4,6 +4,13 @@ All notable changes to Michibiki will be documented in this file.
 
 This project follows semantic versioning for public releases.
 
+## [0.1.6](https://github.com/Takamasa045/michibiki/compare/v0.1.5...v0.1.6) (2026-05-12)
+
+
+### Bug Fixes
+
+* harden pnpm supply-chain defaults ([1f4a5bc](https://github.com/Takamasa045/michibiki/commit/1f4a5bcef5168eeffcf6fe75c8858c06c1050213))
+
 ## [0.1.5](https://github.com/Takamasa045/michibiki/compare/v0.1.4...v0.1.5) (2026-05-09)
 
 
