@@ -29,12 +29,13 @@
     "pnpm": ">=11.0.0"
   },
   "scripts": {
+    "setup:local": "node scripts/setup.mjs",
     "build": "tsc -b packages/video-spec packages/router packages/compliance packages/render-jobs packages/browser-renderer packages/engine-remotion packages/engine-hyperframes packages/engine-editframe apps/cli",
     "test": "vitest run",
     "typecheck": "pnpm build",
-    "pack:check": "for dir in packages/* apps/*; do (cd \"$dir\" && pnpm pack --dry-run); done",
+    "pack:check": "node scripts/pack-check.mjs",
     "release:check": "pnpm build && pnpm test && pnpm audit --audit-level moderate && pnpm pack:check",
-    "clean": "find apps packages -name dist -type d -prune -exec rm -rf {} +",
+    "clean": "node scripts/clean-dist.mjs",
     "michibiki": "node apps/cli/dist/index.js",
     "video-router": "node apps/cli/dist/index.js"
   },

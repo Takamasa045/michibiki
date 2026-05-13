@@ -13,6 +13,17 @@
 - Antigravity の workspace rules ディレクトリを使う場合も、追加するのは `AGENTS.md` への参照だけにし、Michibiki 固有ルールを複製しないでください。
 - Skill 機能は Claude Code でのみ動作します。Codex / Antigravity では Skill 利用ルールは適用対象外で、`AGENTS.md` のルーティングと CLI 実行のみがカノニカルです。
 
+## Repository Setup Requests
+
+ユーザーが「セットアップして」「使えるようにして」「pnpm install して」など、このリポジトリの初回セットアップを依頼した場合は、通常の動画生成フローへ進む前に次を実行してください。
+
+1. Node.js が入っているか確認する: `node --version`
+2. Node.js 22 未満、または Node.js が無い場合は、Node.js 22 以上が必要だと伝えて止まる。
+3. 依存が未導入でも動く初期化コマンドとして `node scripts/setup.mjs` を実行する。
+4. `pnpm michibiki doctor` の結果を要約し、ffmpeg / Chrome / Edge が WARN の場合は不足しているものを短く案内する。
+
+Windows では PowerShell 前提で案内し、必要なら `WINDOWS_START_HERE.md` を参照してください。Chrome / Edge が標準パス以外にある場合は、`VIDEO_ROUTER_CHROME` の指定例を出します。
+
 ## Video Request Routing Rule
 
 ユーザーが自然言語で「このページのプロモ動画を作りたい」「〇〇な動画を作りたい」「URLから動画にしたい」と依頼した場合、ページ内容の要約だけで止めないでください。必ず Michibiki のエンジン比較を提示します。

@@ -50,12 +50,25 @@ Michibiki is distributed through GitHub Releases, not npmjs.com. Clone the repos
 ```bash
 git clone https://github.com/Takamasa045/michibiki.git
 cd michibiki
-pnpm install
-pnpm build
-pnpm test
+node scripts/setup.mjs
 ```
 
-Requirements: Node.js 22+, pnpm 10+, ffmpeg (for HyperFrames/Editframe MP4 rendering), and Chromium/Chrome (auto-detected by `michibiki doctor`).
+Requirements: Node.js 22+, pnpm 11+, ffmpeg (for HyperFrames/Editframe MP4 rendering), and Chromium/Chrome/Edge (auto-detected by `michibiki doctor`).
+
+### Windows
+
+Michibiki can run from an extracted ZIP on Windows with PowerShell. See `WINDOWS_START_HERE.md` for the short handoff. Install Node.js 22+, enable pnpm through Corepack, and keep ffmpeg on `PATH` when you need MP4 preview/render commands:
+
+```powershell
+node scripts/setup.mjs
+```
+
+Chrome and Edge are auto-detected from the standard `Program Files` and user-local install locations. If your browser is installed elsewhere, set `VIDEO_ROUTER_CHROME` before running preview/render:
+
+```powershell
+$env:VIDEO_ROUTER_CHROME="D:\Apps\Chrome\Application\chrome.exe"
+pnpm michibiki doctor
+```
 
 ## Quickstart
 
@@ -257,12 +270,25 @@ Michibiki は GitHub Releases で配布しており npmjs.com には公開して
 ```bash
 git clone https://github.com/Takamasa045/michibiki.git
 cd michibiki
-pnpm install
-pnpm build
-pnpm test
+node scripts/setup.mjs
 ```
 
-必要環境: Node.js 20+、pnpm 9+、ffmpeg（HyperFrames / Editframe の MP4 レンダーに必要）、Chromium / Chrome（`michibiki doctor` で自動検出）。
+必要環境: Node.js 22+、pnpm 11+、ffmpeg（HyperFrames / Editframe の MP4 レンダーに必要）、Chromium / Chrome / Edge（`michibiki doctor` で自動検出）。
+
+Windows:
+
+ZIP を展開したフォルダで PowerShell から実行できます。短い受け渡し手順は `WINDOWS_START_HERE.md` にあります。MP4 の preview/render を使う場合は ffmpeg を `PATH` に入れてください。
+
+```powershell
+node scripts/setup.mjs
+```
+
+Chrome / Edge は標準インストール先から自動検出します。別の場所に入れている場合は `VIDEO_ROUTER_CHROME` を指定します。
+
+```powershell
+$env:VIDEO_ROUTER_CHROME="D:\Apps\Chrome\Application\chrome.exe"
+pnpm michibiki doctor
+```
 
 基本コマンド:
 
