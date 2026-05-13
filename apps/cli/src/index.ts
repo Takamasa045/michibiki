@@ -39,6 +39,17 @@ import {
 import { parseArgs, getValue, getValues, hasFlag } from "./args.js";
 import { printDoctor, runDoctor } from "./doctor.js";
 
+type EngineOptions = {
+  remotionRepoPath?: string;
+  remotionMode?: RemotionProjectMode;
+  hyperframesRenderBackend?: HyperFramesRenderBackend;
+  hyperframesRenderQuality?: HyperFramesRenderQuality;
+  hyperframesRenderFormat?: HyperFramesRenderFormat;
+  hyperframesRenderWorkers?: number;
+  hyperframesUseDocker?: boolean;
+  hyperframesUseGpu?: boolean;
+};
+
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
 
@@ -105,6 +116,7 @@ async function generate(args: ReturnType<typeof parseArgs>): Promise<void> {
     return;
   }
 
+  const engineOptions = parseEngineOptions(args);
   const outputsRoot = path.resolve(getValue(args, "outputs") ?? "outputs");
   const paths = await createJobPaths(outputsRoot);
 
@@ -118,22 +130,7 @@ async function generate(args: ReturnType<typeof parseArgs>): Promise<void> {
   if (!license.ok && !hasFlag(args, "allow-license-risk")) {
     console.log(`License guard blocked execution: ${license.message}`);
   } else {
-    const engine = createEngine(decision.engine, {
-      remotionRepoPath: getValue(args, "remotion-repo"),
-      remotionMode: parseRemotionMode(getValue(args, "remotion-mode")),
-      hyperframesRenderBackend: parseHyperFramesRenderBackend(
-        getValue(args, "hyperframes-renderer")
-      ),
-      hyperframesRenderQuality: parseHyperFramesRenderQuality(
-        getValue(args, "hyperframes-quality")
-      ),
-      hyperframesRenderFormat: parseHyperFramesRenderFormat(
-        getValue(args, "hyperframes-format")
-      ),
-      hyperframesRenderWorkers: parseNumber(getValue(args, "hyperframes-workers")),
-      hyperframesUseDocker: hasFlag(args, "hyperframes-docker"),
-      hyperframesUseGpu: hasFlag(args, "hyperframes-gpu")
-    });
+    const engine = createEngine(decision.engine, engineOptions);
     project = await engine.generateProject(spec, {
       jobId: paths.jobId,
       outputDir: paths.jobDir,
@@ -248,6 +245,7 @@ async function render(args: ReturnType<typeof parseArgs>): Promise<void> {
   if (!job) {
     throw new Error("Missing job. Use michibiki render --job outputs/jobs/<job-id>.");
   }
+  const engineOptions = parseEngineOptions(args);
 
   if (!hasFlag(args, "confirm-render")) {
     console.log(
@@ -263,22 +261,7 @@ async function render(args: ReturnType<typeof parseArgs>): Promise<void> {
   const { jobDir, manifest, project } = await loadGeneratedProject(job, {
     remotionRepoPath: getValue(args, "remotion-repo")
   });
-  const engine = createEngine(manifest.decision.engine, {
-    remotionRepoPath: getValue(args, "remotion-repo"),
-    remotionMode: parseRemotionMode(getValue(args, "remotion-mode")),
-    hyperframesRenderBackend: parseHyperFramesRenderBackend(
-      getValue(args, "hyperframes-renderer")
-    ),
-    hyperframesRenderQuality: parseHyperFramesRenderQuality(
-      getValue(args, "hyperframes-quality")
-    ),
-    hyperframesRenderFormat: parseHyperFramesRenderFormat(
-      getValue(args, "hyperframes-format")
-    ),
-    hyperframesRenderWorkers: parseNumber(getValue(args, "hyperframes-workers")),
-    hyperframesUseDocker: hasFlag(args, "hyperframes-docker"),
-    hyperframesUseGpu: hasFlag(args, "hyperframes-gpu")
-  });
+  const engine = createEngine(manifest.decision.engine, engineOptions);
   const result = await engine.render(project, {
     outputDir: jobDir,
     logDir: path.join(jobDir, "logs"),
@@ -299,26 +282,12 @@ async function preview(args: ReturnType<typeof parseArgs>): Promise<void> {
   if (!job) {
     throw new Error("Missing job. Use michibiki preview --job outputs/jobs/<job-id>.");
   }
+  const engineOptions = parseEngineOptions(args);
 
   const { jobDir, manifest, project } = await loadGeneratedProject(job, {
     remotionRepoPath: getValue(args, "remotion-repo")
   });
-  const engine = createEngine(manifest.decision.engine, {
-    remotionRepoPath: getValue(args, "remotion-repo"),
-    remotionMode: parseRemotionMode(getValue(args, "remotion-mode")),
-    hyperframesRenderBackend: parseHyperFramesRenderBackend(
-      getValue(args, "hyperframes-renderer")
-    ),
-    hyperframesRenderQuality: parseHyperFramesRenderQuality(
-      getValue(args, "hyperframes-quality")
-    ),
-    hyperframesRenderFormat: parseHyperFramesRenderFormat(
-      getValue(args, "hyperframes-format")
-    ),
-    hyperframesRenderWorkers: parseNumber(getValue(args, "hyperframes-workers")),
-    hyperframesUseDocker: hasFlag(args, "hyperframes-docker"),
-    hyperframesUseGpu: hasFlag(args, "hyperframes-gpu")
-  });
+  const engine = createEngine(manifest.decision.engine, engineOptions);
   const result = await engine.preview(project);
   const previewPath = await writePreviewResult(jobDir, result);
 
@@ -373,14 +342,14 @@ Decide/generate options:
   --remotion-repo <path>      Override Remotion monorepo path
   --remotion-mode <mode>      auto, monorepo, standalone
   --hyperframes-renderer <mode>
-                              official-cli, official-producer, official-engine, or local
+                              official-cli, official-producer, or official-engine
   --hyperframes-quality <mode>
                               draft, standard, or high
   --hyperframes-format <type> mp4, webm, or mov
   --hyperframes-workers <n>   Official HyperFrames worker count
   --hyperframes-docker        Use official HyperFrames Docker rendering where supported
   --hyperframes-gpu           Use official HyperFrames GPU acceleration where supported
-  --preview                   Run preview after project generation (opt-in; HyperFrames/Editframe preview launches headless Chrome + ffmpeg)
+  --preview                   Run preview after project generation (opt-in)
   --render                    Render the final MP4 after project generation (still requires --confirm-render to actually run)
   --confirm-render            Required acknowledgement that MP4 rendering is intended; protects against accidental render runs by agents
   --dry-run                   Remotion monorepo only: write job files without running engine commands
@@ -401,7 +370,7 @@ function printEngines(): void {
                Uses an external monorepo when found; otherwise creates a standalone official Remotion project.
                Watch for experimental HTML-in-canvas browser requirements and commercial/team license requirements.
   hyperframes  Best for Web, DOM, CSS, JavaScript, URL, LP-style browser-native motion, website capture, registry blocks, snapshot, and inspect.
-               Renders through the official HyperFrames CLI by default; producer, engine, and legacy local renderers are selectable.
+               Renders through the official HyperFrames CLI by default; official producer and engine renderers are selectable.
   editframe    Best for source footage, audio, captions, B-roll, ef-timegroup/ef-waveform/ef-captions, and timeline handoff workflows.
                Watch for current timeline-preview limits and Editframe plan/terms requirements.
 `);
@@ -608,16 +577,7 @@ function formatPreviewTarget(
 
 function createEngine(
   engine: EngineName,
-  options: {
-    remotionRepoPath?: string;
-    remotionMode?: RemotionProjectMode;
-    hyperframesRenderBackend?: HyperFramesRenderBackend;
-    hyperframesRenderQuality?: HyperFramesRenderQuality;
-    hyperframesRenderFormat?: HyperFramesRenderFormat;
-    hyperframesRenderWorkers?: number;
-    hyperframesUseDocker?: boolean;
-    hyperframesUseGpu?: boolean;
-  } = {}
+  options: EngineOptions = {}
 ): VideoEngine {
   if (engine === "remotion") {
     return createRemotionEngine({
@@ -636,6 +596,25 @@ function createEngine(
     });
   }
   return createEditframeEngine();
+}
+
+function parseEngineOptions(args: ReturnType<typeof parseArgs>): EngineOptions {
+  return {
+    remotionRepoPath: getValue(args, "remotion-repo"),
+    remotionMode: parseRemotionMode(getValue(args, "remotion-mode")),
+    hyperframesRenderBackend: parseHyperFramesRenderBackend(
+      getValue(args, "hyperframes-renderer")
+    ),
+    hyperframesRenderQuality: parseHyperFramesRenderQuality(
+      getValue(args, "hyperframes-quality")
+    ),
+    hyperframesRenderFormat: parseHyperFramesRenderFormat(
+      getValue(args, "hyperframes-format")
+    ),
+    hyperframesRenderWorkers: parseNumber(getValue(args, "hyperframes-workers")),
+    hyperframesUseDocker: hasFlag(args, "hyperframes-docker"),
+    hyperframesUseGpu: hasFlag(args, "hyperframes-gpu")
+  };
 }
 
 function readProjectName(projectRecord: Record<string, unknown>): string {
@@ -687,11 +666,15 @@ function parseRemotionMode(
 function parseHyperFramesRenderBackend(
   value: string | undefined
 ): HyperFramesRenderBackend | undefined {
+  if (value === "local") {
+    throw new Error(
+      "--hyperframes-renderer local is no longer exposed by the CLI. Use official-cli, official-producer, or official-engine."
+    );
+  }
   if (
     value === "official-cli" ||
     value === "official-producer" ||
-    value === "official-engine" ||
-    value === "local"
+    value === "official-engine"
   ) {
     return value;
   }

@@ -41,6 +41,9 @@ describe("HyperFrames engine", () => {
     await expect(
       fs.readFile(path.join(project.rootPath, "motion.js"), "utf8")
     ).resolves.toContain("window.__timelines");
+    await expect(
+      fs.readFile(path.join(project.rootPath, "index.html"), "utf8")
+    ).resolves.not.toContain("HyperFrames Draft");
     expect(existsSync(path.join(tempDir, "project", "project.json"))).toBe(true);
   });
 
@@ -153,6 +156,51 @@ describe("HyperFrames engine", () => {
         "--format",
         "mp4"
       ]),
+      expect.objectContaining({ cwd: project.rootPath })
+    );
+  });
+
+  it("uses the official CLI when older metadata points at the legacy local backend", async () => {
+    const tempDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "hyperframes-legacy-local-")
+    );
+    const spec = createVideoSpecFromPrompt({
+      prompt: "LPを1秒のWeb動画にしたい https://example.com",
+      durationSec: 1
+    });
+    const commandRunner: NonNullable<HyperFramesEngineOptions["commandRunner"]> =
+      vi.fn(async (_command, args) => {
+        const outputPath = args[args.indexOf("--output") + 1];
+        await fs.mkdir(path.dirname(outputPath), { recursive: true });
+        await fs.writeFile(outputPath, "mp4");
+        return {
+          code: 0,
+          command: `node ${args.join(" ")}`,
+          stdout: "rendered",
+          stderr: ""
+        };
+      });
+    const engine = createHyperFramesEngine({
+      cliPath: "/tmp/hyperframes-cli.js",
+      commandRunner
+    });
+
+    const project = await engine.generateProject(spec, {
+      outputDir: tempDir,
+      logDir: path.join(tempDir, "logs")
+    });
+    project.metadata.renderBackend = "local";
+
+    const result = await engine.render(project, {
+      outputDir: tempDir,
+      logDir: path.join(tempDir, "logs")
+    });
+
+    expect(result.ok).toBe(true);
+    expect(result.message).toContain("official CLI");
+    expect(commandRunner).toHaveBeenCalledWith(
+      process.execPath,
+      expect.arrayContaining(["/tmp/hyperframes-cli.js", "render"]),
       expect.objectContaining({ cwd: project.rootPath })
     );
   });

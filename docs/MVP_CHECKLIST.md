@@ -10,7 +10,7 @@ This checklist defines the current CLI-first MVP completion target.
 - Remotion project generation through the external Remotion Studio Monorepo
 - Remotion local render path when the external monorepo is installed
 - HyperFrames HTML/CSS/JS project generation
-- HyperFrames official CLI / producer / engine rendering, with local browser renderer fallback
+- HyperFrames official CLI / producer / engine rendering
 - Editframe timeline handoff generation
 - Editframe local MP4 timeline preview rendering through headless Chrome and ffmpeg
 - Shared render job manifest package

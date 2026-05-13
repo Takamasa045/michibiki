@@ -63,6 +63,7 @@ type HtmlInCanvasRegistryBlock = {
 };
 
 const HTML_IN_CANVAS_REGISTRY_NAME = "html-in-canvas";
+const DEFAULT_RENDER_BACKEND: HyperFramesRenderBackend = "official-cli";
 
 const HTML_IN_CANVAS_REGISTRY_BLOCKS: Record<string, HtmlInCanvasRegistryBlock> =
   {
@@ -271,8 +272,8 @@ async function generateHyperFramesProject(
     projectName,
     projectPath: projectRoot,
     entry: path.join(projectRoot, "index.html"),
-    renderStatus: `${options.renderBackend ?? "official-cli"}-render-ready`,
-    renderBackend: options.renderBackend ?? "official-cli",
+    renderStatus: `${options.renderBackend ?? DEFAULT_RENDER_BACKEND}-render-ready`,
+    renderBackend: options.renderBackend ?? DEFAULT_RENDER_BACKEND,
     renderQuality: options.renderQuality,
     renderFormat: options.renderFormat ?? inferRenderFormat(spec),
     htmlInCanvasBlock: htmlInCanvasBlock?.id,
@@ -319,7 +320,10 @@ async function renderHyperFramesProject(
   }
 ): Promise<RenderResult> {
   const metadataBackend = parseRenderBackend(project.metadata.renderBackend);
-  const backend = options.renderBackend ?? metadataBackend ?? "official-cli";
+  const backend =
+    options.renderBackend ??
+    (metadataBackend === "local" ? DEFAULT_RENDER_BACKEND : metadataBackend) ??
+    DEFAULT_RENDER_BACKEND;
   if (backend === "official-cli") {
     return renderWithOfficialCli(project, context, options);
   }
@@ -661,7 +665,6 @@ function buildHtml(
   <main id="root" class="stage" data-has-html-in-canvas="${htmlInCanvasBlock ? "true" : "false"}" data-composition-id="root" data-start="0" data-duration="${spec.format.durationSec}" data-width="${spec.format.width}" data-height="${spec.format.height}" data-track-index="0">
     ${htmlInCanvasMarkup}
     <section class="hero">
-      <p class="eyebrow">HyperFrames Draft</p>
       <h1>${escapeHtml(spec.title)}</h1>
       <p class="goal">${escapeHtml(spec.goal)}</p>
       ${spec.content.cta ? `<strong class="cta">${escapeHtml(spec.content.cta)}</strong>` : ""}

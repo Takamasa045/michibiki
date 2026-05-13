@@ -5,7 +5,7 @@
 
 Michibiki es un enrutador de producción de video con IA. Convierte una solicitud en lenguaje natural en un `VideoSpec`, selecciona el motor de video más adecuado y crea un proyecto generado o una salida de render.
 
-La versión actual admite generación y renderizado con Remotion, generación HTML/CSS/JS y renderizado MP4 local para HyperFrames, y generación `timeline.json` con previsualización MP4 local para Editframe. Remotion usa el modo `auto` por defecto: utiliza el Remotion Studio Monorepo cuando existe y, si no, crea un proyecto oficial standalone de Remotion dentro del trabajo. HyperFrames/Editframe renderizan con headless Chrome y ffmpeg.
+La versión actual admite generación y renderizado con Remotion, generación HTML/CSS/JS y renderizado oficial con HyperFrames CLI/producer/engine, y generación `timeline.json` con previsualización MP4 local para Editframe. Remotion usa el modo `auto` por defecto: utiliza el Remotion Studio Monorepo cuando existe y, si no, crea un proyecto oficial standalone de Remotion dentro del trabajo. HyperFrames renderiza por la CLI oficial de forma predeterminada; Editframe renderiza previsualizaciones con headless Chrome y ffmpeg.
 
 ## Funciones principales
 
