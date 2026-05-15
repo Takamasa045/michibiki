@@ -1,0 +1,43 @@
+name: Renovate
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 07:15 JST, Monday-Friday. renovate.json also limits updates to before 9am JST.
+    - cron: "15 22 * * 0-4"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: renovate
+  cancel-in-progress: false
+
+jobs:
+  renovate:
+    name: Renovate dependency updates
+    runs-on: ubuntu-latest
+    if: github.repository == 'Takamasa045/michibiki'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Check Renovate token
+        env:
+          RENOVATE_TOKEN: ${{ secrets.RENOVATE_TOKEN }}
+        run: |
+          if [ -z "$RENOVATE_TOKEN" ]; then
+            echo "::error::Set RENOVATE_TOKEN as a repository secret before running Renovate."
+            echo "::error::Use a PAT with public_repo/repo scope and workflow scope, or a GitHub App token with equivalent repository permissions."
+            exit 1
+          fi
+
+      - name: Self-hosted Renovate
+        uses: renovatebot/github-action@v46.1.14
+        with:
+          token: ${{ secrets.RENOVATE_TOKEN }}
+        env:
+          LOG_LEVEL: info
+          RENOVATE_PLATFORM: github
+          RENOVATE_REPOSITORIES: ${{ github.repository }}

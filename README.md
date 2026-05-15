@@ -55,6 +55,14 @@ node scripts/setup.mjs
 
 Requirements: Node.js 22+, pnpm 11+, ffmpeg (for HyperFrames/Editframe MP4 rendering), and Chromium/Chrome/Edge (auto-detected by `michibiki doctor`).
 
+## Dependency Automation
+
+GitHub runs Renovate from `.github/workflows/renovate.yml` on weekdays at 07:15 JST, with `renovate.json` limiting updates to before 9am JST. The existing `video engines` Renovate group keeps HyperFrames, Remotion standalone project runtime constants, React runtime packages, and Editframe packages updated together.
+
+Before the scheduled workflow can open pull requests, add a repository secret named `RENOVATE_TOKEN`. Use a classic PAT with `public_repo` for this public repository, or `repo` if the repository becomes private. Include the `workflow` scope so Renovate can also update GitHub Actions such as `actions/checkout` and `renovatebot/github-action`. A GitHub App installation token with equivalent repository permissions also works.
+
+Run the `Renovate` workflow manually from GitHub Actions after setting the secret to confirm that it can create/update dependency PRs.
+
 ### Windows
 
 Michibiki can run from an extracted ZIP on Windows with PowerShell. See `WINDOWS_START_HERE.md` for the short handoff. Install Node.js 22+, enable pnpm through Corepack, and keep ffmpeg on `PATH` when you need MP4 preview/render commands:
@@ -274,6 +282,12 @@ node scripts/setup.mjs
 ```
 
 必要環境: Node.js 22+、pnpm 11+、ffmpeg（HyperFrames / Editframe の MP4 レンダーに必要）、Chromium / Chrome / Edge（`michibiki doctor` で自動検出）。
+
+依存更新の自動化:
+
+GitHub では `.github/workflows/renovate.yml` により、平日 07:15 JST に Renovate を実行します。`renovate.json` の `video engines` グループで、HyperFrames、Remotion standalone 生成時の runtime 定数、React runtime、Editframe 関連 package をまとめて更新 PR にします。
+
+実行には repository secret `RENOVATE_TOKEN` が必要です。この public repo では classic PAT の `public_repo` と `workflow` scope を付けて登録します。private repo にする場合は `repo` scope を使います。GitHub App installation token を使う場合も、Contents / Pull requests / Issues / Workflows の書き込み権限を与えてください。
 
 Windows:
 
