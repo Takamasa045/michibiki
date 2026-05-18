@@ -47,11 +47,11 @@
     "test": "vitest run src"
   },
   "dependencies": {
-    "@hyperframes/engine": "^0.6.6",
-    "@hyperframes/producer": "^0.6.6",
+    "@hyperframes/engine": "^0.6.20",
+    "@hyperframes/producer": "^0.6.20",
     "@michibiki/browser-renderer": "workspace:*",
     "@michibiki/compliance": "workspace:*",
     "@michibiki/video-spec": "workspace:*",
-    "hyperframes": "^0.6.6"
+    "hyperframes": "^0.6.20"
   }
 }
