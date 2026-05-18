@@ -4,6 +4,16 @@ All notable changes to Michibiki will be documented in this file.
 
 This project follows semantic versioning for public releases.
 
+## [0.1.7](https://github.com/Takamasa045/michibiki/compare/v0.1.6...v0.1.7) (2026-05-18)
+
+
+### Bug Fixes
+
+* **deps:** override vulnerable ws version ([#16](https://github.com/Takamasa045/michibiki/issues/16)) ([64baf19](https://github.com/Takamasa045/michibiki/commit/64baf1925b6fafd15b1a1098f5efb1b7adb4a33e))
+* **deps:** update video engines to ^0.6.20 ([#12](https://github.com/Takamasa045/michibiki/issues/12)) ([15f060b](https://github.com/Takamasa045/michibiki/commit/15f060b3b16da2098d2351f14379e2bb82a646c3))
+* **deps:** update video engines to ^0.6.6 ([#11](https://github.com/Takamasa045/michibiki/issues/11)) ([57d9dd1](https://github.com/Takamasa045/michibiki/commit/57d9dd194e0fb344da62cf585220dedd0943454a))
+* use official hyperframes renderers ([a12506f](https://github.com/Takamasa045/michibiki/commit/a12506f456bdfa33e2192f3f44ae2278d32096dd))
+
 ## [0.1.6](https://github.com/Takamasa045/michibiki/compare/v0.1.5...v0.1.6) (2026-05-12)
 
 
