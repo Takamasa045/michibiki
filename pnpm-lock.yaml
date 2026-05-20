@@ -15,8 +15,8 @@ importers:
         specifier: ^22.15.0
         version: 22.19.17
       typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
+        specifier: ^6.0.3
+        version: 6.0.3
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@22.19.17)
@@ -72,10 +72,10 @@ importers:
     dependencies:
       '@hyperframes/engine':
         specifier: ^0.6.20
-        version: 0.6.20(typescript@5.9.3)
+        version: 0.6.20(typescript@6.0.3)
       '@hyperframes/producer':
         specifier: ^0.6.20
-        version: 0.6.20(typescript@5.9.3)
+        version: 0.6.20(typescript@6.0.3)
       '@michibiki/browser-renderer':
         specifier: workspace:*
         version: link:../browser-renderer
@@ -1621,8 +1621,8 @@ packages:
   typed-query-selector@2.12.2:
     resolution: {integrity: sha512-EOPFbyIub4ngnEdqi2yOcNeDLaX/0jcE1JoAXQDDMIthap7FoN795lc/SHfIq2d416VufXpM8z/lD+WRm2gfOQ==}
 
-  typescript@5.9.3:
-    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
+  typescript@6.0.3:
+    resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -1980,13 +1980,13 @@ snapshots:
     transitivePeerDependencies:
       - canvas
 
-  '@hyperframes/engine@0.6.20(typescript@5.9.3)':
+  '@hyperframes/engine@0.6.20(typescript@6.0.3)':
     dependencies:
       '@hono/node-server': 1.19.14(hono@4.12.18)
       '@hyperframes/core': 0.6.20(hono@4.12.18)
       hono: 4.12.18
       linkedom: 0.18.12
-      puppeteer: 24.43.0(typescript@5.9.3)
+      puppeteer: 24.43.0(typescript@6.0.3)
       puppeteer-core: 24.43.0
     transitivePeerDependencies:
       - bare-abort-controller
@@ -1998,7 +1998,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@hyperframes/producer@0.6.20(typescript@5.9.3)':
+  '@hyperframes/producer@0.6.20(typescript@6.0.3)':
     dependencies:
       '@fontsource/archivo-black': 5.2.8
       '@fontsource/eb-garamond': 5.2.7
@@ -2013,11 +2013,11 @@ snapshots:
       '@fontsource/space-mono': 5.2.9
       '@hono/node-server': 1.19.14(hono@4.12.18)
       '@hyperframes/core': 0.6.20(hono@4.12.18)
-      '@hyperframes/engine': 0.6.20(typescript@5.9.3)
+      '@hyperframes/engine': 0.6.20(typescript@6.0.3)
       hono: 4.12.18
       linkedom: 0.18.12
       postcss: 8.5.14
-      puppeteer: 24.43.0(typescript@5.9.3)
+      puppeteer: 24.43.0(typescript@6.0.3)
       puppeteer-core: 24.43.0
     transitivePeerDependencies:
       - bare-abort-controller
@@ -2422,14 +2422,14 @@ snapshots:
 
   compare-versions@6.1.1: {}
 
-  cosmiconfig@9.0.1(typescript@5.9.3):
+  cosmiconfig@9.0.1(typescript@6.0.3):
     dependencies:
       env-paths: 2.2.1
       import-fresh: 3.3.1
       js-yaml: 4.1.1
       parse-json: 5.2.0
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 6.0.3
 
   css-select@5.2.2:
     dependencies:
@@ -3006,11 +3006,11 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  puppeteer@24.43.0(typescript@5.9.3):
+  puppeteer@24.43.0(typescript@6.0.3):
     dependencies:
       '@puppeteer/browsers': 2.13.1
       chromium-bidi: 14.0.0(devtools-protocol@0.0.1608973)
-      cosmiconfig: 9.0.1(typescript@5.9.3)
+      cosmiconfig: 9.0.1(typescript@6.0.3)
       devtools-protocol: 0.0.1608973
       puppeteer-core: 24.43.0
       typed-query-selector: 2.12.2
@@ -3209,7 +3209,7 @@ snapshots:
 
   typed-query-selector@2.12.2: {}
 
-  typescript@5.9.3: {}
+  typescript@6.0.3: {}
 
   uhyphen@0.2.0: {}
 

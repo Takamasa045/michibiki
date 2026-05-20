@@ -43,7 +43,7 @@ const REACT_TYPES_VERSION = "^19.2.14";
 // renovate: datasource=npm depName=@types/react-dom versioning=npm
 const REACT_DOM_TYPES_VERSION = "^19.2.3";
 // renovate: datasource=npm depName=typescript versioning=npm
-const TYPESCRIPT_VERSION = "^5.8.3";
+const TYPESCRIPT_VERSION = "^6.0.0";
 
 export function createRemotionEngine(
   options: RemotionEngineOptions = {}
