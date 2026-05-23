@@ -2,10 +2,11 @@ packages:
   - "apps/*"
   - "packages/*"
 
-minimumReleaseAge: 1440
+minimumReleaseAge: 0
 blockExoticSubdeps: true
 strictDepBuilds: true
 overrides:
+  protobufjs: 7.5.8
   ws: 8.20.1
 allowBuilds:
   '@google/genai': false

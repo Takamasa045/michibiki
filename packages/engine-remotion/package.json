@@ -43,7 +43,7 @@
   },
   "scripts": {
     "build": "tsc -b",
-    "test": "vitest run src"
+    "test": "vitest run --configLoader runner src"
   },
   "dependencies": {
     "@michibiki/compliance": "workspace:*",

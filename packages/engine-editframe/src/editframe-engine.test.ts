@@ -48,6 +48,9 @@ describe("Editframe engine", () => {
     expect(project.engine).toBe("editframe");
     expect(existsSync(path.join(project.rootPath, "timeline.json"))).toBe(true);
     await expect(
+      fs.readFile(path.join(project.rootPath, "package.json"), "utf8")
+    ).resolves.toContain("@editframe/api");
+    await expect(
       fs.readFile(path.join(project.rootPath, "preview.html"), "utf8")
     ).resolves.toContain("videoRouterFrame");
     expect(existsSync(path.join(tempDir, "project", "project.json"))).toBe(true);

@@ -44,14 +44,14 @@
   },
   "scripts": {
     "build": "tsc -b",
-    "test": "vitest run src"
+    "test": "vitest run --configLoader runner src"
   },
   "dependencies": {
-    "@hyperframes/engine": "^0.6.20",
-    "@hyperframes/producer": "^0.6.20",
+    "@hyperframes/engine": "^0.6.40",
+    "@hyperframes/producer": "^0.6.40",
     "@michibiki/browser-renderer": "workspace:*",
     "@michibiki/compliance": "workspace:*",
     "@michibiki/video-spec": "workspace:*",
-    "hyperframes": "^0.6.20"
+    "hyperframes": "^0.6.40"
   }
 }

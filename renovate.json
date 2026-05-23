@@ -7,8 +7,11 @@
     ":maintainLockFilesWeekly"
   ],
   "timezone": "Asia/Tokyo",
-  "schedule": ["before 9am every weekday"],
   "rangeStrategy": "bump",
+  "automerge": true,
+  "automergeType": "pr",
+  "platformAutomerge": false,
+  "automergeStrategy": "squash",
   "packageRules": [
     {
       "description": "Keep video engine packages and generated project runtime versions updated together.",
@@ -32,7 +35,6 @@
       ],
       "groupName": "video engines",
       "groupSlug": "video-engines",
-      "minimumReleaseAge": "1 day",
       "prPriority": 10,
       "rangeStrategy": "bump"
     }
@@ -42,7 +44,8 @@
       "customType": "regex",
       "description": "Update Remotion standalone project dependency constants.",
       "managerFilePatterns": [
-        "/(^|/)packages/engine-remotion/src/remotion-engine\\.ts$/"
+        "/(^|/)packages/engine-remotion/src/remotion-engine\\.ts$/",
+        "/(^|/)packages/engine-editframe/src/editframe-versions\\.ts$/"
       ],
       "matchStrings": [
         "// renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>[^\\s]+)(?: versioning=(?<versioning>[^\\s]+))?\\s+const [A-Z_]+_VERSION = \"(?<currentValue>[^\"]+)\";"

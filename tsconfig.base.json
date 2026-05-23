@@ -4,6 +4,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "lib": ["ES2022"],
+    "types": ["node"],
     "strict": true,
     "declaration": true,
     "declarationMap": true,
@@ -15,4 +16,3 @@
     "skipLibCheck": true
   }
 }
-

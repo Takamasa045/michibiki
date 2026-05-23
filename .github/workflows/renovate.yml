@@ -3,8 +3,8 @@ name: Renovate
 on:
   workflow_dispatch:
   schedule:
-    # 07:15 JST, Monday-Friday. renovate.json also limits updates to before 9am JST.
-    - cron: "15 22 * * 0-4"
+    # Run often so fast-moving video engines are picked up close to publish time.
+    - cron: "15 */3 * * *"
 
 permissions:
   contents: read

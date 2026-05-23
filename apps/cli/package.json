@@ -42,7 +42,7 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc -b",
-    "test": "vitest run src"
+    "test": "vitest run --configLoader runner src"
   },
   "dependencies": {
     "@michibiki/browser-renderer": "workspace:*",
