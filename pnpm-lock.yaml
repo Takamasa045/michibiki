@@ -72,11 +72,11 @@ importers:
   packages/engine-hyperframes:
     dependencies:
       '@hyperframes/engine':
-        specifier: ^0.6.52
-        version: 0.6.52(typescript@6.0.3)
+        specifier: ^0.6.56
+        version: 0.6.56(typescript@6.0.3)
       '@hyperframes/producer':
-        specifier: ^0.6.52
-        version: 0.6.52(typescript@6.0.3)
+        specifier: ^0.6.56
+        version: 0.6.56(typescript@6.0.3)
       '@michibiki/browser-renderer':
         specifier: workspace:*
         version: link:../browser-renderer
@@ -87,8 +87,8 @@ importers:
         specifier: workspace:*
         version: link:../video-spec
       hyperframes:
-        specifier: ^0.6.52
-        version: 0.6.52
+        specifier: ^0.6.56
+        version: 0.6.56
 
   packages/engine-remotion:
     dependencies:
@@ -119,8 +119,25 @@ packages:
     resolution: {integrity: sha512-9NhCeYjq9+3uxgdtp20LSiJXJvN0FeCtNGpJxuMFZ1Kv3cWUNb6DOhJwUvcVCzKGR66cw4njwM6hrJLqgOwbcw==}
     engines: {node: '>=6.9.0'}
 
+  '@babel/helper-string-parser@7.29.7':
+    resolution: {integrity: sha512-Pb5ijPrZ89GDH8223L4UP8i6QApWxs04RbPQJTeWDV0/keR2E36MeKnyr6LYmUUvqRRI+Iv87SuF1W6ErINzYw==}
+    engines: {node: '>=6.9.0'}
+
   '@babel/helper-validator-identifier@7.28.5':
     resolution: {integrity: sha512-qSs4ifwzKJSV39ucNjsvc6WVHs6b7S03sOh2OcHF9UHfVPqWWALUsNUVzhSBiItjRZoLHx7nIarVjqKVusUZ1Q==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/helper-validator-identifier@7.29.7':
+    resolution: {integrity: sha512-qehxGkRj55h/ff8EMaJ+cYhyaKlHIxqYDn682wQD7RNp9UujOQsHog2uS0r2vzr4pW+sXf90NeeayjcNaX3fFg==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/parser@7.29.7':
+    resolution: {integrity: sha512-hnORnjP/1P/zFEndoeX+n+t1RwWRJiJpM/jO7FW32Kn9r5+sJB2JWOdYo4L6k78j15eCwY3Gm/7364B1EMwtNg==}
+    engines: {node: '>=6.0.0'}
+    hasBin: true
+
+  '@babel/types@7.29.7':
+    resolution: {integrity: sha512-4zBIxpPzowiZpusoFkyGVwakdRJUyuH5PxQ/PrqghfdFWWasvnCdPfQXHrenDai+gyLARulZjZowCOj6fjT4pA==}
     engines: {node: '>=6.9.0'}
 
   '@chenglou/pretext@0.0.5':
@@ -339,20 +356,20 @@ packages:
     peerDependencies:
       hono: ^4
 
-  '@hyperframes/core@0.6.52':
-    resolution: {integrity: sha512-1XSbGbC3E5jtofedcbwI/VkWSLcag/YANiXpk/A+aA33gGj3eJRZPsiuGfPI1PDJP3683dS5CTN+dByVekDoQg==}
+  '@hyperframes/core@0.6.56':
+    resolution: {integrity: sha512-tSvvn3siQCED/l/NyAzG33Dg5Zsegbx5SE7m637UlrAB2o1/LXlYOgRFpUXXhvfmoU7xCdD1+pfB4RO4BqW82w==}
     peerDependencies:
       hono: ^4.0.0
     peerDependenciesMeta:
       hono:
         optional: true
 
-  '@hyperframes/engine@0.6.52':
-    resolution: {integrity: sha512-DGDI4UNyUacqdDC/+/TNjPQcW3/hXVhOP48tFChs/NYj1N5+1z5L8/y2kuAzxRGY/wjj/Qg0O5GJ4+f1QeuI+A==}
+  '@hyperframes/engine@0.6.56':
+    resolution: {integrity: sha512-+MeAla/zpNTKuKYU89V/NlylMol2qQ1Sw/bcqXIactd5OM3TTU6iKXFtUZJYuN7nOlhVoDi6OcIk2HWNJ849Tw==}
     engines: {node: '>=22'}
 
-  '@hyperframes/producer@0.6.52':
-    resolution: {integrity: sha512-D/irT4OVs//G0vRHhan5dV75+MgpxiEo2OpadlqNSqOTUKeHXN706CzaqJfQA4oiziFHjFgNxs/+hBLHOMirUA==}
+  '@hyperframes/producer@0.6.56':
+    resolution: {integrity: sha512-igllY2UmPvZSh3aYme0qGqFJfCthgezNleTpJ6GZ1HxTX07soRpci2bk8lGBEgUWJ5XSEIFnJ14J78DM1ImMMw==}
     engines: {node: '>=22'}
 
   '@img/colour@1.1.0':
@@ -707,6 +724,10 @@ packages:
 
   ast-types@0.13.4:
     resolution: {integrity: sha512-x1FCFnFifvYDDzTaLII71vG5uvDwgtmDTEVWAxrgeiR8VjMONcCXJx7E+USjDtHlwFmt9MysbqgF9b9Vjr6w+w==}
+    engines: {node: '>=4'}
+
+  ast-types@0.16.1:
+    resolution: {integrity: sha512-6t10qk83GOG8p0vKmaCr8eiilZwO171AvbROMtvvNiwrTly62t+7XkA8RdIIVbpMhCASAsxgAzdRSwh6nw/5Dg==}
     engines: {node: '>=4'}
 
   b4a@1.8.1:
@@ -1087,8 +1108,8 @@ packages:
     resolution: {integrity: sha512-vK9P5/iUfdl95AI+JVyUuIcVtd4ofvtrOr3HNtM2yxC9bnMbEdp3x01OhQNnjb8IJYi38VlTE3mBXwcfvywuSw==}
     engines: {node: '>= 14'}
 
-  hyperframes@0.6.52:
-    resolution: {integrity: sha512-EgcSM1TOUbgMUEtUiaH5xFg3bEwoKn4ourMP68QCudmUV/F3plEP23h+JJMNfxfIvCa2zuGFCOhEusaUC6WxVA==}
+  hyperframes@0.6.56:
+    resolution: {integrity: sha512-aYTSUE6UsUvKTBM7E7z3cXDpYlWQWE+ipvGYx6gtzCFogSOVDuNlEs5B3U598fpQntVgjtUHVvH6SbaFd+IZSw==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -1360,6 +1381,10 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
+  recast@0.23.11:
+    resolution: {integrity: sha512-YTUo+Flmw4ZXiWfQKGcwwc11KnoRAYgzAE2E7mXKCjSviTKShtxBsN6YUUBB2gtaBzKzeKunxhUwNHQuRryhWA==}
+    engines: {node: '>= 4'}
+
   require-directory@2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}
     engines: {node: '>=0.10.0'}
@@ -1454,6 +1479,9 @@ packages:
 
   tiny-inflate@1.0.3:
     resolution: {integrity: sha512-pkY1fj1cKHb2seWDy0B16HeWyczlJA9/WW3u3c4z/NiWDsO3DOU5D7nhTLE9CF0yXv/QZFY7sEJmj24dK+Rrqw==}
+
+  tiny-invariant@1.3.3:
+    resolution: {integrity: sha512-+FbBPE1o9QAYvviau/qC5SE3caw21q3xkvWKBtja5vgqOWIHHJ3ioaq1VPfn/Szqctz2bU/oYeKd9/z5BL+PVg==}
 
   tinybench@2.9.0:
     resolution: {integrity: sha512-0+DUvqWMValLmha6lr4kD8iAMK1HzV0/aKnCtWb9v9641TnP/MFb7Pc2bxoxQjTXAErryXVgUOfv2YqNllqGeg==}
@@ -1642,7 +1670,20 @@ snapshots:
       js-tokens: 4.0.0
       picocolors: 1.1.1
 
+  '@babel/helper-string-parser@7.29.7': {}
+
   '@babel/helper-validator-identifier@7.28.5': {}
+
+  '@babel/helper-validator-identifier@7.29.7': {}
+
+  '@babel/parser@7.29.7':
+    dependencies:
+      '@babel/types': 7.29.7
+
+  '@babel/types@7.29.7':
+    dependencies:
+      '@babel/helper-string-parser': 7.29.7
+      '@babel/helper-validator-identifier': 7.29.7
 
   '@chenglou/pretext@0.0.5': {}
 
@@ -1778,10 +1819,12 @@ snapshots:
     dependencies:
       hono: 4.12.23
 
-  '@hyperframes/core@0.6.52(hono@4.12.23)':
+  '@hyperframes/core@0.6.56(hono@4.12.23)':
     dependencies:
+      '@babel/parser': 7.29.7
       '@chenglou/pretext': 0.0.5
       postcss: 8.5.15
+      recast: 0.23.11
     optionalDependencies:
       esbuild: 0.25.12
       hono: 4.12.23
@@ -1789,10 +1832,10 @@ snapshots:
     transitivePeerDependencies:
       - canvas
 
-  '@hyperframes/engine@0.6.52(typescript@6.0.3)':
+  '@hyperframes/engine@0.6.56(typescript@6.0.3)':
     dependencies:
       '@hono/node-server': 1.19.14(hono@4.12.23)
-      '@hyperframes/core': 0.6.52(hono@4.12.23)
+      '@hyperframes/core': 0.6.56(hono@4.12.23)
       hono: 4.12.23
       linkedom: 0.18.12
       puppeteer: 24.43.1(typescript@6.0.3)
@@ -1807,7 +1850,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@hyperframes/producer@0.6.52(typescript@6.0.3)':
+  '@hyperframes/producer@0.6.56(typescript@6.0.3)':
     dependencies:
       '@fontsource/archivo-black': 5.2.8
       '@fontsource/eb-garamond': 5.2.7
@@ -1821,8 +1864,8 @@ snapshots:
       '@fontsource/outfit': 5.2.8
       '@fontsource/space-mono': 5.2.9
       '@hono/node-server': 1.19.14(hono@4.12.23)
-      '@hyperframes/core': 0.6.52(hono@4.12.23)
-      '@hyperframes/engine': 0.6.52(typescript@6.0.3)
+      '@hyperframes/core': 0.6.56(hono@4.12.23)
+      '@hyperframes/engine': 0.6.56(typescript@6.0.3)
       hono: 4.12.23
       linkedom: 0.18.12
       postcss: 8.5.15
@@ -2101,6 +2144,10 @@ snapshots:
   assertion-error@2.0.1: {}
 
   ast-types@0.13.4:
+    dependencies:
+      tslib: 2.8.1
+
+  ast-types@0.16.1:
     dependencies:
       tslib: 2.8.1
 
@@ -2500,7 +2547,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  hyperframes@0.6.52:
+  hyperframes@0.6.56:
     dependencies:
       '@hono/node-server': 1.19.14(hono@4.12.23)
       '@puppeteer/browsers': 2.13.2
@@ -2806,6 +2853,14 @@ snapshots:
       - typescript
       - utf-8-validate
 
+  recast@0.23.11:
+    dependencies:
+      ast-types: 0.16.1
+      esprima: 4.0.1
+      source-map: 0.6.1
+      tiny-invariant: 1.3.3
+      tslib: 2.8.1
+
   require-directory@2.1.1: {}
 
   resolve-from@4.0.0: {}
@@ -2897,8 +2952,7 @@ snapshots:
 
   source-map-js@1.2.1: {}
 
-  source-map@0.6.1:
-    optional: true
+  source-map@0.6.1: {}
 
   stackback@0.0.2: {}
 
@@ -2960,6 +3014,8 @@ snapshots:
       - react-native-b4a
 
   tiny-inflate@1.0.3: {}
+
+  tiny-invariant@1.3.3: {}
 
   tinybench@2.9.0: {}
 
