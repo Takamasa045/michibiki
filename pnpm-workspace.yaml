@@ -6,7 +6,7 @@ minimumReleaseAge: 0
 blockExoticSubdeps: true
 strictDepBuilds: true
 overrides:
-  protobufjs: 8.4.2
+  protobufjs: 8.5.0
   ws: 8.21.0
 allowBuilds:
   '@google/genai': false
