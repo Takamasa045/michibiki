@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  protobufjs: 8.5.0
+  protobufjs: 8.6.0
   ws: 8.21.0
 
 importers:
@@ -1354,8 +1354,8 @@ packages:
     resolution: {integrity: sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==}
     engines: {node: '>=0.4.0'}
 
-  protobufjs@8.5.0:
-    resolution: {integrity: sha512-df1jWDPA5VIBNRtuAHjqr09f2qN5D4Vke1wYqOQg1XJ7ZDpA7BD6L7E4tyChgGRLB5hqk2m79Zsy0WHwV9a84A==}
+  protobufjs@8.6.0:
+    resolution: {integrity: sha512-PIOO89BMGMXGz2333TVv/OqPNVWm7w30ll/4FtLbtLBaonzJMYwTbAZSSlobjIy9MoUgIAxSVUpK7aP7EpTtkg==}
     engines: {node: '>=12.0.0'}
 
   proxy-agent@6.5.0:
@@ -1801,7 +1801,7 @@ snapshots:
     dependencies:
       google-auth-library: 10.6.2
       p-retry: 4.6.2
-      protobufjs: 8.5.0
+      protobufjs: 8.6.0
       ws: 8.21.0
     transitivePeerDependencies:
       - bufferutil
@@ -2789,7 +2789,7 @@ snapshots:
 
   progress@2.0.3: {}
 
-  protobufjs@8.5.0:
+  protobufjs@8.6.0:
     dependencies:
       long: 5.3.2
     optional: true
