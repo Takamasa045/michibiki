@@ -72,11 +72,11 @@ importers:
   packages/engine-hyperframes:
     dependencies:
       '@hyperframes/engine':
-        specifier: ^0.6.80
-        version: 0.6.80(typescript@6.0.3)
+        specifier: ^0.6.81
+        version: 0.6.81(typescript@6.0.3)
       '@hyperframes/producer':
-        specifier: ^0.6.80
-        version: 0.6.80(typescript@6.0.3)
+        specifier: ^0.6.81
+        version: 0.6.81(typescript@6.0.3)
       '@michibiki/browser-renderer':
         specifier: workspace:*
         version: link:../browser-renderer
@@ -87,8 +87,8 @@ importers:
         specifier: workspace:*
         version: link:../video-spec
       hyperframes:
-        specifier: ^0.6.80
-        version: 0.6.80
+        specifier: ^0.6.81
+        version: 0.6.81
 
   packages/engine-remotion:
     dependencies:
@@ -352,20 +352,20 @@ packages:
     peerDependencies:
       hono: ^4
 
-  '@hyperframes/core@0.6.80':
-    resolution: {integrity: sha512-CbVrVqOcm8i5f1KzP2AlHQEEcM+AzSSwnPgV5KWlHUntAMtGt2++qxOzwLoyyxkN/X/++LwwAOocaQq/cTKULw==}
+  '@hyperframes/core@0.6.81':
+    resolution: {integrity: sha512-xXJhtxKS+eTB45lfATXDqEo4Mz8kP6XraZurDWJXlhF4BlBp9HslPBjaTgk4/HJ8lYbBdVpx5ok4U6XCu1m+6A==}
     peerDependencies:
       hono: ^4.0.0
     peerDependenciesMeta:
       hono:
         optional: true
 
-  '@hyperframes/engine@0.6.80':
-    resolution: {integrity: sha512-RiLdEKvIThuo7QP+W5GX3HXnE/sJ8wim8XVYWE/+M2sNCAFbOh5caU+QkFXJaQlc7A2IZYrOLanLorcVdsibSw==}
+  '@hyperframes/engine@0.6.81':
+    resolution: {integrity: sha512-mblC36puNiuvEgZT1I/o09PbkQhjOej0I7Z4UEv23JMT1e8Q2acQmU6Bm8Snn9Uslfq6DVKGXxGrDMsVUbZ8bw==}
     engines: {node: '>=22'}
 
-  '@hyperframes/producer@0.6.80':
-    resolution: {integrity: sha512-2S++fFGjUdr5ZzQmjGUFR34xkD7qM648qkZNCHmiu6ocjP26rIzHYnoe0t6bEu/ono/d/IYVXHenV65CR9LZgQ==}
+  '@hyperframes/producer@0.6.81':
+    resolution: {integrity: sha512-djf526wahqI/3tffSy/wp0rzYgk77GDd8nQGMXBoYCX+1yL9Z9dae6I+TQ0SJRzFebfNe0sg5fb5qrlEDZrY/w==}
     engines: {node: '>=22'}
 
   '@img/colour@1.1.0':
@@ -1104,8 +1104,8 @@ packages:
     resolution: {integrity: sha512-vK9P5/iUfdl95AI+JVyUuIcVtd4ofvtrOr3HNtM2yxC9bnMbEdp3x01OhQNnjb8IJYi38VlTE3mBXwcfvywuSw==}
     engines: {node: '>= 14'}
 
-  hyperframes@0.6.80:
-    resolution: {integrity: sha512-7twBaZNecsZgfRHmdiiljW/skLVTnJGmTJBeYDAW/LJ98mbcywQwKUBdEfj+YIymw17bVX2nNWD1yHYFBdbBlw==}
+  hyperframes@0.6.81:
+    resolution: {integrity: sha512-8c3xQr7AG1h7j2yEfVEsxSOKS9OAsY0zC+eVmQf3sqdmNY/BKHpvsfcwxBRYpPxLp6ZMhnNpwdc0ESTQEwoOIg==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -1606,6 +1606,10 @@ packages:
       jsdom:
         optional: true
 
+  wawoff2@2.0.1:
+    resolution: {integrity: sha512-r0CEmvpH63r4T15ebFqeOjGqU4+EgTx4I510NtK35EMciSdcTxCw3Byy3JnBonz7iyIFZ0AbVo0bbFpEVuhCYA==}
+    hasBin: true
+
   web-streams-polyfill@3.3.3:
     resolution: {integrity: sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==}
     engines: {node: '>= 8'}
@@ -1814,7 +1818,7 @@ snapshots:
     dependencies:
       hono: 4.12.23
 
-  '@hyperframes/core@0.6.80(hono@4.12.23)':
+  '@hyperframes/core@0.6.81(hono@4.12.23)':
     dependencies:
       '@babel/parser': 7.29.7
       '@chenglou/pretext': 0.0.5
@@ -1827,10 +1831,10 @@ snapshots:
     transitivePeerDependencies:
       - canvas
 
-  '@hyperframes/engine@0.6.80(typescript@6.0.3)':
+  '@hyperframes/engine@0.6.81(typescript@6.0.3)':
     dependencies:
       '@hono/node-server': 1.19.14(hono@4.12.23)
-      '@hyperframes/core': 0.6.80(hono@4.12.23)
+      '@hyperframes/core': 0.6.81(hono@4.12.23)
       hono: 4.12.23
       linkedom: 0.18.12
       puppeteer: 24.43.1(typescript@6.0.3)
@@ -1845,7 +1849,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@hyperframes/producer@0.6.80(typescript@6.0.3)':
+  '@hyperframes/producer@0.6.81(typescript@6.0.3)':
     dependencies:
       '@fontsource/archivo-black': 5.2.8
       '@fontsource/eb-garamond': 5.2.7
@@ -1859,13 +1863,14 @@ snapshots:
       '@fontsource/outfit': 5.2.8
       '@fontsource/space-mono': 5.2.9
       '@hono/node-server': 1.19.14(hono@4.12.23)
-      '@hyperframes/core': 0.6.80(hono@4.12.23)
-      '@hyperframes/engine': 0.6.80(typescript@6.0.3)
+      '@hyperframes/core': 0.6.81(hono@4.12.23)
+      '@hyperframes/engine': 0.6.81(typescript@6.0.3)
       hono: 4.12.23
       linkedom: 0.18.12
       postcss: 8.5.15
       puppeteer: 24.43.1(typescript@6.0.3)
       puppeteer-core: 24.43.1
+      wawoff2: 2.0.1
     transitivePeerDependencies:
       - bare-abort-controller
       - bare-buffer
@@ -2542,7 +2547,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  hyperframes@0.6.80:
+  hyperframes@0.6.81:
     dependencies:
       '@hono/node-server': 1.19.14(hono@4.12.23)
       '@puppeteer/browsers': 2.13.2
@@ -3083,6 +3088,10 @@ snapshots:
       '@types/node': 25.9.2
     transitivePeerDependencies:
       - msw
+
+  wawoff2@2.0.1:
+    dependencies:
+      argparse: 2.0.1
 
   web-streams-polyfill@3.3.3:
     optional: true
