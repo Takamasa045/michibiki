@@ -26,6 +26,7 @@ Best for a website, landing page, or URL that should become browser-native motio
 pnpm michibiki generate \
   --duration 1 \
   --render \
+  --confirm-render \
   --prompt "$(cat examples/lp-trailer/prompt.txt)"
 ```
 
@@ -41,6 +42,7 @@ pnpm michibiki generate \
   --asset examples/asset-short/input/clip.mp4 \
   --asset examples/asset-short/input/voice.mp3 \
   --render \
+  --confirm-render \
   --prompt "$(cat examples/asset-short/prompt.txt)"
 ```
 

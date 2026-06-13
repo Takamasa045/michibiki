@@ -9,4 +9,4 @@ coverage/
 !.env.example
 outputs/*
 !outputs/README.md
-engines/remotion-studio-monorepo/
+engines/
