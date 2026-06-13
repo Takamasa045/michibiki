@@ -21,7 +21,7 @@ import {
   writeJobFiles,
   writePreviewResult
 } from "@michibiki/render-jobs";
-import { selectEngine } from "@michibiki/router";
+import { AMBIGUITY_MARGIN, selectEngine } from "@michibiki/router";
 import {
   createVideoSpecFromPrompt,
   type AspectRatio,
@@ -353,7 +353,7 @@ Decide/generate options:
   --render                    Render the final MP4 after project generation (still requires --confirm-render to actually run)
   --confirm-render            Required acknowledgement that MP4 rendering is intended; protects against accidental render runs by agents
   --dry-run                   Remotion monorepo only: write job files without running engine commands
-  --resolve-ambiguity         Proceed with the auto recommendation even when the router cannot decide between two engines (top vs runner-up margin ≤ 8%)
+  --resolve-ambiguity         Proceed with the auto recommendation even when the router cannot decide between two engines (top vs runner-up margin ≤ ${AMBIGUITY_MARGIN}%)
   --allow-license-risk        Proceed even when license guard flags risk
 
 Recommended sequence (the steps the agent rules expect):

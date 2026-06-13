@@ -80,8 +80,8 @@ describe("HyperFrames engine", () => {
       path.join(project.rootPath, "index.html"),
       "utf8"
     );
-    expect(html).toContain('data-has-html-in-canvas="false"');
     expect(html).not.toContain("data-composition-src=");
+    expect(html).not.toContain("data-has-html-in-canvas");
     await expect(
       fs.readFile(path.join(project.rootPath, "README.md"), "utf8")
     ).resolves.toContain(

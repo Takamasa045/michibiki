@@ -5,7 +5,7 @@ Current draft output:
 - `timeline.json`
 - `preview.html`
 - `video-spec.json`
-- `render/output.mp4` when `michibiki generate --render` is used
+- `render/output.mp4` when `michibiki generate --render --confirm-render` is used
 
 Planned named templates:
 

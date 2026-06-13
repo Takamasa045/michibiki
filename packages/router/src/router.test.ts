@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createVideoSpecFromPrompt } from "@michibiki/video-spec";
-import { selectEngine } from "./router.js";
+import { AMBIGUITY_MARGIN, selectEngine } from "./router.js";
 
 describe("selectEngine", () => {
   it("honors explicit engine preference", () => {
@@ -354,7 +354,7 @@ describe("selectEngine", () => {
         (left, right) => right.fitPercent - left.fitPercent
       );
       const margin = (sorted[0]?.fitPercent ?? 0) - (sorted[1]?.fitPercent ?? 0);
-      if (margin <= 8) {
+      if (margin <= AMBIGUITY_MARGIN) {
         expect(decision.clarifyingQuestions.length).toBeGreaterThan(0);
         expect(decision.clarifyingQuestions[0]).toMatch(/Two engines/);
       }
@@ -380,7 +380,7 @@ describe("selectEngine", () => {
         (left, right) => right.fitPercent - left.fitPercent
       );
       const margin = (sorted[0]?.fitPercent ?? 0) - (sorted[1]?.fitPercent ?? 0);
-      if (margin <= 8) {
+      if (margin <= AMBIGUITY_MARGIN) {
         expect(decision.selectionGuide).toContain("Close call");
       }
     });
