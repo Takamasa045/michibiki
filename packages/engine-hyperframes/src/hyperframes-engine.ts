@@ -7,14 +7,15 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { renderBrowserVideo, resolveChromePath } from "@michibiki/browser-renderer";
 import { validateLicense } from "@michibiki/compliance";
-import type {
-  GeneratedProject,
-  GenerateProjectContext,
-  PreviewResult,
-  RenderContext,
-  RenderResult,
-  VideoEngine,
-  VideoSpec
+import {
+  slugify,
+  type GeneratedProject,
+  type GenerateProjectContext,
+  type PreviewResult,
+  type RenderContext,
+  type RenderResult,
+  type VideoEngine,
+  type VideoSpec
 } from "@michibiki/video-spec";
 import {
   HTML_IN_CANVAS_REGISTRY_NAME,
@@ -613,20 +614,6 @@ async function installHyperFramesRegistryItem(
 
 function createProjectName(spec: VideoSpec): string {
   return `hyperframes-${slugify(spec.title)}-${Date.now()}`;
-}
-
-function slugify(value: string): string {
-  return (
-    value
-      .normalize("NFKD")
-      .replace(/[^\w\s-]/g, "")
-      .trim()
-      .toLowerCase()
-      .replace(/[_\s]+/g, "-")
-      .replace(/-+/g, "-")
-      .replace(/^-|-$/g, "")
-      .slice(0, 40) || "video"
-  );
 }
 
 async function writeLog(

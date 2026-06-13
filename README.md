@@ -105,7 +105,7 @@ Re-consolidate any scatter with the organizer (dry run by default):
 ```bash
 pnpm organize              # print the move/cleanup plan, change nothing
 pnpm organize --apply      # move into outputs/projects/<slug>/ and prune empty dirs
-pnpm organize --clean-jobs # also delete regenerable node_modules under outputs/jobs/
+pnpm organize --clean-jobs # also delete regenerable node_modules under outputs/jobs/ and outputs/projects/
 ```
 
 It never overwrites an existing target, stays within `outputs/`, is idempotent, and records every action to `outputs/.organize-ledger.json`. See [`outputs/README.md`](outputs/README.md) and the Output Layout Rule in [`AGENTS.md`](AGENTS.md).
@@ -248,7 +248,7 @@ Remotion アダプターは標準で `auto` モードです。外部の Remotion
 ```bash
 pnpm organize              # 移動/整理プランを表示するだけ（変更しない）
 pnpm organize --apply      # outputs/projects/<slug>/ へ移動し空ディレクトリを整理
-pnpm organize --clean-jobs # outputs/jobs 配下の再生成可能な node_modules も削除
+pnpm organize --clean-jobs # outputs/jobs と outputs/projects 配下の再生成可能な node_modules も削除
 ```
 
 既存ファイルを上書きせず、`outputs/` の外には出ず、冪等で、すべての操作を `outputs/.organize-ledger.json` に記録します。詳細は [`outputs/README.md`](outputs/README.md) と [`AGENTS.md`](AGENTS.md) の Output Layout Rule を参照してください。
