@@ -23,16 +23,13 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-// --- Canonical buckets within a project folder -----------------------------
-export const BUCKETS = ["clips", "audio", "previews", "final", "assets"];
-
 // Top-level dirs that are NOT scatter and must never be reorganized.
-export const PROTECTED = ["jobs", "projects", "hyperframes", "remotion", "editframe"];
+const PROTECTED = ["jobs", "projects", "hyperframes", "remotion", "editframe"];
 
 // Declarative migration plan. Each rule maps an existing scattered source to a
 // destination under outputs/projects/<slug>/. This table is the auditable
 // source of truth — no heuristic guessing happens outside of it.
-export const MIGRATIONS = [
+const MIGRATIONS = [
   // pixverse-tokyo: promo + urgency variants of one campaign (today's work).
   { kind: "files", src: "pixverse-clips", to: "projects/pixverse-tokyo/clips" },
   { kind: "files", src: "pixverse-clips-urgency", to: "projects/pixverse-tokyo/clips" },
@@ -57,7 +54,7 @@ export const MIGRATIONS = [
 ];
 
 // Source dirs that should be removed if left empty after migration.
-export const PRUNE_IF_EMPTY = [
+const PRUNE_IF_EMPTY = [
   "pixverse-clips",
   "pixverse-clips-urgency",
   "audio",
