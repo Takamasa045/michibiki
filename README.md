@@ -136,6 +136,20 @@ Engine behavior, recommendation rules, and agent contracts are documented in:
 - [`GEMINI.md`](GEMINI.md) — Antigravity / Gemini compatibility pointer to `AGENTS.md`
 - [`docs/AGENT_RESPONSE_EXAMPLES.md`](docs/AGENT_RESPONSE_EXAMPLES.md) — agent response samples
 
+### Outputs
+
+Generated artifacts live under `outputs/`. Each deliverable gets its own folder — `outputs/projects/<slug>/{clips,audio,previews,final,assets}` — so a single video's source clips, audio, previews, and final renders stay together instead of scattering across type-named buckets. CLI render jobs (`outputs/jobs/<job-id>/`) and engine defaults (`outputs/<engine>/<project>/`) keep their existing conventions. All of `outputs/` except `outputs/README.md` is git-ignored.
+
+Re-consolidate any scatter with the organizer (dry run by default):
+
+```bash
+pnpm organize              # print the move/cleanup plan, change nothing
+pnpm organize --apply      # move into outputs/projects/<slug>/ and prune empty dirs
+pnpm organize --clean-jobs # also delete regenerable node_modules under outputs/jobs/
+```
+
+It never overwrites an existing target, stays within `outputs/`, is idempotent, and records every action to `outputs/.organize-ledger.json`. See [`outputs/README.md`](outputs/README.md) and the Output Layout Rule in [`AGENTS.md`](AGENTS.md).
+
 ### Agent Compatibility
 
 `AGENTS.md` is the single source of truth for agent behavior in this repository. **Codex CLI, Codex Cloud, and Antigravity all read `AGENTS.md` natively** with no extra setup. Claude Code reaches the same rules through `CLAUDE.md`, and Antigravity additionally reads `GEMINI.md`. Tool-specific files stay as thin pointers so video-routing rules, approval gates, and engine guidance do not drift.
