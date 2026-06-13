@@ -72,8 +72,8 @@ Windows では PowerShell 前提で案内し、必要なら `WINDOWS_START_HERE.
 
 1. `michibiki decide --prompt "..."` — 副作用なし。エンジン比較と方針提案のみ。
 2. `michibiki generate --prompt "..." [--engine X]` — プロジェクトファイル生成のみ。preview/render は走らせない。
-3. `michibiki preview --job outputs/jobs/<id>` — preview 起動（HyperFrames/Editframe では headless Chrome + ffmpeg のフレームキャプチャが走る、副作用あり）。
-4. `michibiki render --job outputs/jobs/<id> --confirm-render` — 最終 MP4 レンダー。`--confirm-render` 無しでは実行されず exit code 2 で停止する。
+3. `michibiki preview --job outputs/projects/<slug>` — preview 起動（HyperFrames/Editframe では headless Chrome + ffmpeg のフレームキャプチャが走る、副作用あり）。
+4. `michibiki render --job outputs/projects/<slug> --confirm-render` — 最終 MP4 レンダー。`--confirm-render` 無しでは実行されず exit code 2 で停止する。
 
 ルール:
 
@@ -101,7 +101,7 @@ outputs/projects/<project-slug>/
 
 - `<project-slug>` は kebab-case（例: `pixverse-tokyo`, `ai-lab-takabon-suno-demo`）。1つのキャンペーン・楽曲・案件で1フォルダ。
 - **バリアント（promo / urgency / v2 など）で新フォルダを増やさない。** `final/promo-16x9.mp4` `final/urgency-9x16.mp4` のようにファイル名で分岐するか、必要なら `final/urgency/` のサブフォルダにする。`outputs/pixverse-clips-urgency/` のような接尾辞フォルダは作らない。
-- CLI 経由の成果物は従来どおり `outputs/jobs/<job-id>/`、engine 既定出力は `outputs/<engine>/<project>/`（`hyperframes` / `remotion` / `editframe`）。これらの規約フォルダは触らない。
+- CLI 経由の成果物も `outputs/projects/<slug>/` に書き込まれる（`<slug>` はタイトル由来、衝突時は `-2` 等を付与。機械向けに `video-spec.json` / `project/` / `render/` / `preview/` / `logs/` を持つ）。旧 `outputs/jobs/<id>` は互換のため resolve のみ維持。engine 既定出力は `outputs/<engine>/<project>/`（`hyperframes` / `remotion` / `editframe`）で、CLI を介さない単体利用時のみ。これらの規約フォルダは触らない。
 - `outputs/` は `outputs/README.md` を除き丸ごと Git 管理対象外。構造の説明は `outputs/README.md` にある。
 - 種類別に散らかった既存成果物は `node scripts/organize-outputs.mjs`（dry run）で計画を確認し、`--apply` で `outputs/projects/<slug>/` へ再集約する。移動は既存ファイルを上書きせず、`outputs/.organize-ledger.json` に記録される。
 
