@@ -18,7 +18,7 @@
 ユーザーが「セットアップして」「使えるようにして」「pnpm install して」など、このリポジトリの初回セットアップを依頼した場合は、通常の動画生成フローへ進む前に次を実行してください。
 
 1. Node.js が入っているか確認する: `node --version`
-2. Node.js 22 未満、または Node.js が無い場合は、Node.js 22 以上が必要だと伝えて止まる。
+2. Node.js 24.16 未満、または Node.js が無い場合は、Node.js 24.16 以上が必要だと伝えて止まる。
 3. 依存が未導入でも動く初期化コマンドとして `node scripts/setup.mjs` を実行する。
 4. `pnpm michibiki doctor` の結果を要約し、ffmpeg / Chrome / Edge が WARN の場合は不足しているものを短く案内する。
 

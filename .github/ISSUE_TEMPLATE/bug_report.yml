@@ -41,9 +41,9 @@ body:
     id: version
     attributes:
       label: Michibiki version or commit
-      placeholder: v0.1.1
+      placeholder: v0.1.8
   - type: input
     id: environment
     attributes:
       label: Environment
-      placeholder: macOS 15, Node 22, pnpm 10, ffmpeg 8
+      placeholder: macOS 15, Node 24, pnpm 11, ffmpeg 8

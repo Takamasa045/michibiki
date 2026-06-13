@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
 import process from "node:process";
 
-const PNPM_VERSION = "11.1.1";
+const PNPM_VERSION = "11.6.0";
 const pnpmCommand = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
 
 const steps = [

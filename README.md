@@ -53,7 +53,7 @@ cd michibiki
 node scripts/setup.mjs
 ```
 
-Requirements: Node.js 22+, pnpm 11+, ffmpeg (for HyperFrames/Editframe MP4 rendering), and Chromium/Chrome/Edge (auto-detected by `michibiki doctor`).
+Requirements: Node.js 24.16+, pnpm 11+, ffmpeg (for HyperFrames/Editframe MP4 rendering), and Chromium/Chrome/Edge (auto-detected by `michibiki doctor`).
 
 ## Dependency Automation
 
@@ -65,7 +65,7 @@ Run the `Renovate` workflow manually from GitHub Actions after setting the secre
 
 ### Windows
 
-Michibiki can run from an extracted ZIP on Windows with PowerShell. See `WINDOWS_START_HERE.md` for the short handoff. Install Node.js 22+, enable pnpm through Corepack, and keep ffmpeg on `PATH` when you need MP4 preview/render commands:
+Michibiki can run from an extracted ZIP on Windows with PowerShell. See `WINDOWS_START_HERE.md` for the short handoff. Install Node.js 24.16+, enable pnpm through Corepack, and keep ffmpeg on `PATH` when you need MP4 preview/render commands:
 
 ```powershell
 node scripts/setup.mjs
@@ -295,7 +295,7 @@ cd michibiki
 node scripts/setup.mjs
 ```
 
-必要環境: Node.js 22+、pnpm 11+、ffmpeg（HyperFrames / Editframe の MP4 レンダーに必要）、Chromium / Chrome / Edge（`michibiki doctor` で自動検出）。
+必要環境: Node.js 24.16+、pnpm 11+、ffmpeg（HyperFrames / Editframe の MP4 レンダーに必要）、Chromium / Chrome / Edge（`michibiki doctor` で自動検出）。
 
 依存更新の自動化:
 
