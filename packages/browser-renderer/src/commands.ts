@@ -1,3 +1,4 @@
+import { existsSync, statSync } from "node:fs";
 import { spawn } from "node:child_process";
 
 export type CommandResult = {
@@ -10,6 +11,8 @@ export type CommandResult = {
 export type CommandOptions = {
   detached?: boolean;
   timeoutMs?: number;
+  successFile?: string;
+  successFileSettleMs?: number;
 };
 
 export type CommandRunner = (
@@ -33,24 +36,55 @@ export function runCommand(
     let stderr = "";
     let settled = false;
     const commandLine = `${command} ${args.join(" ")}`;
+    let timeoutTimer: NodeJS.Timeout | undefined;
+    let successTimer: NodeJS.Timeout | undefined;
+    let lastSuccessFileSize = -1;
+    let stableSince = 0;
+    const killChild = () => {
+      if (options.detached && child.pid) {
+        try {
+          process.kill(-child.pid, "SIGKILL");
+          return;
+        } catch {
+          // Fall through to killing the direct child.
+        }
+      }
+      child.kill("SIGKILL");
+    };
     const finish = (result: CommandResult) => {
       if (settled) return;
       settled = true;
-      if (timer) clearTimeout(timer);
+      if (timeoutTimer) clearTimeout(timeoutTimer);
+      if (successTimer) clearInterval(successTimer);
       resolve(result);
     };
-    const timer = options.timeoutMs
+    if (options.successFile) {
+      const settleMs = options.successFileSettleMs ?? 250;
+      successTimer = setInterval(() => {
+        if (settled || !options.successFile || !existsSync(options.successFile)) return;
+        const size = statSync(options.successFile).size;
+        const now = Date.now();
+        if (size > 0 && size === lastSuccessFileSize) {
+          if (!stableSince) stableSince = now;
+          if (now - stableSince >= settleMs) {
+            killChild();
+            finish({
+              code: 0,
+              stdout,
+              stderr,
+              command: commandLine
+            });
+          }
+        } else {
+          stableSince = 0;
+          lastSuccessFileSize = size;
+        }
+      }, 100);
+    }
+    timeoutTimer = options.timeoutMs
       ? setTimeout(() => {
           stderr += `Command timed out after ${options.timeoutMs}ms.\n`;
-          if (options.detached && child.pid) {
-            try {
-              process.kill(-child.pid, "SIGKILL");
-            } catch {
-              child.kill("SIGKILL");
-            }
-          } else {
-            child.kill("SIGKILL");
-          }
+          killChild();
           finish({
             code: 124,
             stdout,

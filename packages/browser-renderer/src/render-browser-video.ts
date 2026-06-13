@@ -133,22 +133,22 @@ async function captureFrames(params: {
   extraQuery: Record<string, string>;
   commandRunner: CommandRunner;
 }): Promise<{ ok: boolean; log: string }> {
-  const profileDir = await fs.mkdtemp(path.join(os.tmpdir(), "michibiki-chrome-"));
   const logLines: string[] = [
     `Capturing ${params.frameCount} ${params.logLabel} frames at ${params.width}x${params.height} ${params.fps}fps`,
     `Chrome: ${params.chromePath}`
   ];
 
-  try {
-    for (let frame = 0; frame < params.frameCount; frame += 1) {
-      const framePath = path.join(params.frameDir, `${String(frame).padStart(6, "0")}.png`);
-      const frameUrl = new URL(params.entryUrl);
-      frameUrl.searchParams.set("frame", String(frame));
-      frameUrl.searchParams.set("fps", String(params.fps));
-      for (const [key, value] of Object.entries(params.extraQuery)) {
-        frameUrl.searchParams.set(key, value);
-      }
+  for (let frame = 0; frame < params.frameCount; frame += 1) {
+    const profileDir = await fs.mkdtemp(path.join(os.tmpdir(), "michibiki-chrome-frame-"));
+    const framePath = path.join(params.frameDir, `${String(frame).padStart(6, "0")}.png`);
+    const frameUrl = new URL(params.entryUrl);
+    frameUrl.searchParams.set("frame", String(frame));
+    frameUrl.searchParams.set("fps", String(params.fps));
+    for (const [key, value] of Object.entries(params.extraQuery)) {
+      frameUrl.searchParams.set(key, value);
+    }
 
+    try {
       const result = await params.commandRunner(
         params.chromePath,
         [
@@ -158,6 +158,10 @@ async function captureFrames(params: {
           "--no-first-run",
           "--no-default-browser-check",
           "--disable-background-networking",
+          "--disable-application-cache",
+          "--aggressive-cache-discard",
+          "--disk-cache-size=1",
+          "--media-cache-size=1",
           `--user-data-dir=${profileDir}`,
           `--window-size=${params.width},${params.height}`,
           "--force-device-scale-factor=1",
@@ -165,7 +169,7 @@ async function captureFrames(params: {
           `--screenshot=${framePath}`,
           frameUrl.href
         ],
-        { detached: true, timeoutMs: 10000 }
+        { detached: true, timeoutMs: 10000, successFile: framePath }
       );
 
       appendCommandLog(logLines, result);
@@ -174,12 +178,12 @@ async function captureFrames(params: {
         logLines.push(`Frame capture failed at frame ${frame}.`);
         return { ok: false, log: logLines.join("\n") };
       }
+    } finally {
+      await fs.rm(profileDir, { recursive: true, force: true });
     }
-
-    return { ok: true, log: logLines.join("\n") };
-  } finally {
-    await fs.rm(profileDir, { recursive: true, force: true });
   }
+
+  return { ok: true, log: logLines.join("\n") };
 }
 
 function appendCommandLog(logLines: string[], result: CommandResult): void {
