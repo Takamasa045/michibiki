@@ -15,7 +15,7 @@ Generated Project
   ↓
 Preview Result / Render
   ↓
-outputs/jobs/<job-id>
+outputs/projects/<slug>
 ```
 
 ## Core Boundaries
@@ -52,9 +52,9 @@ The guard is intentionally conservative for Remotion commercial, team, SaaS, and
 
 ### `packages/render-jobs`
 
-Owns the `outputs/jobs/<job-id>` filesystem contract.
+Owns the `outputs/projects/<slug>` filesystem contract (legacy `outputs/jobs/<job-id>` paths still resolve for backward compatibility).
 
-It creates job directories, writes `video-spec.json`, `engine-decision.json`, `license-result.json`, reads `project/project.json`, and stores `preview/preview-result.json`. CLI, future API routes, and Studio views should share this package instead of duplicating job manifest logic.
+It creates per-deliverable job directories (the folder name is a title-derived, collision-safe slug), writes `video-spec.json`, `engine-decision.json`, `license-result.json`, reads `project/project.json`, and stores `preview/preview-result.json`. CLI, future API routes, and Studio views should share this package instead of duplicating job manifest logic.
 
 ### `packages/browser-renderer`
 

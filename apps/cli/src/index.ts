@@ -118,7 +118,7 @@ async function generate(args: ReturnType<typeof parseArgs>): Promise<void> {
 
   const engineOptions = parseEngineOptions(args);
   const outputsRoot = path.resolve(getValue(args, "outputs") ?? "outputs");
-  const paths = await createJobPaths(outputsRoot);
+  const paths = await createJobPaths(outputsRoot, { slug: spec.title });
 
   await writeJobFiles({ paths, spec, decision, license });
 
@@ -243,7 +243,7 @@ function buildDecisionFromArgs(args: ReturnType<typeof parseArgs>): {
 async function render(args: ReturnType<typeof parseArgs>): Promise<void> {
   const job = getValue(args, "job") ?? args.positionals[0];
   if (!job) {
-    throw new Error("Missing job. Use michibiki render --job outputs/jobs/<job-id>.");
+    throw new Error("Missing job. Use michibiki render --job outputs/projects/<slug>.");
   }
   const engineOptions = parseEngineOptions(args);
 
@@ -280,7 +280,7 @@ async function render(args: ReturnType<typeof parseArgs>): Promise<void> {
 async function preview(args: ReturnType<typeof parseArgs>): Promise<void> {
   const job = getValue(args, "job") ?? args.positionals[0];
   if (!job) {
-    throw new Error("Missing job. Use michibiki preview --job outputs/jobs/<job-id>.");
+    throw new Error("Missing job. Use michibiki preview --job outputs/projects/<slug>.");
   }
   const engineOptions = parseEngineOptions(args);
 
@@ -307,7 +307,7 @@ async function preview(args: ReturnType<typeof parseArgs>): Promise<void> {
 async function inspect(args: ReturnType<typeof parseArgs>): Promise<void> {
   const job = getValue(args, "job") ?? args.positionals[0];
   if (!job) {
-    throw new Error("Missing job. Use michibiki inspect --job outputs/jobs/<job-id>.");
+    throw new Error("Missing job. Use michibiki inspect --job outputs/projects/<slug>.");
   }
 
   const jobDir = resolveJobDir(job);
@@ -323,9 +323,9 @@ Usage:
   michibiki create --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。縦型..."
   michibiki generate --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。縦型..."
   michibiki generate --prompt "..." --render
-  michibiki preview --job outputs/jobs/<job-id>
-  michibiki render --job outputs/jobs/<job-id>
-  michibiki inspect --job outputs/jobs/<job-id>
+  michibiki preview --job outputs/projects/<slug>
+  michibiki render --job outputs/projects/<slug>
+  michibiki inspect --job outputs/projects/<slug>
   michibiki engines
   michibiki doctor
 
@@ -359,8 +359,8 @@ Decide/generate options:
 Recommended sequence (the steps the agent rules expect):
   1. michibiki decide --prompt "..."                          (no side effects)
   2. michibiki generate --prompt "..." [--engine X]           (creates project files only)
-  3. michibiki preview --job outputs/jobs/<id>                (run preview to validate)
-  4. michibiki render --job outputs/jobs/<id> --confirm-render (final MP4)
+  3. michibiki preview --job outputs/projects/<slug>          (run preview to validate)
+  4. michibiki render --job outputs/projects/<slug> --confirm-render (final MP4)
 `);
 }
 

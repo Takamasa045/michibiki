@@ -31,7 +31,7 @@ Michibiki is CLI-first today. It supports:
 - **HyperFrames** — HTML/CSS/JS project generation rendered through the official CLI by default, with optional official producer or low-level engine backends.
 - **Editframe** — timeline handoff project generation with local MP4 timeline previews. It does not bundle or replace the official Editframe SDK.
 
-Generated jobs may contain prompts, asset paths, and rendered files, and are ignored by default under `outputs/jobs/`.
+Generated jobs may contain prompts, asset paths, and rendered files, and are ignored by default under `outputs/projects/`.
 
 ## Packages
 
@@ -86,8 +86,8 @@ The recommended workflow has four opt-in stages, so nothing renders or generates
 ```bash
 pnpm michibiki decide   --prompt "..."                            # 1. inspect engineFits, no side effects
 pnpm michibiki generate --prompt "..." [--engine X]               # 2. project files only
-pnpm michibiki preview  --job outputs/jobs/<id>                   # 3. validate (headless browser for HyperFrames/Editframe)
-pnpm michibiki render   --job outputs/jobs/<id> --confirm-render  # 4. final MP4 (gated)
+pnpm michibiki preview  --job outputs/projects/<slug>                   # 3. validate (headless browser for HyperFrames/Editframe)
+pnpm michibiki render   --job outputs/projects/<slug> --confirm-render  # 4. final MP4 (gated)
 ```
 
 `generate` no longer auto-runs preview (`--preview` opts in), and `--render` requires `--confirm-render` to actually produce an MP4 — this prevents agents from rendering without explicit user approval.
@@ -98,7 +98,7 @@ The Remotion adapter runs in `auto` mode by default: it uses an external Remotio
 
 ## Outputs
 
-Generated artifacts live under `outputs/`. Each deliverable gets its own folder — `outputs/projects/<slug>/{clips,audio,previews,final,assets}` — so a single video's source clips, audio, previews, and final renders stay together instead of scattering across type-named buckets. CLI render jobs (`outputs/jobs/<job-id>/`) and engine defaults (`outputs/<engine>/<project>/`) keep their existing conventions. All of `outputs/` except `outputs/README.md` is git-ignored.
+Generated artifacts live under `outputs/projects/<slug>/`. Each deliverable gets its own folder named after the request title, so everything for one video stays together instead of scattering across an opaque `jobs/<id>` bucket. CLI runs derive `<slug>` from the title and never overwrite an existing folder (a collision appends `-2`, `-3`, …); a CLI deliverable holds its machine substructure (`video-spec.json`, `engine-decision.json`, `project/`, `render/`, `preview/`, `logs/`), while hand-assembled deliverables use the human-curated buckets (`clips/`, `audio/`, `previews/`, `final/`, `assets/`) in the same per-project folder. Engine defaults (`outputs/<engine>/<project>/`) are used only for direct, non-CLI engine usage. All of `outputs/` except `outputs/README.md` is git-ignored.
 
 Re-consolidate any scatter with the organizer (dry run by default):
 
@@ -180,7 +180,7 @@ Michibiki は現在 CLI-first です。対応状況:
 - **HyperFrames** — HTML/CSS/JS プロジェクトを生成し、標準で公式 CLI、必要に応じて公式 producer package・低レベル engine package でMP4化します。
 - **Editframe** — `timeline.json` 生成とローカルMP4タイムラインプレビュー。公式 Editframe SDK を同梱・代替するものではありません。
 
-生成ジョブにはプロンプト、素材パス、レンダー結果が含まれる可能性があり、標準では `outputs/jobs/` 配下として git 管理外にしています。
+生成ジョブにはプロンプト、素材パス、レンダー結果が含まれる可能性があり、標準では `outputs/projects/` 配下として git 管理外にしています。
 
 ### 主な機能
 
@@ -191,7 +191,7 @@ Michibiki は現在 CLI-first です。対応状況:
 - HyperFrames HTML/CSS/JS プロジェクト生成と公式 CLI / producer / engine 経由のMP4レンダー
 - Editframe timeline handoff 生成とMP4タイムラインプレビュー
 - HyperFrames の従来 local backend と Editframe で使う headless Chrome + ffmpeg レンダー基盤
-- `outputs/jobs/<job-id>` への成果物保存とライセンス注意の表示
+- `outputs/projects/<slug>` への成果物保存とライセンス注意の表示
 
 ### セットアップ
 
@@ -229,8 +229,8 @@ pnpm michibiki decide --prompt "AIエージェント勉強会のプロモ動画�
 ```bash
 pnpm michibiki decide   --prompt "..."                            # 1. engineFits を確認（副作用なし）
 pnpm michibiki generate --prompt "..." [--engine X]               # 2. プロジェクトファイルのみ生成
-pnpm michibiki preview  --job outputs/jobs/<id>                   # 3. 検証（HyperFrames/Editframe は headless ブラウザ）
-pnpm michibiki render   --job outputs/jobs/<id> --confirm-render  # 4. 最終MP4（ゲートあり）
+pnpm michibiki preview  --job outputs/projects/<slug>                   # 3. 検証（HyperFrames/Editframe は headless ブラウザ）
+pnpm michibiki render   --job outputs/projects/<slug> --confirm-render  # 4. 最終MP4（ゲートあり）
 ```
 
 `generate` はプレビューを自動実行しません（`--preview` で opt-in）。`--render` で実際にMP4を出力するには `--confirm-render` が必須です。これにより、エージェントがユーザー承認なしにレンダーすることを防ぎます。
@@ -241,7 +241,7 @@ Remotion アダプターは標準で `auto` モードです。外部の Remotion
 
 ### 出力（Outputs）
 
-成果物は `outputs/` 配下に保存されます。1本の動画ごとに専用フォルダ（`outputs/projects/<slug>/{clips,audio,previews,final,assets}`）を持ち、素材クリップ・音声・プレビュー・最終レンダーが散らばらずまとまります。CLI のレンダージョブ（`outputs/jobs/<job-id>/`）とエンジン既定（`outputs/<engine>/<project>/`）は従来の規約のままです。`outputs/README.md` 以外の `outputs/` は git 管理外です。
+成果物は `outputs/projects/<slug>/` 配下に保存されます。1本の動画ごとにリクエストのタイトル由来の専用フォルダを持ち、不透明な `jobs/<id>` バケットに散らばらずまとまります。CLI 実行時は `<slug>` をタイトルから生成し、既存フォルダを上書きしません（衝突時は `-2`, `-3`, … を付与）。CLI 成果物は機械向けの内部構造（`video-spec.json`, `engine-decision.json`, `project/`, `render/`, `preview/`, `logs/`）を持ち、手組みの成果物は同じプロジェクトフォルダ内で人間向けバケット（`clips/`, `audio/`, `previews/`, `final/`, `assets/`）を使います。エンジン既定（`outputs/<engine>/<project>/`）は CLI を介さない単体利用時のみ使われます。`outputs/README.md` 以外の `outputs/` は git 管理外です。
 
 散らばった成果物は organizer で再集約できます（標準は dry run）。
 

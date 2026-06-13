@@ -25,7 +25,7 @@ That directory is ignored by this repository's `.gitignore` because it is treate
 Generated job files are written under:
 
 ```text
-outputs/jobs/
+outputs/projects/
 ```
 
 They may contain user prompts, project metadata, asset paths, and render outputs. They are ignored by default.

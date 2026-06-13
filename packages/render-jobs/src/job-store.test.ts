@@ -122,12 +122,41 @@ describe("render job store", () => {
 
   it("resolves absolute paths, outputs paths, and bare job ids", () => {
     expect(resolveJobDir("/tmp/job")).toBe("/tmp/job");
+    // Legacy outputs/jobs/<id> paths are still honored as-is.
     expect(resolveJobDir("outputs/jobs/job_1", "/repo")).toBe(
       path.resolve("/repo", "outputs/jobs/job_1")
     );
-    expect(resolveJobDir("job_1", "/repo")).toBe(
-      path.resolve("/repo", "outputs", "jobs", "job_1")
+    // Bare names now resolve under the current outputs/projects/ location.
+    expect(resolveJobDir("event-promo", "/repo")).toBe(
+      path.resolve("/repo", "outputs", "projects", "event-promo")
     );
+  });
+
+  it("places jobs under outputs/projects/<slug> derived from the title", async () => {
+    const outputRoot = await fs.mkdtemp(path.join(os.tmpdir(), "michibiki-job-"));
+    const paths = await createJobPaths(outputRoot, { slug: "Winter Outdoor Promo!" });
+
+    expect(paths.jobId).toBe("winter-outdoor-promo");
+    expect(paths.jobDir).toBe(
+      path.join(outputRoot, "projects", "winter-outdoor-promo")
+    );
+  });
+
+  it("never overwrites an existing deliverable folder with the same title", async () => {
+    const outputRoot = await fs.mkdtemp(path.join(os.tmpdir(), "michibiki-job-"));
+    const first = await createJobPaths(outputRoot, { slug: "Promo" });
+    const second = await createJobPaths(outputRoot, { slug: "Promo" });
+
+    expect(first.jobId).toBe("promo");
+    expect(second.jobId).toBe("promo-2");
+    expect(second.jobDir).not.toBe(first.jobDir);
+  });
+
+  it("falls back to a stable slug when the title has no sluggable characters", async () => {
+    const outputRoot = await fs.mkdtemp(path.join(os.tmpdir(), "michibiki-job-"));
+    const paths = await createJobPaths(outputRoot, { slug: "！！！" });
+
+    expect(paths.jobId).toBe("video");
   });
 
   it("keeps generated browser projects inside the job project directory", async () => {

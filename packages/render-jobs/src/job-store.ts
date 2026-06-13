@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -8,11 +7,17 @@ import type {
   PreviewResult,
   VideoSpec
 } from "@michibiki/video-spec";
+import { slugify } from "./slug.js";
 
 export type JobPaths = {
   jobId: string;
   jobDir: string;
   logDir: string;
+};
+
+export type CreateJobPathsOptions = {
+  /** Human-readable name for the deliverable folder under outputs/projects/. */
+  slug?: string;
 };
 
 export type JobManifest = {
@@ -22,14 +27,14 @@ export type JobManifest = {
   preview?: PreviewResult;
 };
 
-export async function createJobPaths(outputsRoot: string): Promise<JobPaths> {
-  const timestamp = new Date()
-    .toISOString()
-    .replace(/[-:]/g, "")
-    .replace(/\..+$/, "")
-    .replace("T", "_");
-  const jobId = `job_${timestamp}_${randomUUID().slice(0, 6)}`;
-  const jobDir = path.resolve(outputsRoot, "jobs", jobId);
+export async function createJobPaths(
+  outputsRoot: string,
+  options: CreateJobPathsOptions = {}
+): Promise<JobPaths> {
+  const projectsRoot = path.resolve(outputsRoot, "projects");
+  const baseSlug = slugify(options.slug ?? "");
+  const jobId = await reserveUniqueSlug(projectsRoot, baseSlug);
+  const jobDir = path.join(projectsRoot, jobId);
   const logDir = path.join(jobDir, "logs");
 
   await fs.mkdir(logDir, { recursive: true });
@@ -38,6 +43,29 @@ export async function createJobPaths(outputsRoot: string): Promise<JobPaths> {
   await fs.mkdir(path.join(jobDir, "project"), { recursive: true });
 
   return { jobId, jobDir, logDir };
+}
+
+/**
+ * Pick a unique folder name under projectsRoot. Uses the clean slug when it is
+ * free, otherwise appends -2, -3, ... so a second deliverable with the same
+ * title never overwrites the first.
+ */
+async function reserveUniqueSlug(
+  projectsRoot: string,
+  baseSlug: string
+): Promise<string> {
+  if (!existsSync(path.join(projectsRoot, baseSlug))) {
+    return baseSlug;
+  }
+  for (let suffix = 2; suffix < 1000; suffix += 1) {
+    const candidate = `${baseSlug}-${suffix}`;
+    if (!existsSync(path.join(projectsRoot, candidate))) {
+      return candidate;
+    }
+  }
+  throw new Error(
+    `Unable to reserve a unique output folder for "${baseSlug}" under ${projectsRoot}.`
+  );
 }
 
 export async function writeJobFiles(params: {
@@ -87,10 +115,13 @@ export function resolveJobDir(job: string, cwd = process.cwd()): string {
   if (path.isAbsolute(job)) {
     return job;
   }
+  // An explicit outputs/... path (e.g. legacy outputs/jobs/<id> or the current
+  // outputs/projects/<slug>) is honored as-is.
   if (job.startsWith("outputs/")) {
     return path.resolve(cwd, job);
   }
-  return path.resolve(cwd, "outputs", "jobs", job);
+  // A bare name resolves to the current deliverable location.
+  return path.resolve(cwd, "outputs", "projects", job);
 }
 
 export async function validateGeneratedProjectPath(params: {
