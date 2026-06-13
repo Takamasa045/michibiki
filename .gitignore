@@ -7,5 +7,6 @@ coverage/
 .env
 .env.*
 !.env.example
-outputs/jobs/
+outputs/*
+!outputs/README.md
 engines/remotion-studio-monorepo/

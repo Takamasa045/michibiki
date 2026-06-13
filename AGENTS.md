@@ -83,6 +83,28 @@ Windows では PowerShell 前提で案内し、必要なら `WINDOWS_START_HERE.
 - ステージ 4（`render`）は「レンダーして」「MP4まで」「完成動画を出して」などの明示依頼があり、かつ preview の結果に問題がない場合のみ実行する。`--confirm-render` を必ず付ける。CLI ゲートが exit 2 で止めるが、エージェントはユーザー合意なくこのフラグを付けてはならない。
 - 「生成まで依頼している場合は推奨エンジンで進めてよい」と解釈できる場面でも、上記の合意が不足している場合は、生成・編集・レンダーへ進まず確認する。
 
+## 成果物の保存規約 (Output Layout Rule)
+
+成果物（動画・音声・プレビュー・中間素材）は **1成果物 = 1フォルダ** で保存します。スキルやツールに出力先を渡せる場合は、種類別トップ（`outputs/audio/` 等）に直接吐かせず、必ず以下のプロジェクト単位パスを指定してください。
+
+```
+outputs/projects/<project-slug>/
+  clips/      # 生成元クリップ（PixVerse / Sora / Veo など）
+  audio/      # BGM / SFX / ナレーション / master
+  previews/   # プレビュー画像・QCシート（qc/ をネスト可）
+  final/      # 最終納品 MP4
+  assets/     # 静止画・overlays・中間素材
+  manifest.json  # （任意）何の成果物か・元プロンプト・日付
+```
+
+ルール:
+
+- `<project-slug>` は kebab-case（例: `pixverse-tokyo`, `ai-lab-takabon-suno-demo`）。1つのキャンペーン・楽曲・案件で1フォルダ。
+- **バリアント（promo / urgency / v2 など）で新フォルダを増やさない。** `final/promo-16x9.mp4` `final/urgency-9x16.mp4` のようにファイル名で分岐するか、必要なら `final/urgency/` のサブフォルダにする。`outputs/pixverse-clips-urgency/` のような接尾辞フォルダは作らない。
+- CLI 経由の成果物は従来どおり `outputs/jobs/<job-id>/`、engine 既定出力は `outputs/<engine>/<project>/`（`hyperframes` / `remotion` / `editframe`）。これらの規約フォルダは触らない。
+- `outputs/` は `outputs/README.md` を除き丸ごと Git 管理対象外。構造の説明は `outputs/README.md` にある。
+- 種類別に散らかった既存成果物は `node scripts/organize-outputs.mjs`（dry run）で計画を確認し、`--apply` で `outputs/projects/<slug>/` へ再集約する。移動は既存ファイルを上書きせず、`outputs/.organize-ledger.json` に記録される。
+
 ## Editframe 直接制作セットアップ
 
 ユーザーが明示的に "Let's build a video with Editframe."、`--engine editframe`、または Editframe で動画・テンプレート・編集ツール・自動生成ワークフローを作りたいと依頼した場合の補助ルールです。これは Michibiki のエンジン比較・承認境界を上書きしません。エンジン未選択の自然言語依頼では、先に `michibiki decide` または同等の `selectEngine()` 判定を使います。
