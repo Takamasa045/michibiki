@@ -15,7 +15,7 @@ Michibiki는 자연어 영상 제작 요청을 `VideoSpec`으로 변환하고, R
 - Remotion auto 모드로 Monorepo 또는 standalone 공식 프로젝트 생성
 - HyperFrames HTML/CSS/JS 프로젝트 생성 및 MP4 렌더링
 - Editframe timeline handoff 생성 및 MP4 타임라인 프리뷰 렌더링
-- `outputs/jobs/<job-id>`에 결과 저장
+- `outputs/projects/<slug>`에 결과 저장
 - 외부 엔진 라이선스 안내 표시
 
 ## 설치
@@ -36,7 +36,7 @@ pnpm test
 pnpm michibiki doctor
 pnpm michibiki decide --prompt "Create a 30-second vertical event promo video."
 pnpm michibiki create --prompt "Create a 30-second vertical event promo video."
-pnpm michibiki preview --job outputs/jobs/<job-id>
+pnpm michibiki preview --job outputs/projects/<slug>
 pnpm michibiki generate --prompt "Create a 30-second vertical event promo video."
 ```
 

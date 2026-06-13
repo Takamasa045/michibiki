@@ -15,7 +15,7 @@ Michibiki 是一个 AI 视频制作路由器。它会把自然语言视频需求
 - 通过 Remotion auto 模式生成 Monorepo 或 standalone 官方项目
 - 生成 HyperFrames HTML/CSS/JS 项目并渲染 MP4
 - 生成 Editframe timeline handoff 并渲染 MP4 时间线预览
-- 将结果保存到 `outputs/jobs/<job-id>`
+- 将结果保存到 `outputs/projects/<slug>`
 - 显示第三方引擎的许可证提醒
 
 ## 安装
@@ -36,7 +36,7 @@ pnpm test
 pnpm michibiki doctor
 pnpm michibiki decide --prompt "Create a 30-second vertical event promo video."
 pnpm michibiki create --prompt "Create a 30-second vertical event promo video."
-pnpm michibiki preview --job outputs/jobs/<job-id>
+pnpm michibiki preview --job outputs/projects/<slug>
 pnpm michibiki generate --prompt "Create a 30-second vertical event promo video."
 ```
 

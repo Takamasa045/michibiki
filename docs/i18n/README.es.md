@@ -15,7 +15,7 @@ La versión actual admite generación y renderizado con Remotion, generación HT
 - Crear proyectos Remotion mediante Monorepo o standalone oficial con modo auto
 - Generar proyectos HTML/CSS/JS para HyperFrames y renderizar MP4
 - Generar handoffs `timeline.json` para Editframe y renderizar previsualizaciones MP4
-- Guardar resultados en `outputs/jobs/<job-id>`
+- Guardar resultados en `outputs/projects/<slug>`
 - Mostrar avisos de licencia para motores externos
 
 ## Instalación
@@ -36,7 +36,7 @@ Requisitos: Node.js 20+, pnpm 9+, ffmpeg (para renderizado MP4 de HyperFrames / 
 pnpm michibiki doctor
 pnpm michibiki decide --prompt "Create a 30-second vertical event promo video."
 pnpm michibiki create --prompt "Create a 30-second vertical event promo video."
-pnpm michibiki preview --job outputs/jobs/<job-id>
+pnpm michibiki preview --job outputs/projects/<slug>
 pnpm michibiki generate --prompt "Create a 30-second vertical event promo video."
 ```
 
