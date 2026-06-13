@@ -13,9 +13,11 @@
 //   jobs/ (CLI), hyperframes/ remotion/ editframe/ (engine defaults), projects/ (target).
 //
 // Usage:
-//   node scripts/organize-outputs.mjs            # dry run (default)
-//   node scripts/organize-outputs.mjs --apply    # execute moves + cleanup
-//   node scripts/organize-outputs.mjs --no-clean # skip .DS_Store / node_modules deletion
+//   node scripts/organize-outputs.mjs             # dry run (default)
+//   node scripts/organize-outputs.mjs --apply     # execute moves + cleanup
+//   node scripts/organize-outputs.mjs --no-clean  # skip .DS_Store / node_modules deletion
+//   node scripts/organize-outputs.mjs --clean-jobs# also delete regenerable node_modules under
+//                                                 # jobs/ and projects/ (generated deliverables)
 
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
@@ -131,22 +133,27 @@ export function buildPlan(inventory, options = {}) {
     unmatched.push({ from: entry.name, reason: "unknown top-level entry, left in place" });
   }
 
-  // jobs/ is the CLI render-job tree and stays untouched unless explicitly opted
-  // in. By default cleanup never reaches into it.
-  const inJobs = (rel) => rel === "jobs" || rel.startsWith("jobs/");
+  // jobs/ (legacy CLI render-job tree) and projects/ (current per-deliverable
+  // CLI output) hold regenerable node_modules tied to a deliverable. By default
+  // cleanup never reaches into them; --clean-jobs opts in.
+  const inGenerated = (rel) =>
+    rel === "jobs" ||
+    rel.startsWith("jobs/") ||
+    rel === "projects" ||
+    rel.startsWith("projects/");
   const allDs = inventory.dsStores ?? [];
   const allNm = inventory.nodeModules ?? [];
   const cleanups = clean
     ? {
-        dsStores: allDs.filter((p) => cleanJobs || !inJobs(p)),
-        nodeModules: allNm.filter((p) => cleanJobs || !inJobs(p))
+        dsStores: allDs.filter((p) => cleanJobs || !inGenerated(p)),
+        nodeModules: allNm.filter((p) => cleanJobs || !inGenerated(p))
       }
     : { dsStores: [], nodeModules: [] };
   const skippedJobsCleanup =
     clean && !cleanJobs
       ? {
-          dsStores: allDs.filter(inJobs),
-          nodeModules: allNm.filter(inJobs)
+          dsStores: allDs.filter(inGenerated),
+          nodeModules: allNm.filter(inGenerated)
         }
       : { dsStores: [], nodeModules: [] };
 
@@ -339,7 +346,7 @@ function fmt(plan) {
   if (skipped && (skipped.nodeModules.length || skipped.dsStores.length)) {
     push("");
     push(
-      `SKIPPED under outputs/jobs/ (pass --clean-jobs to also delete; jobs are kept untouched by default):`
+      `SKIPPED under outputs/jobs/ or outputs/projects/ (pass --clean-jobs to also delete; generated deliverables are kept untouched by default):`
     );
     push(`  .DS_Store: ${skipped.dsStores.length}`);
     for (const nm of skipped.nodeModules) push(`  node_modules: outputs/${nm}`);
