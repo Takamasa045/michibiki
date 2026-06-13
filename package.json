@@ -36,6 +36,7 @@
     "pack:check": "node scripts/pack-check.mjs",
     "release:check": "pnpm build && pnpm test && pnpm audit --audit-level moderate && pnpm pack:check",
     "clean": "node scripts/clean-dist.mjs",
+    "organize": "node scripts/organize-outputs.mjs",
     "michibiki": "node apps/cli/dist/index.js",
     "video-router": "node apps/cli/dist/index.js"
   },
