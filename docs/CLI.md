@@ -10,9 +10,9 @@ Full command reference for the `michibiki` CLI. For a high-level overview and se
 pnpm michibiki decide   --prompt "..."                          # engine selection only, no side effects
 pnpm michibiki generate --prompt "..." [--engine X]             # project files only
 pnpm michibiki create   --prompt "..."                          # alias-style generate entry point
-pnpm michibiki preview  --job outputs/jobs/<job-id>             # validate (headless browser for HyperFrames/Editframe)
-pnpm michibiki render   --job outputs/jobs/<job-id> --confirm-render   # final MP4 (gated)
-pnpm michibiki inspect  --job outputs/jobs/<job-id>             # show job manifest and decision
+pnpm michibiki preview  --job outputs/projects/<slug>             # validate (headless browser for HyperFrames/Editframe)
+pnpm michibiki render   --job outputs/projects/<slug> --confirm-render   # final MP4 (gated)
+pnpm michibiki inspect  --job outputs/projects/<slug>             # show job manifest and decision
 pnpm michibiki doctor                                           # environment / engine detection
 pnpm michibiki engines                                          # list engines and capabilities
 ```
@@ -28,8 +28,8 @@ Every generated job writes `engine-decision.json` with the same selected engine,
 ```bash
 pnpm michibiki decide   --prompt "..."                                 # 1. inspect engineFits, no side effects
 pnpm michibiki generate --prompt "..." [--engine X]                    # 2. project files only
-pnpm michibiki preview  --job outputs/jobs/<id>                        # 3. validate (headless browser for HyperFrames/Editframe)
-pnpm michibiki render   --job outputs/jobs/<id> --confirm-render       # 4. final MP4 (gated)
+pnpm michibiki preview  --job outputs/projects/<slug>                        # 3. validate (headless browser for HyperFrames/Editframe)
+pnpm michibiki render   --job outputs/projects/<slug> --confirm-render       # 4. final MP4 (gated)
 ```
 
 `generate` no longer auto-runs preview. Pass `--preview` to opt in. `--render` requires `--confirm-render` to actually run an MP4 — this prevents agents from rendering without explicit user approval.
@@ -65,8 +65,8 @@ pnpm michibiki generate --engine remotion --remotion-mode standalone --prompt "C
 HyperFrames rendering uses the official CLI by default. Select another backend when needed:
 
 ```bash
-pnpm michibiki render --job outputs/jobs/<id> --confirm-render --hyperframes-renderer official-producer
-pnpm michibiki render --job outputs/jobs/<id> --confirm-render --hyperframes-renderer official-engine
+pnpm michibiki render --job outputs/projects/<slug> --confirm-render --hyperframes-renderer official-producer
+pnpm michibiki render --job outputs/projects/<slug> --confirm-render --hyperframes-renderer official-engine
 ```
 
 Useful HyperFrames render options:
@@ -93,7 +93,7 @@ pnpm michibiki generate --engine editframe --asset ./clip.mp4 --asset ./voice.mp
 ## Generated job layout
 
 ```text
-outputs/jobs/<job-id>/
+outputs/projects/<slug>/
   video-spec.json
   engine-decision.json
   license-result.json

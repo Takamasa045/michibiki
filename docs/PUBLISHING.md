@@ -13,7 +13,7 @@ The `Release` workflow uses Release Please and `GITHUB_TOKEN`, so it only needs 
 
 GitHub automatically attaches source archives to each release. Build outputs and engine checkouts are intentionally not committed:
 
-- generated jobs stay under `outputs/jobs/`
+- generated jobs stay under `outputs/projects/`
 - third-party engine checkouts stay under `engines/`
 
 ## Release Gate
