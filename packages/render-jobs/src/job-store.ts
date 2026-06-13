@@ -1,13 +1,13 @@
 import { existsSync } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
-import type {
-  EngineDecision,
-  EngineName,
-  PreviewResult,
-  VideoSpec
+import {
+  slugify,
+  type EngineDecision,
+  type EngineName,
+  type PreviewResult,
+  type VideoSpec
 } from "@michibiki/video-spec";
-import { slugify } from "./slug.js";
 
 export type JobPaths = {
   jobId: string;

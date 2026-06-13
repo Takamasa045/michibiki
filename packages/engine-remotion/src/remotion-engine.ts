@@ -4,16 +4,17 @@ import { existsSync } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { validateLicense } from "@michibiki/compliance";
-import type {
-  GeneratedProject,
-  GenerateProjectContext,
-  LicenseContext,
-  LicenseResult,
-  PreviewResult,
-  RenderContext,
-  RenderResult,
-  VideoEngine,
-  VideoSpec
+import {
+  slugify,
+  type GeneratedProject,
+  type GenerateProjectContext,
+  type LicenseContext,
+  type LicenseResult,
+  type PreviewResult,
+  type RenderContext,
+  type RenderResult,
+  type VideoEngine,
+  type VideoSpec
 } from "@michibiki/video-spec";
 import { resolveRemotionRepoPath } from "./paths.js";
 import {
@@ -664,19 +665,6 @@ function isStandaloneRemotionProject(project: GeneratedProject): boolean {
 function createAppName(spec: VideoSpec): string {
   const slug = slugify(spec.title || "michibiki");
   return `${slug}-${new Date().toISOString().slice(0, 10).replaceAll("-", "")}-${randomUUID().slice(0, 8)}`;
-}
-
-function slugify(value: string): string {
-  const normalized = value
-    .normalize("NFKD")
-    .replace(/[^\w\s-]/g, "")
-    .trim()
-    .toLowerCase()
-    .replace(/[_\s]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-
-  return normalized.length > 0 ? normalized.slice(0, 40) : "michibiki";
 }
 
 function getStringMetadata(

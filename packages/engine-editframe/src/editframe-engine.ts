@@ -3,16 +3,17 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { renderBrowserVideo } from "@michibiki/browser-renderer";
 import { validateLicense } from "@michibiki/compliance";
-import type {
-  AssetSpec,
-  GeneratedProject,
-  GenerateProjectContext,
-  PreviewResult,
-  RenderContext,
-  RenderResult,
-  SceneSpec,
-  VideoEngine,
-  VideoSpec
+import {
+  slugify,
+  type AssetSpec,
+  type GeneratedProject,
+  type GenerateProjectContext,
+  type PreviewResult,
+  type RenderContext,
+  type RenderResult,
+  type SceneSpec,
+  type VideoEngine,
+  type VideoSpec
 } from "@michibiki/video-spec";
 import { EDITFRAME_PACKAGE_VERSIONS } from "./editframe-versions.js";
 
@@ -429,20 +430,6 @@ function buildPackageJson(projectName: string): string {
 
 function createProjectName(spec: VideoSpec): string {
   return `editframe-${slugify(spec.title)}-${Date.now()}`;
-}
-
-function slugify(value: string): string {
-  return (
-    value
-      .normalize("NFKD")
-      .replace(/[^\w\s-]/g, "")
-      .trim()
-      .toLowerCase()
-      .replace(/[_\s]+/g, "-")
-      .replace(/-+/g, "-")
-      .replace(/^-|-$/g, "")
-      .slice(0, 40) || "video"
-  );
 }
 
 function escapeHtml(value: string): string {
