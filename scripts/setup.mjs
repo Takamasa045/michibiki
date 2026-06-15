@@ -1,8 +1,20 @@
 import { spawn } from "node:child_process";
 import process from "node:process";
 
+const MIN_NODE_VERSION = "24.16.0";
 const PNPM_VERSION = "11.6.0";
 const pnpmCommand = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
+
+const nodeCheck = checkNodeVersion(process.version);
+if (!nodeCheck.ok) {
+  console.error(
+    `Michibiki requires Node.js >=${MIN_NODE_VERSION} (current: ${process.version}).`
+  );
+  console.error(
+    `Install Node.js ${MIN_NODE_VERSION} or newer, then rerun node scripts/setup.mjs.`
+  );
+  process.exit(1);
+}
 
 const steps = [
   {
@@ -63,4 +75,37 @@ function run(command, args, extraEnv = {}) {
       reject(new Error(`${command} ${args.join(" ")} exited with code ${code}`));
     });
   });
+}
+
+function checkNodeVersion(version) {
+  return {
+    ok: isNodeVersionSupported(version)
+  };
+}
+
+function isNodeVersionSupported(version) {
+  const current = parseNodeVersion(version);
+  const minimum = parseNodeVersion(MIN_NODE_VERSION);
+  if (!current || !minimum) return false;
+
+  return compareNodeVersions(current, minimum) >= 0;
+}
+
+function parseNodeVersion(version) {
+  const match = version.trim().match(/^v?(\d+)\.(\d+)\.(\d+)/);
+  if (!match) return undefined;
+
+  return {
+    major: Number(match[1]),
+    minor: Number(match[2]),
+    patch: Number(match[3])
+  };
+}
+
+function compareNodeVersions(left, right) {
+  return (
+    left.major - right.major ||
+    left.minor - right.minor ||
+    left.patch - right.patch
+  );
 }

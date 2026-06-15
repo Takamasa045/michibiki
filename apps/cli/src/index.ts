@@ -38,6 +38,10 @@ import {
 } from "@michibiki/video-spec";
 import { parseArgs, getValue, getValues, hasFlag } from "./args.js";
 import { printDoctor, runDoctor } from "./doctor.js";
+import {
+  checkNodeVersion,
+  formatUnsupportedNodeVersion
+} from "./node-version.js";
 
 type EngineOptions = {
   remotionRepoPath?: string;
@@ -56,6 +60,14 @@ async function main(): Promise<void> {
   if (!args.command || args.command === "help" || hasFlag(args, "help")) {
     printHelp();
     return;
+  }
+
+  if (args.command !== "doctor") {
+    const node = checkNodeVersion();
+    if (!node.ok) {
+      console.error(formatUnsupportedNodeVersion(node));
+      process.exit(1);
+    }
   }
 
   if (args.command === "decide" || args.command === "route") {

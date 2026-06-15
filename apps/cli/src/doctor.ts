@@ -2,7 +2,11 @@ import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { resolveChromePath } from "@michibiki/browser-renderer";
-import { getRemotionRepoCandidates, resolveRemotionRepoPath } from "@michibiki/engine-remotion";
+import {
+  getRemotionRepoCandidates,
+  resolveRemotionRepoPath
+} from "@michibiki/engine-remotion";
+import { checkNodeVersion, formatNodeVersionDetail } from "./node-version.js";
 
 export type DoctorCheck = {
   name: string;
@@ -13,6 +17,7 @@ export type DoctorCheck = {
 export function runDoctor(cwd = process.cwd()): DoctorCheck[] {
   const remotionRepoPath = resolveRemotionRepoPath(undefined, cwd);
   const hasRemotionRepo = existsSync(path.join(remotionRepoPath, "package.json"));
+  const node = checkNodeVersion();
   const pnpm = commandVersion("pnpm", ["-v"]);
   const ffmpeg = commandVersion("ffmpeg", ["-version"]);
   const chromePath = resolveChromePath();
@@ -20,8 +25,8 @@ export function runDoctor(cwd = process.cwd()): DoctorCheck[] {
   return [
     {
       name: "Node.js",
-      ok: true,
-      detail: process.version
+      ok: node.ok,
+      detail: formatNodeVersionDetail(node)
     },
     {
       name: "pnpm",
