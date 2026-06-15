@@ -38,6 +38,7 @@ import {
 } from "@michibiki/video-spec";
 import { parseArgs, getValue, getValues, hasFlag } from "./args.js";
 import { printDoctor, runDoctor } from "./doctor.js";
+import { loadVideoSpecFromFile } from "./spec-input.js";
 
 type EngineOptions = {
   remotionRepoPath?: string;
@@ -59,7 +60,7 @@ async function main(): Promise<void> {
   }
 
   if (args.command === "decide" || args.command === "route") {
-    decide(args);
+    await decide(args);
     return;
   }
 
@@ -99,7 +100,7 @@ async function main(): Promise<void> {
 }
 
 async function generate(args: ReturnType<typeof parseArgs>): Promise<void> {
-  const { spec, decision, license } = buildDecisionFromArgs(args);
+  const { spec, decision, license } = await buildDecisionFromArgs(args);
 
   if (
     decision.clarifyingQuestions.length > 0 &&
@@ -188,8 +189,8 @@ async function generate(args: ReturnType<typeof parseArgs>): Promise<void> {
   });
 }
 
-function decide(args: ReturnType<typeof parseArgs>): void {
-  const { spec, decision, license } = buildDecisionFromArgs(args);
+async function decide(args: ReturnType<typeof parseArgs>): Promise<void> {
+  const { spec, decision, license } = await buildDecisionFromArgs(args);
 
   printDecisionSummary({
     title: spec.title,
@@ -207,30 +208,39 @@ function decide(args: ReturnType<typeof parseArgs>): void {
   });
 }
 
-function buildDecisionFromArgs(args: ReturnType<typeof parseArgs>): {
+async function buildDecisionFromArgs(args: ReturnType<typeof parseArgs>): Promise<{
   spec: ReturnType<typeof createVideoSpecFromPrompt>;
   decision: ReturnType<typeof selectEngine>;
   license: ReturnType<typeof validateLicense>;
-} {
+}> {
+  const specPath = getValue(args, "spec");
   const prompt = getValue(args, "prompt") ?? args.positionals.join(" ");
-  if (!prompt) {
-    throw new Error("Missing prompt. Use --prompt \"...\".");
+  if (!specPath && !prompt) {
+    throw new Error("Missing prompt. Use --prompt \"...\" or --spec <video-spec.json>.");
   }
 
   const enginePreference = parseEnginePreference(getValue(args, "engine"));
   const licenseMode = parseLicenseMode(getValue(args, "license-mode"));
-  const spec = createVideoSpecFromPrompt({
-    prompt,
-    title: getValue(args, "title"),
-    durationSec: parseNumber(getValue(args, "duration")),
-    aspectRatio: parseAspectRatio(getValue(args, "aspect-ratio")),
-    outputType: parseOutputType(getValue(args, "output-type")),
-    assetSources: getValues(args, "asset"),
-    referenceUrls: getValues(args, "url"),
-    enginePreference,
-    licenseMode,
-    allowCloudRender: hasFlag(args, "allow-cloud-render")
-  });
+  const spec = specPath
+    ? await buildSpecFromFileArgs({
+        allowCloudRender: hasFlag(args, "allow-cloud-render"),
+        enginePreference,
+        licenseMode,
+        specPath
+      })
+    : createVideoSpecFromPrompt({
+        prompt,
+        title: getValue(args, "title"),
+        durationSec: parseNumber(getValue(args, "duration")),
+        aspectRatio: parseAspectRatio(getValue(args, "aspect-ratio")),
+        outputType: parseOutputType(getValue(args, "output-type")),
+        assetSources: getValues(args, "asset"),
+        referenceUrls: getValues(args, "url"),
+        enginePreference,
+        licenseMode,
+        allowCloudRender: hasFlag(args, "allow-cloud-render")
+      });
+
   const decision = selectEngine(spec);
   const license = validateLicense(decision.engine, {
     usage: spec.constraints.licenseMode ?? "personal",
@@ -238,6 +248,25 @@ function buildDecisionFromArgs(args: ReturnType<typeof parseArgs>): {
   });
 
   return { spec, decision, license };
+}
+
+async function buildSpecFromFileArgs(params: {
+  allowCloudRender: boolean;
+  enginePreference?: EnginePreference;
+  licenseMode?: LicenseMode;
+  specPath: string;
+}): Promise<ReturnType<typeof createVideoSpecFromPrompt>> {
+  const spec = await loadVideoSpecFromFile(params.specPath);
+
+  return {
+    ...spec,
+    constraints: {
+      ...spec.constraints,
+      ...(params.enginePreference ? { enginePreference: params.enginePreference } : {}),
+      ...(params.licenseMode ? { licenseMode: params.licenseMode } : {}),
+      allowCloudRender: params.allowCloudRender ? true : spec.constraints.allowCloudRender
+    }
+  };
 }
 
 async function render(args: ReturnType<typeof parseArgs>): Promise<void> {
@@ -320,8 +349,10 @@ function printHelp(): void {
 
 Usage:
   michibiki decide --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。縦型..."
+  michibiki decide --spec outputs/projects/<slug>/michibiki/video-spec.json
   michibiki create --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。縦型..."
   michibiki generate --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。縦型..."
+  michibiki generate --spec outputs/projects/<slug>/michibiki/video-spec.json --engine editframe
   michibiki generate --prompt "..." --render
   michibiki preview --job outputs/jobs/<job-id>
   michibiki render --job outputs/jobs/<job-id>
@@ -331,6 +362,7 @@ Usage:
 
 Decide/generate options:
   --prompt <text>             Natural language video request
+  --spec <path>               Existing VideoSpec JSON, such as a PixVerse handoff
   --title <text>              Optional title
   --duration <seconds>        Override duration
   --aspect-ratio <value>      9:16, 16:9, 1:1, or 4:5

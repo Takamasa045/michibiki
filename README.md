@@ -89,6 +89,17 @@ pnpm michibiki decide --prompt "Create a 15-second vertical event promo video."
 
 `pnpm michibiki <command>` is how every CLI invocation works in this repo. The legacy `pnpm video-router` script and the `video-router` binary remain available as aliases.
 
+### Existing VideoSpec / PixVerse Handoff
+
+Michibiki can start from an existing `VideoSpec` JSON instead of a prompt. This is the recommended bridge from PixVerse Character Pipeline handoff folders.
+
+```bash
+pnpm michibiki decide --spec path/to/michibiki/video-spec.json
+pnpm michibiki generate --spec path/to/michibiki/video-spec.json --engine editframe
+```
+
+When `--spec` is used, relative asset sources are resolved from the `video-spec.json` file location. A PixVerse handoff usually points to an already rendered MP4, so `editframe` is the practical default when the next step is trimming, captions, music, or social repurposing. Use `--engine auto` to let the router score all engines again.
+
 The Remotion adapter runs in `auto` mode by default. If the external Remotion Studio Monorepo is found, Michibiki generates into that monorepo. If it is not found, Michibiki creates a standalone official Remotion project under the job directory instead.
 
 Standalone Remotion output includes a minimal `package.json`, `src/index.ts`, `src/Root.tsx`, and `public/assets/data/video-spec.json`. Preview it with the command printed by `michibiki preview`, or force it with:
@@ -327,6 +338,15 @@ pnpm michibiki create --prompt "AIエージェント勉強会のプロモ動画�
 pnpm michibiki preview --job outputs/jobs/<job-id>
 pnpm michibiki generate --prompt "AIエージェント勉強会のプロモ動画を30秒で作りたい。"
 ```
+
+既存の `VideoSpec` JSON から始めることもできます。PixVerse Character Pipeline の handoff folder を受け取る場合は、この入口を使います。
+
+```bash
+pnpm michibiki decide --spec path/to/michibiki/video-spec.json
+pnpm michibiki generate --spec path/to/michibiki/video-spec.json --engine editframe
+```
+
+`--spec` で読む場合、相対 asset path は `video-spec.json` の場所を基準に解決されます。PixVerse handoff は完成済み MP4 を指すことが多いため、次工程がカット編集、字幕、BGM、SNS 展開なら `editframe` が実用的な既定です。再度3エンジン比較したい場合は `--engine auto` を指定します。
 
 実行例は `examples/` にあります。自然言語、URL/LP、構成JSON、素材ありの入力タイプを含み、どの入口でも `engineFits`、`selectionGuide`、`bestUse`、`featureHighlights` が出ることを確認できます。
 HyperFrames で HTML-in-Canvas / `drawElementImage` / DOM-to-canvas VFX を指定した場合は、ワークスペースで固定された HyperFrames CLI を使い、`pnpm --filter @michibiki/engine-hyperframes exec hyperframes add html-in-canvas --dir <generated-project> --no-clipboard --json` 相当で公式 registry bundle を生成プロジェクトに追加します。Studio の live preview は `chrome://flags/#canvas-draw-element` が必要ですが、公式レンダー時は自動で有効化されます。
