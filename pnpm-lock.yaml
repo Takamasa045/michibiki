@@ -6,7 +6,7 @@ settings:
 
 overrides:
   esbuild: 0.28.1
-  protobufjs: 8.6.3
+  protobufjs: 8.6.4
   ws: 8.21.0
 
 importers:
@@ -1380,8 +1380,8 @@ packages:
     resolution: {integrity: sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==}
     engines: {node: '>=0.4.0'}
 
-  protobufjs@8.6.3:
-    resolution: {integrity: sha512-alQyzT0j401LGBtwsqu6uprjR6pfNH1UJf9N6GBFMjIcd+HzTe0/HrjAbFCqun+zvnfLarrxAtMM2xvZ+kFZ5A==}
+  protobufjs@8.6.4:
+    resolution: {integrity: sha512-/+XMv9JalknuncEJSwsyEVlwcxVLKx2iaoSUXFZA86MJkdqyOdfrlB1sB7S6aKyUk9tl20YY+SgQe5J2sJHTcg==}
     engines: {node: '>=12.0.0'}
 
   proxy-agent@6.5.0:
@@ -1839,7 +1839,7 @@ snapshots:
     dependencies:
       google-auth-library: 10.7.0
       p-retry: 4.6.2
-      protobufjs: 8.6.3
+      protobufjs: 8.6.4
       ws: 8.21.0
     transitivePeerDependencies:
       - bufferutil
@@ -2849,7 +2849,7 @@ snapshots:
 
   progress@2.0.3: {}
 
-  protobufjs@8.6.3:
+  protobufjs@8.6.4:
     dependencies:
       long: 5.3.2
     optional: true

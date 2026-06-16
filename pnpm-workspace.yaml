@@ -7,7 +7,7 @@ blockExoticSubdeps: true
 strictDepBuilds: true
 overrides:
   esbuild: 0.28.1
-  protobufjs: 8.6.3
+  protobufjs: 8.6.4
   ws: 8.21.0
 allowBuilds:
   '@google/genai': false
