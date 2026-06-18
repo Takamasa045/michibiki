@@ -25,7 +25,7 @@
     "access": "public"
   },
   "engines": {
-    "node": ">=24.16.0"
+    "node": ">=24.17.0"
   },
   "files": [
     "dist/**/*.js",
