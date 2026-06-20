@@ -1,10 +1,18 @@
-export const MIN_NODE_VERSION = "24.16.0";
+export const MIN_NODE_VERSION = "24.17.0";
 
 export type NodeVersionCheck = {
   ok: boolean;
   current: string;
   required: string;
 };
+
+const LIGHTWEIGHT_COMMANDS = new Set([
+  "decide",
+  "doctor",
+  "engines",
+  "help",
+  "route"
+]);
 
 type ParsedVersion = {
   major: number;
@@ -29,9 +37,11 @@ export function checkNodeVersion(version = process.version): NodeVersionCheck {
 }
 
 export function formatUnsupportedNodeVersion(
-  check = checkNodeVersion()
+  check = checkNodeVersion(),
+  command?: string
 ): string {
-  return `Michibiki requires Node.js ${check.required} (current: ${check.current}). Install Node.js ${MIN_NODE_VERSION} or newer, then rerun the command.`;
+  const subject = command ? `Michibiki command "${command}"` : "Michibiki";
+  return `${subject} requires Node.js ${check.required} (current: ${check.current}). Install Node.js ${MIN_NODE_VERSION} or newer, then rerun the command.`;
 }
 
 export function formatNodeVersionDetail(check = checkNodeVersion()): string {
@@ -39,6 +49,11 @@ export function formatNodeVersionDetail(check = checkNodeVersion()): string {
     return `${check.current} (requires ${check.required})`;
   }
   return `${check.current} unsupported; requires ${check.required}`;
+}
+
+export function commandRequiresSupportedNode(command?: string): boolean {
+  if (!command) return false;
+  return !LIGHTWEIGHT_COMMANDS.has(command);
 }
 
 function parseNodeVersion(version: string): ParsedVersion | undefined {

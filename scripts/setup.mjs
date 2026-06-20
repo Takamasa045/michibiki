@@ -1,8 +1,8 @@
 import { spawn } from "node:child_process";
 import process from "node:process";
 
-const MIN_NODE_VERSION = "24.16.0";
-const PNPM_VERSION = "11.6.0";
+const MIN_NODE_VERSION = "24.17.0";
+const PNPM_VERSION = "11.8.0";
 const pnpmCommand = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
 
 const nodeCheck = checkNodeVersion(process.version);

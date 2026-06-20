@@ -25,6 +25,10 @@ export type TimelineClip = {
   startSec: number;
   durationSec: number;
   layer: number;
+  role?: "primary" | "insert" | "bed" | "caption" | "overlay";
+  fit?: "cover" | "contain";
+  transition?: "cut" | "crossfade" | "pop";
+  layout?: "full-frame" | "picture-in-picture";
 };
 
 export type EditframeTimeline = {
@@ -76,9 +80,8 @@ export function buildEditframeTimeline(spec: VideoSpec): EditframeTimeline {
     }
   ];
   const sceneClips = buildSceneTextClips(scenes);
-  const assetClips = spec.assets.flatMap((asset, index) =>
-    buildAssetClips(asset, index, spec.format.durationSec)
-  );
+  const assetClips = buildAssetTimelineClips(spec.assets, spec.format.durationSec);
+  const motionOverlayClips = buildMotionOverlayClips(spec);
   const ctaClip = spec.content.cta
     ? [
         {
@@ -87,7 +90,8 @@ export function buildEditframeTimeline(spec: VideoSpec): EditframeTimeline {
           text: spec.content.cta,
           startSec: Math.max(0, spec.format.durationSec - 4),
           durationSec: Math.min(4, spec.format.durationSec),
-          layer: 20
+          layer: 20,
+          role: "caption" as const
         }
       ]
     : [];
@@ -96,7 +100,7 @@ export function buildEditframeTimeline(spec: VideoSpec): EditframeTimeline {
     id: `timeline_${randomUUID()}`,
     title: spec.title,
     format: spec.format,
-    clips: [...assetClips, ...sceneClips, ...ctaClip].sort(
+    clips: [...assetClips, ...sceneClips, ...motionOverlayClips, ...ctaClip].sort(
       (a, b) => a.startSec - b.startSec || a.layer - b.layer
     ),
     notes: [
@@ -208,40 +212,177 @@ function buildSceneTextClips(scenes: SceneSpec[]): TimelineClip[] {
       text: scene.text ?? scene.description,
       startSec: cursor,
       durationSec: scene.durationSec,
-      layer: 10
+      layer: 10,
+      role: "caption"
     };
     cursor += scene.durationSec;
     return clip;
   });
 }
 
-function buildAssetClips(
-  asset: AssetSpec,
-  index: number,
+function buildAssetTimelineClips(
+  assets: AssetSpec[],
   totalDurationSec: number
 ): TimelineClip[] {
+  const audioAndSubtitleClips = assets.flatMap((asset, index) => {
+    if (asset.type === "audio") {
+      return [buildFullDurationAssetClip(asset, index, totalDurationSec, "audio")];
+    }
+    if (asset.type === "subtitle") {
+      return [
+        buildFullDurationAssetClip(asset, index, totalDurationSec, "subtitle")
+      ];
+    }
+    return [];
+  });
+  const visualAssets = assets
+    .map((asset, index) => ({ asset, index }))
+    .filter(({ asset }) => asset.type !== "audio" && asset.type !== "subtitle");
+
+  if (visualAssets.length <= 1) {
+    return [
+      ...audioAndSubtitleClips,
+      ...visualAssets.flatMap(({ asset, index }) =>
+        buildFullDurationAssetClip(
+          asset,
+          index,
+          totalDurationSec,
+          toTimelineClipType(asset)
+        )
+      )
+    ];
+  }
+
+  const primaryDurationSec = roundSeconds(totalDurationSec / visualAssets.length);
+  const primaryClips = visualAssets.map(({ asset, index }, visualIndex) => {
+    const startSec = roundSeconds(visualIndex * primaryDurationSec);
+    const durationSec =
+      visualIndex === visualAssets.length - 1
+        ? roundSeconds(totalDurationSec - startSec)
+        : primaryDurationSec;
+    return {
+      ...buildBaseAssetClip(asset, index, startSec, durationSec),
+      id: `clip_asset_${index + 1}_primary`,
+      type: toTimelineClipType(asset),
+      layer: 0,
+      role: "primary" as const,
+      fit: "cover" as const,
+      layout: "full-frame" as const,
+      transition: visualIndex === 0 ? "cut" as const : "crossfade" as const
+    };
+  });
+  const insertClips = visualAssets.map((_, visualIndex) => {
+    const source = visualAssets[(visualIndex + 1) % visualAssets.length]!;
+    const primary = primaryClips[visualIndex]!;
+    const insertStartSec = roundSeconds(
+      Math.min(
+        totalDurationSec - 0.5,
+        primary.startSec + primary.durationSec * 0.58
+      )
+    );
+    const insertDurationSec = roundSeconds(
+      Math.min(
+        2,
+        Math.max(1, primary.durationSec * 0.3),
+        totalDurationSec - insertStartSec
+      )
+    );
+    return {
+      ...buildBaseAssetClip(
+        source.asset,
+        source.index,
+        insertStartSec,
+        insertDurationSec
+      ),
+      id: `clip_asset_${source.index + 1}_insert_${visualIndex + 1}`,
+      type: toTimelineClipType(source.asset),
+      layer: 5,
+      role: "insert" as const,
+      fit: "contain" as const,
+      layout: "picture-in-picture" as const,
+      transition: "pop" as const
+    };
+  });
+
+  return [...audioAndSubtitleClips, ...primaryClips, ...insertClips];
+}
+
+function buildFullDurationAssetClip(
+  asset: AssetSpec,
+  index: number,
+  totalDurationSec: number,
+  type: TimelineClip["type"]
+): TimelineClip {
+  const base = buildBaseAssetClip(asset, index, 0, totalDurationSec);
+  if (type === "audio") {
+    return { ...base, type, layer: -10, role: "bed" };
+  }
+  if (type === "subtitle") {
+    return { ...base, type, layer: 30, role: "caption" };
+  }
+  return {
+    ...base,
+    type,
+    layer: index,
+    role: "primary",
+    fit: type === "data" ? undefined : "cover",
+    layout: type === "data" ? undefined : "full-frame"
+  };
+}
+
+function buildBaseAssetClip(
+  asset: AssetSpec,
+  index: number,
+  startSec: number,
+  durationSec: number
+): Omit<TimelineClip, "type"> {
   const base = {
     id: `clip_asset_${index + 1}`,
     source: asset.source,
-    startSec: 0,
-    durationSec: totalDurationSec,
+    startSec,
+    durationSec,
     layer: index
   };
 
-  if (asset.type === "video") {
-    return [{ ...base, type: "video" }];
-  }
-  if (asset.type === "audio") {
-    return [{ ...base, type: "audio", layer: -10 }];
-  }
-  if (asset.type === "image") {
-    return [{ ...base, type: "image" }];
-  }
-  if (asset.type === "subtitle") {
-    return [{ ...base, type: "subtitle", layer: 30 }];
-  }
+  return base;
+}
 
-  return [{ ...base, type: "data" }];
+function toTimelineClipType(asset: AssetSpec): TimelineClip["type"] {
+  if (
+    asset.type === "video" ||
+    asset.type === "audio" ||
+    asset.type === "image" ||
+    asset.type === "subtitle"
+  ) {
+    return asset.type;
+  }
+  return "data";
+}
+
+function buildMotionOverlayClips(spec: VideoSpec): TimelineClip[] {
+  if (!/(手書き|ライン|線|星|スター|スピード|speed|line|star)/i.test(spec.goal)) {
+    return [];
+  }
+  const beats = [0.15, 0.5, 0.82];
+  return beats.map((beat, index) => ({
+    id: `clip_motion_overlay_${index + 1}`,
+    type: "text",
+    text:
+      index === 0
+        ? "white hand-drawn line"
+        : index === 1
+          ? "speed accent"
+          : "star pop",
+    startSec: roundSeconds(spec.format.durationSec * beat),
+    durationSec: Math.min(1.6, Math.max(0.8, spec.format.durationSec * 0.12)),
+    layer: 25,
+    role: "overlay",
+    transition: "pop"
+  }));
+}
+
+function roundSeconds(value: number): number {
+  return Math.max(0, Math.round(value * 10) / 10);
 }
 
 function buildPreviewHtml(spec: VideoSpec, timeline: EditframeTimeline): string {

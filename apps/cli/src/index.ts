@@ -40,6 +40,7 @@ import { parseArgs, getValue, getValues, hasFlag } from "./args.js";
 import { printDoctor, runDoctor } from "./doctor.js";
 import {
   checkNodeVersion,
+  commandRequiresSupportedNode,
   formatUnsupportedNodeVersion
 } from "./node-version.js";
 
@@ -62,10 +63,10 @@ async function main(): Promise<void> {
     return;
   }
 
-  if (args.command !== "doctor") {
+  if (commandRequiresSupportedNode(args.command)) {
     const node = checkNodeVersion();
     if (!node.ok) {
-      console.error(formatUnsupportedNodeVersion(node));
+      console.error(formatUnsupportedNodeVersion(node, args.command));
       process.exit(1);
     }
   }
