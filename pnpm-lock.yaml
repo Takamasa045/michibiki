@@ -1107,8 +1107,8 @@ packages:
   has-property-descriptors@1.0.2:
     resolution: {integrity: sha512-55JNKuIW+vq4Ke1BjOTjM2YctQIvCT7GFzHwmfZPGo5wnrgkid0YQtnAleFSqumZm4az3n2BS+erby5ipJdgrg==}
 
-  hono@4.12.25:
-    resolution: {integrity: sha512-2NFaIyNVgJmBs/ecmtGzlmluTFs5cHEWGTdu0t1HBwYzoGXOL5nUQBRMXsXWla5i4KkG//QMzVP88m1+I3fdAQ==}
+  hono@4.12.26:
+    resolution: {integrity: sha512-uyZtpnYxM9CmQ7QsQknM4zN8EftNqhON1qYeIKM0Se67CCEe2c44xyGURwB0axX2fBDu1dqHrHAc1hmNT8ITkw==}
     engines: {node: '>=16.9.0'}
 
   html-escaper@3.0.3:
@@ -1284,8 +1284,8 @@ packages:
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
-  nanoid@3.3.12:
-    resolution: {integrity: sha512-ZB9RH/39qpq5Vu6Y+NmUaFhQR6pp+M2Xt76XBnEwDaGcVAqhlvxrl3B2bKS5D3NH3QR76v3aSrKaF/Kiy7lEtQ==}
+  nanoid@3.3.14:
+    resolution: {integrity: sha512-U9kYi5bpVMEI31yC8iw4bJJp0avcHXA0W8/wNfLfnvJYzihQo2ZRPYPvpAAd570HAcCBjCTN7vnr+v4StKl1IQ==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
@@ -1316,11 +1316,11 @@ packages:
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
 
-  onnxruntime-common@1.26.0:
-    resolution: {integrity: sha512-qVyMR4lcWgbkc4getFV+GQijsTnbg/siteoqcDwa3sI/LxbrMSNw4ePyvCq/ymdQaRomCA7YuWmhzsswxvymdw==}
+  onnxruntime-common@1.27.0:
+    resolution: {integrity: sha512-3KxL5wIVqa8Ex08jxSzncm9CMgw8CjOFyOQ7SxvG9o0cVLlhTNKXyIQuTbtX4tGPJEf73OER2xrjt4HJSBL4ow==}
 
-  onnxruntime-node@1.26.0:
-    resolution: {integrity: sha512-OHl6PiOEOqxaLHL0N9eFrbzS7IGmu3BtJNH3RTEnRAheCIkfc3gjcjl4sGcjp9C22ZC9YTquDOxSdT/stBQ6BQ==}
+  onnxruntime-node@1.27.0:
+    resolution: {integrity: sha512-QEzGwrvNBgv4uPVdnbHsOGG4G6T96mdlcFI8aAKPjMU8wOPpVocPXb6k3QGkaZagVTv2G9Bnnbo6Z3JdXr1fQw==}
     os: [win32, darwin, linux]
 
   open@10.2.0:
@@ -1434,8 +1434,8 @@ packages:
   safe-buffer@5.2.1:
     resolution: {integrity: sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==}
 
-  semver@7.8.4:
-    resolution: {integrity: sha512-rUCObTnP32Q08R2uuIrt7r9PlEonuTmtuXYcW6s5kjdlj3xbnwe+21yXptAUYcMAABLkYYTtnmzb3w3EDZfueA==}
+  semver@7.8.5:
+    resolution: {integrity: sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -1681,8 +1681,8 @@ packages:
     resolution: {integrity: sha512-tVpsJW7DdjecAiFpbIB1e3qxIQsE6NoPc5/eTdrbbIC4h0LVsWhnoa3g+m2HclBIujHzsxZ4VJVA+GUuc2/LBw==}
     engines: {node: '>=12'}
 
-  yargs@17.7.2:
-    resolution: {integrity: sha512-7dSzzRQ++CKnNI/krKnYRV7JKKPUXMEh61soaHKg9mrWEhzFWhFnxPxGl+69cD1Ou63C13NUPCnmIcrvqCuM6w==}
+  yargs@17.7.3:
+    resolution: {integrity: sha512-GZtjxm/J/4TSxuL3FNYjCmLktBTnIw/rVmKSIyKeYAZpmJB2ig9VauCC5xsa82GNKVKDAqpOn3KVzNt0zmrU0g==}
     engines: {node: '>=12'}
 
   yauzl@2.10.0:
@@ -1847,11 +1847,11 @@ snapshots:
       - utf-8-validate
     optional: true
 
-  '@hono/node-server@1.19.14(hono@4.12.25)':
+  '@hono/node-server@1.19.14(hono@4.12.26)':
     dependencies:
-      hono: 4.12.25
+      hono: 4.12.26
 
-  '@hyperframes/core@0.6.120(hono@4.12.25)':
+  '@hyperframes/core@0.6.120(hono@4.12.26)':
     dependencies:
       '@babel/parser': 7.29.7
       '@chenglou/pretext': 0.0.5
@@ -1864,16 +1864,16 @@ snapshots:
       recast: 0.23.11
     optionalDependencies:
       esbuild: 0.28.1
-      hono: 4.12.25
+      hono: 4.12.26
       linkedom: 0.18.12
     transitivePeerDependencies:
       - canvas
 
   '@hyperframes/engine@0.6.120(typescript@6.0.3)':
     dependencies:
-      '@hono/node-server': 1.19.14(hono@4.12.25)
-      '@hyperframes/core': 0.6.120(hono@4.12.25)
-      hono: 4.12.25
+      '@hono/node-server': 1.19.14(hono@4.12.26)
+      '@hyperframes/core': 0.6.120(hono@4.12.26)
+      hono: 4.12.26
       linkedom: 0.18.12
       puppeteer: 24.43.1(typescript@6.0.3)
       puppeteer-core: 24.43.1
@@ -1900,10 +1900,10 @@ snapshots:
       '@fontsource/oswald': 5.2.8
       '@fontsource/outfit': 5.2.8
       '@fontsource/space-mono': 5.2.9
-      '@hono/node-server': 1.19.14(hono@4.12.25)
-      '@hyperframes/core': 0.6.120(hono@4.12.25)
+      '@hono/node-server': 1.19.14(hono@4.12.26)
+      '@hyperframes/core': 0.6.120(hono@4.12.26)
       '@hyperframes/engine': 0.6.120(typescript@6.0.3)
-      hono: 4.12.25
+      hono: 4.12.26
       linkedom: 0.18.12
       postcss: 8.5.15
       puppeteer: 24.43.1(typescript@6.0.3)
@@ -2032,9 +2032,9 @@ snapshots:
       extract-zip: 2.0.1
       progress: 2.0.3
       proxy-agent: 6.5.0
-      semver: 7.8.4
+      semver: 7.8.5
       tar-fs: 3.1.2
-      yargs: 17.7.2
+      yargs: 17.7.3
     transitivePeerDependencies:
       - bare-abort-controller
       - bare-buffer
@@ -2542,7 +2542,7 @@ snapshots:
     dependencies:
       globalthis: 1.0.4
       matcher: 4.0.0
-      semver: 7.8.4
+      semver: 7.8.5
       serialize-error: 8.1.0
 
   globalthis@1.0.4:
@@ -2571,7 +2571,7 @@ snapshots:
     dependencies:
       es-define-property: 1.0.1
 
-  hono@4.12.25: {}
+  hono@4.12.26: {}
 
   html-escaper@3.0.3: {}
 
@@ -2598,7 +2598,7 @@ snapshots:
 
   hyperframes@0.6.120:
     dependencies:
-      '@hono/node-server': 1.19.14(hono@4.12.25)
+      '@hono/node-server': 1.19.14(hono@4.12.26)
       '@puppeteer/browsers': 2.13.2
       adm-zip: 0.5.17
       citty: 0.2.2
@@ -2607,8 +2607,8 @@ snapshots:
       esbuild: 0.28.1
       fontkit: 2.0.4
       giget: 3.3.0
-      hono: 4.12.25
-      onnxruntime-node: 1.26.0
+      hono: 4.12.26
+      onnxruntime-node: 1.27.0
       open: 10.2.0
       postcss: 8.5.15
       prettier: 3.8.4
@@ -2748,7 +2748,7 @@ snapshots:
 
   ms@2.1.3: {}
 
-  nanoid@3.3.12: {}
+  nanoid@3.3.14: {}
 
   netmask@2.1.1: {}
 
@@ -2774,13 +2774,13 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
-  onnxruntime-common@1.26.0: {}
+  onnxruntime-common@1.27.0: {}
 
-  onnxruntime-node@1.26.0:
+  onnxruntime-node@1.27.0:
     dependencies:
       adm-zip: 0.5.17
       global-agent: 4.1.3
-      onnxruntime-common: 1.26.0
+      onnxruntime-common: 1.27.0
 
   open@10.2.0:
     dependencies:
@@ -2841,7 +2841,7 @@ snapshots:
 
   postcss@8.5.15:
     dependencies:
-      nanoid: 3.3.12
+      nanoid: 3.3.14
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
@@ -2951,7 +2951,7 @@ snapshots:
   safe-buffer@5.2.1:
     optional: true
 
-  semver@7.8.4: {}
+  semver@7.8.5: {}
 
   serialize-error@8.1.0:
     dependencies:
@@ -2961,7 +2961,7 @@ snapshots:
     dependencies:
       '@img/colour': 1.1.0
       detect-libc: 2.1.2
-      semver: 7.8.4
+      semver: 7.8.5
     optionalDependencies:
       '@img/sharp-darwin-arm64': 0.34.5
       '@img/sharp-darwin-x64': 0.34.5
@@ -3178,7 +3178,7 @@ snapshots:
 
   yargs-parser@21.1.1: {}
 
-  yargs@17.7.2:
+  yargs@17.7.3:
     dependencies:
       cliui: 8.0.1
       escalade: 3.2.0
