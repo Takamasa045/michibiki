@@ -4,6 +4,40 @@ All notable changes to Michibiki will be documented in this file.
 
 This project follows semantic versioning for public releases.
 
+## [0.1.9](https://github.com/Takamasa045/michibiki/compare/v0.1.8...v0.1.9) (2026-06-21)
+
+
+### Features
+
+* **render-jobs:** write CLI jobs to outputs/projects/&lt;slug&gt; ([#77](https://github.com/Takamasa045/michibiki/issues/77)) ([94544ba](https://github.com/Takamasa045/michibiki/commit/94544baab5f238ce9fa9b970ece75d5e89dfd6fb))
+
+
+### Bug Fixes
+
+* **browser-renderer:** treat stable screenshot file as completion ([#74](https://github.com/Takamasa045/michibiki/issues/74)) ([df04c0e](https://github.com/Takamasa045/michibiki/commit/df04c0e33f61c5d96bb4b1cefe6d6dc981397add))
+* **deps:** override esbuild to 0.28.1 to resolve GHSA-gv7w-rqvm-qjhr ([#71](https://github.com/Takamasa045/michibiki/issues/71)) ([6a92a7e](https://github.com/Takamasa045/michibiki/commit/6a92a7e7538ad876875cf502ed269cf676070728))
+* **deps:** update video engines ([#68](https://github.com/Takamasa045/michibiki/issues/68)) ([f9e9631](https://github.com/Takamasa045/michibiki/commit/f9e9631b451f0ba9491895162f71c9a4324b81a0))
+* **deps:** update video engines to ^0.6.109 ([#83](https://github.com/Takamasa045/michibiki/issues/83)) ([cead0f6](https://github.com/Takamasa045/michibiki/commit/cead0f6aabb483f4dda314458852f8f5f69b933a))
+* **deps:** update video engines to ^0.6.110 ([#85](https://github.com/Takamasa045/michibiki/issues/85)) ([dbe5d8d](https://github.com/Takamasa045/michibiki/commit/dbe5d8d29a9916cdf6027c703589b810e6eb66bd))
+* **deps:** update video engines to ^0.6.112 ([#87](https://github.com/Takamasa045/michibiki/issues/87)) ([5abb374](https://github.com/Takamasa045/michibiki/commit/5abb37454364b0685779121f35c94802679573da))
+* **deps:** update video engines to ^0.6.114 ([#91](https://github.com/Takamasa045/michibiki/issues/91)) ([8d78102](https://github.com/Takamasa045/michibiki/commit/8d78102a72bd2c206ab57e4a89866549887da4f4))
+* **deps:** update video engines to ^0.6.115 ([#93](https://github.com/Takamasa045/michibiki/issues/93)) ([d694302](https://github.com/Takamasa045/michibiki/commit/d694302781cadaf31a164fbefc616536ac0db751))
+* **deps:** update video engines to ^0.6.118 ([#94](https://github.com/Takamasa045/michibiki/issues/94)) ([87b5c7b](https://github.com/Takamasa045/michibiki/commit/87b5c7bcf4c74c681cfdfd03550e83fb7ae52316))
+* **deps:** update video engines to ^0.6.119 ([#95](https://github.com/Takamasa045/michibiki/issues/95)) ([be29c12](https://github.com/Takamasa045/michibiki/commit/be29c126530c5ae46f3ed7ea3568a4f5d697f306))
+* **deps:** update video engines to ^0.6.99 ([#80](https://github.com/Takamasa045/michibiki/issues/80)) ([43c62cd](https://github.com/Takamasa045/michibiki/commit/43c62cd81558e9c81c8cf8c8d6e24145785ee2b6))
+* enforce node version requirement ([e20a6fd](https://github.com/Takamasa045/michibiki/commit/e20a6fd98626c7d300077ffdbaac8b2e3fef25d8))
+* improve CLI routing and editframe timelines ([6adf40a](https://github.com/Takamasa045/michibiki/commit/6adf40aef1afe7be922447179237761479f7a4b2))
+
+
+### Code Refactoring
+
+* cleanup dead code, fix renovate manager, split oversized modules ([#73](https://github.com/Takamasa045/michibiki/issues/73)) ([360f902](https://github.com/Takamasa045/michibiki/commit/360f90262355f3dd14e4c3afa1646e54303261bb))
+
+
+### Documentation
+
+* restructure README and extract CLI reference to docs/CLI.md ([#75](https://github.com/Takamasa045/michibiki/issues/75)) ([8860ec7](https://github.com/Takamasa045/michibiki/commit/8860ec7ca681aa81a271d9fac6784fef80f982dc))
+
 ## [0.1.8](https://github.com/Takamasa045/michibiki/compare/v0.1.7...v0.1.8) (2026-06-13)
 
 
