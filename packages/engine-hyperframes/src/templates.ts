@@ -5,6 +5,7 @@ import type { HtmlInCanvasRegistryBlock } from "./registry.js";
 
 export function buildHtml(spec: VideoSpec): string {
   const scenes = spec.content.scenes ?? [];
+  const previewCopy = buildPreviewCopy(spec);
   const sceneMarkup = scenes
     .map(
       (scene) => `<section class="scene">
@@ -26,9 +27,14 @@ export function buildHtml(spec: VideoSpec): string {
 </head>
 <body data-aspect="${spec.format.aspectRatio}">
   <main id="root" class="stage" data-composition-id="root" data-start="0" data-duration="${spec.format.durationSec}" data-width="${spec.format.width}" data-height="${spec.format.height}" data-track-index="0">
+    <div class="status-bar" aria-label="draft status">
+      <span>HyperFrames draft</span>
+      <span>${previewCopy.status.join(" · ")}</span>
+    </div>
     <section class="hero">
       <h1>${escapeHtml(spec.title)}</h1>
-      <p class="goal">${escapeHtml(spec.goal)}</p>
+      <p class="hook">${escapeHtml(previewCopy.hook)}</p>
+      ${previewCopy.cues.length > 0 ? `<ul class="cue-list">${previewCopy.cues.map((cue) => `<li>${escapeHtml(cue)}</li>`).join("")}</ul>` : ""}
       ${spec.content.cta ? `<strong class="cta">${escapeHtml(spec.content.cta)}</strong>` : ""}
     </section>
     ${sceneMarkup}
@@ -46,11 +52,14 @@ export function buildCss(spec: VideoSpec): string {
 
   return `:root {
   color-scheme: dark;
-  --bg: #101418;
-  --fg: #f4f7fb;
-  --muted: #9fb1c2;
+  --bg: #101217;
+  --panel: #171c22;
+  --fg: #f6f1e8;
+  --muted: #b7c0c8;
   --accent: #33d6a6;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --sharp: #f2b84b;
+  --rule: rgba(246, 241, 232, 0.14);
+  font-family: "Avenir Next", "Hiragino Sans", "Yu Gothic", ui-sans-serif, system-ui, sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -60,7 +69,7 @@ body {
   min-height: 100vh;
   display: grid;
   place-items: center;
-  background: #0b0f14;
+  background: #080a0d;
   color: var(--fg);
 }
 
@@ -70,10 +79,24 @@ body {
   aspect-ratio: ${width} / ${height};
   min-height: min(100vh, ${height}px);
   overflow: hidden;
+  container-type: inline-size;
   background:
-    linear-gradient(135deg, rgba(51, 214, 166, 0.22), transparent 38%),
-    linear-gradient(315deg, rgba(74, 144, 226, 0.24), transparent 42%),
+    linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255,255,255,0.035) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(51, 214, 166, 0.2), transparent 34%),
+    linear-gradient(315deg, rgba(242, 184, 75, 0.18), transparent 42%),
     var(--bg);
+  background-size: 74px 74px, 74px 74px, auto, auto, auto;
+}
+
+.stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 0 44%, rgba(246, 241, 232, 0.1) 45%, transparent 54% 100%);
+  mix-blend-mode: screen;
+  opacity: 0.72;
+  pointer-events: none;
 }
 
 .hero,
@@ -85,6 +108,20 @@ body {
   gap: 18px;
   padding: 8%;
   z-index: 2;
+}
+
+.status-bar {
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  top: 6%;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  color: var(--muted);
+  font-size: clamp(12px, 1.35cqw, 18px);
+  font-weight: 700;
 }
 
 .scene {
@@ -103,7 +140,7 @@ body {
 .eyebrow,
 .scene-kicker {
   color: var(--accent);
-  font-size: 14px;
+  font-size: clamp(12px, 1.4cqw, 18px);
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -116,29 +153,49 @@ p {
 
 h1 {
   max-width: 12ch;
-  font-size: clamp(44px, 9vw, 118px);
+  font-size: clamp(44px, 8.5cqw, 118px);
   line-height: 0.94;
 }
 
 h2 {
   max-width: 18ch;
-  font-size: clamp(30px, 6vw, 76px);
+  font-size: clamp(30px, 5.6cqw, 76px);
   line-height: 1;
 }
 
-.goal {
-  max-width: 58ch;
+.hook {
+  max-width: 32ch;
   color: var(--muted);
-  font-size: clamp(16px, 2vw, 28px);
-  line-height: 1.5;
+  font-size: clamp(18px, 2.4cqw, 32px);
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.cue-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 68ch;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cue-list li {
+  border: 1px solid var(--rule);
+  padding: 8px 11px;
+  background: rgba(23, 28, 34, 0.72);
+  color: var(--fg);
+  font-size: clamp(12px, 1.35cqw, 18px);
 }
 
 .cta {
   width: fit-content;
-  border: 1px solid rgba(51, 214, 166, 0.55);
-  padding: 12px 16px;
-  color: var(--fg);
-  background: rgba(51, 214, 166, 0.14);
+  border: 1px solid rgba(242, 184, 75, 0.75);
+  padding: 12px 18px;
+  color: #120f08;
+  background: var(--sharp);
+  box-shadow: 0 18px 60px rgba(242, 184, 75, 0.18);
 }
 `;
 }
@@ -163,6 +220,9 @@ gsap.set(panels, {
   scale: 0.985,
   pointerEvents: "none"
 });
+if (panels[0]) {
+  gsap.set(panels[0], { opacity: 1, y: 0, scale: 1, pointerEvents: "auto" });
+}
 
 const tl = gsap.timeline({ paused: true });
 
@@ -172,6 +232,9 @@ panels.forEach((panel, index) => {
   const end = (index + 1) * panelDuration - pad;
   const holdEnd = Math.max(start + 0.9, end - 0.48);
 
+  if (index === 0) {
+    tl.set(panel, { opacity: 1, y: 0, scale: 1, pointerEvents: "auto" }, 0);
+  }
   tl.set(panel, { pointerEvents: "auto" }, start);
   tl.to(panel, { opacity: 1, y: 0, scale: 1, duration: 0.62, ease: "power3.out" }, start);
   tl.to(panel, { opacity: 0, y: -34, scale: 0.988, duration: 0.48, ease: "power2.in" }, holdEnd);
@@ -253,3 +316,31 @@ function escapeHtml(value: string): string {
     .replace(/'/g, "&#39;");
 }
 
+function buildPreviewCopy(spec: VideoSpec): {
+  hook: string;
+  cues: string[];
+  status: string[];
+} {
+  const captions = (
+    spec.content.captions ??
+    spec.content.scenes?.map((scene) => scene.text ?? scene.description) ??
+    []
+  )
+    .map((caption) => caption.trim())
+    .filter(Boolean);
+  const hook = captions[0] ?? spec.content.script?.split("\n")[0] ?? spec.title;
+
+  return {
+    hook: truncateCopy(hook, 46),
+    cues: captions.slice(1, 4).map((caption) => truncateCopy(caption, 34)),
+    status: [
+      `${spec.format.durationSec}s`,
+      spec.format.aspectRatio,
+      `${spec.format.fps}fps`
+    ]
+  };
+}
+
+function truncateCopy(value: string, maxLength: number): string {
+  return value.length <= maxLength ? value : `${value.slice(0, maxLength - 1)}…`;
+}

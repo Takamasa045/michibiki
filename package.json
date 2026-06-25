@@ -1,6 +1,6 @@
 {
   "name": "michibiki",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Michibiki is a CLI-first AI video production router for VideoSpec generation and engine selection.",
   "private": true,
   "type": "module",

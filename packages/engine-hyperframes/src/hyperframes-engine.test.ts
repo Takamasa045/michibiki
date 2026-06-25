@@ -30,20 +30,19 @@ describe("HyperFrames engine", () => {
       outputDir: tempDir,
       logDir: path.join(tempDir, "logs")
     });
+    const html = await fs.readFile(path.join(project.rootPath, "index.html"), "utf8");
 
     expect(project.engine).toBe("hyperframes");
-    await expect(
-      fs.readFile(path.join(project.rootPath, "index.html"), "utf8")
-    ).resolves.toContain('data-composition-id="root"');
+    expect(html).toContain('data-composition-id="root"');
+    expect(html).toContain("HyperFrames draft");
+    expect(html).not.toContain("SaaSのLPを15秒のWeb動画にしたい");
     await expect(
       fs.readFile(path.join(project.rootPath, "motion.js"), "utf8")
     ).resolves.toContain("window.__hf");
     await expect(
       fs.readFile(path.join(project.rootPath, "motion.js"), "utf8")
     ).resolves.toContain("window.__timelines");
-    await expect(
-      fs.readFile(path.join(project.rootPath, "index.html"), "utf8")
-    ).resolves.not.toContain("HyperFrames Draft");
+    expect(html).not.toContain("HyperFrames Draft");
     expect(existsSync(path.join(tempDir, "project", "project.json"))).toBe(true);
   });
 

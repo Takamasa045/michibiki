@@ -4,8 +4,8 @@ Michibiki は Windows でも ZIP を展開して使えます。PowerShell で展
 
 ## 必要なもの
 
-- Node.js 24.16 以上
-- pnpm 11 以上（Corepack で有効化）
+- Node.js 24.18 以上
+- pnpm 11.9 以上（Corepack で有効化）
 - Google Chrome / Microsoft Edge / Chromium
 - ffmpeg（MP4 の preview / render を使う場合）
 

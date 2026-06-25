@@ -2,11 +2,109 @@
 
 [![CI](https://github.com/Takamasa045/michibiki/actions/workflows/ci.yml/badge.svg)](https://github.com/Takamasa045/michibiki/actions/workflows/ci.yml)
 
-[English](#english) | [日本語](#日本語) | [简体中文](docs/i18n/README.zh-CN.md) | [한국어](docs/i18n/README.ko.md) | [Español](docs/i18n/README.es.md) | [Français](docs/i18n/README.fr.md)
+## Language Switch
 
-> Translations under `docs/i18n/` are summaries and may lag behind the canonical English/Japanese sections. PRs welcome.
+[English](#en) | [日本語](#ja) | [简体中文](#zh) | [한국어](#ko) | [Español](#es) | [Français](#fr)
 
+All language summaries live in this README. The detailed English and Japanese references continue below.
+
+<a id="en"></a>
 ## English
+
+**Michibiki is an AI video production router: request -> `VideoSpec` -> engine choice -> generated project, preview, or render.**
+
+Start with a natural-language request. Michibiki compares Remotion, HyperFrames, and Editframe, then shows which engine fits the job and why.
+
+| Goal | Natural-language request |
+|------|--------------------------|
+| Compare engines first | "I want to make a 30-second vertical event promo. Decide the best engine and explain the tradeoffs." |
+| Generate a project | "Generate the project with the recommended engine, but do not preview or render yet." |
+| Preview only | "Preview the generated job and summarize what needs fixing." |
+| Render the final MP4 | "Render this job to MP4 after the preview is approved." |
+
+Use `node scripts/setup.mjs` for setup, then `pnpm michibiki doctor` and `pnpm michibiki decide --prompt "..."`.
+
+<a id="ja"></a>
+## 日本語
+
+**Michibiki は AI 動画制作ルーターです。依頼 -> `VideoSpec` -> エンジン選定 -> project / preview / render へ導きます。**
+
+まず自然言語で頼みます。Michibiki は Remotion / HyperFrames / Editframe を比較し、どのエンジンが向いているかと理由を返します。
+
+| やりたいこと | 自然言語での頼み方 |
+|-------------|-------------------|
+| まずエンジン比較したい | 「30 秒の縦型イベントプロモ動画を作りたい。最適なエンジンを判断して、使い分けも説明して」 |
+| project だけ生成したい | 「推奨エンジンで project を生成して。preview と render はまだ走らせないで」 |
+| preview だけ確認したい | 「生成済み job を preview して、直すべき点を要約して」 |
+| 最終 MP4 まで出したい | 「preview が問題なければ、この job を MP4 に render して」 |
+
+セットアップは `node scripts/setup.mjs`、確認は `pnpm michibiki doctor`、最初の判断は `pnpm michibiki decide --prompt "..."` です。
+
+<a id="zh"></a>
+## 简体中文
+
+**Michibiki 是一个 AI 视频制作路由器：需求 -> `VideoSpec` -> 引擎选择 -> 生成项目、预览或渲染。**
+
+先用自然语言描述你想做的视频。Michibiki 会比较 Remotion、HyperFrames 和 Editframe，并说明最适合的引擎和原因。
+
+| 目标 | 可以这样说 |
+|------|------------|
+| 先比较引擎 | "我想制作一个 30 秒的竖屏活动宣传视频。请判断最适合的引擎，并说明取舍。" |
+| 只生成项目 | "用推荐引擎生成 project，但先不要 preview 或 render。" |
+| 只看预览 | "预览已生成的 job，并总结需要修正的地方。" |
+| 输出最终 MP4 | "preview 确认没问题后，把这个 job render 成 MP4。" |
+
+设置使用 `node scripts/setup.mjs`，环境检查使用 `pnpm michibiki doctor`，首次判断使用 `pnpm michibiki decide --prompt "..."`。
+
+<a id="ko"></a>
+## 한국어
+
+**Michibiki는 AI 영상 제작 라우터입니다: 요청 -> `VideoSpec` -> 엔진 선택 -> 생성 프로젝트, 프리뷰 또는 렌더로 이어집니다.**
+
+먼저 자연어로 만들고 싶은 영상을 설명합니다. Michibiki는 Remotion, HyperFrames, Editframe을 비교하고 어떤 엔진이 적합한지와 이유를 보여줍니다.
+
+| 목표 | 이렇게 요청하세요 |
+|------|------------------|
+| 먼저 엔진 비교 | "30초 세로형 이벤트 홍보 영상을 만들고 싶어. 가장 적합한 엔진을 판단하고 장단점을 설명해줘." |
+| 프로젝트만 생성 | "추천 엔진으로 project를 생성해줘. preview와 render는 아직 실행하지 마." |
+| 프리뷰만 확인 | "생성된 job을 preview하고 수정할 점을 요약해줘." |
+| 최종 MP4 렌더 | "preview가 승인되면 이 job을 MP4로 render해줘." |
+
+설정은 `node scripts/setup.mjs`, 환경 확인은 `pnpm michibiki doctor`, 첫 판단은 `pnpm michibiki decide --prompt "..."` 를 사용합니다.
+
+<a id="es"></a>
+## Español
+
+**Michibiki es un router de producción de video con IA: solicitud -> `VideoSpec` -> elección de motor -> proyecto, vista previa o render.**
+
+Empieza con una petición en lenguaje natural. Michibiki compara Remotion, HyperFrames y Editframe, y explica qué motor encaja mejor y por qué.
+
+| Objetivo | Qué decir |
+|----------|-----------|
+| Comparar motores primero | "Quiero crear un promo vertical de 30 segundos para un evento. Decide el mejor motor y explica los tradeoffs." |
+| Generar solo el proyecto | "Genera el project con el motor recomendado, pero no ejecutes preview ni render todavía." |
+| Revisar solo preview | "Haz preview del job generado y resume qué habría que corregir." |
+| Renderizar el MP4 final | "Cuando el preview esté aprobado, renderiza este job como MP4." |
+
+Usa `node scripts/setup.mjs` para instalar, `pnpm michibiki doctor` para comprobar el entorno y `pnpm michibiki decide --prompt "..."` para la primera decisión.
+
+<a id="fr"></a>
+## Français
+
+**Michibiki est un routeur de production vidéo IA : demande -> `VideoSpec` -> choix du moteur -> projet généré, aperçu ou rendu.**
+
+Commencez par une demande en langage naturel. Michibiki compare Remotion, HyperFrames et Editframe, puis explique quel moteur convient le mieux et pourquoi.
+
+| Objectif | Formulation |
+|----------|-------------|
+| Comparer les moteurs d'abord | "Je veux créer une promo événementielle verticale de 30 secondes. Choisis le meilleur moteur et explique les compromis." |
+| Générer seulement le projet | "Génère le project avec le moteur recommandé, mais ne lance pas encore le preview ni le render." |
+| Vérifier seulement l'aperçu | "Prévisualise le job généré et résume les points à corriger." |
+| Rendre le MP4 final | "Une fois le preview validé, rends ce job en MP4." |
+
+Utilisez `node scripts/setup.mjs` pour l'installation, `pnpm michibiki doctor` pour vérifier l'environnement et `pnpm michibiki decide --prompt "..."` pour la première décision.
+
+## Technical Reference (English)
 
 Michibiki is an AI video production router. It turns a natural-language video request into a `VideoSpec`, selects the best video engine, and creates a generated project or render output.
 
@@ -55,11 +153,11 @@ cd michibiki
 node scripts/setup.mjs
 ```
 
-Requirements: Node.js 24.16+, pnpm 11.6+, ffmpeg (for HyperFrames/Editframe MP4 rendering), and Chromium/Chrome/Edge (auto-detected by `michibiki doctor`).
+Requirements: Node.js 24.18+, pnpm 11.9+, ffmpeg (for HyperFrames/Editframe MP4 rendering), and Chromium/Chrome/Edge (auto-detected by `michibiki doctor`).
 
 ### Windows
 
-Michibiki can run from an extracted ZIP on Windows with PowerShell. See `WINDOWS_START_HERE.md` for the short handoff. Install Node.js 24.16+, enable pnpm through Corepack, and keep ffmpeg on `PATH` when you need MP4 preview/render commands:
+Michibiki can run from an extracted ZIP on Windows with PowerShell. See `WINDOWS_START_HERE.md` for the short handoff. Install Node.js 24.18+, enable pnpm through Corepack, and keep ffmpeg on `PATH` when you need MP4 preview/render commands:
 
 ```powershell
 node scripts/setup.mjs
@@ -155,7 +253,7 @@ This project integrates multiple video generation and rendering engines as exter
 Each third-party engine remains governed by its own license and terms.
 Please review and comply with each license before using this project commercially or in a team environment.
 
-## 日本語
+## Technical Reference (Japanese)
 
 Michibiki は、自然言語の動画制作リクエストを `VideoSpec` に変換し、Remotion / HyperFrames / Editframe の中から最適な動画制作エンジンを選択するAI動画制作ルーターです。
 
@@ -203,7 +301,7 @@ cd michibiki
 node scripts/setup.mjs
 ```
 
-必要環境: Node.js 24.16+、pnpm 11.6+、ffmpeg（HyperFrames / Editframe の MP4 レンダーに必要）、Chromium / Chrome / Edge（`michibiki doctor` で自動検出）。
+必要環境: Node.js 24.18+、pnpm 11.9+、ffmpeg（HyperFrames / Editframe の MP4 レンダーに必要）、Chromium / Chrome / Edge（`michibiki doctor` で自動検出）。
 
 #### Windows
 

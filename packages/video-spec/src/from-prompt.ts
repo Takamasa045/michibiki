@@ -135,7 +135,11 @@ function inferTitle(prompt: string): string {
     return "Product Promo";
   }
 
-  return prompt
+  const conciseTitle = splitPromptSegments(stripUrls(prompt))
+    .map((segment) => rewriteSegmentAsTitle(segment))
+    .find((segment): segment is string => Boolean(segment));
+
+  return (conciseTitle ?? prompt)
     .replace(/\s+/g, " ")
     .slice(0, 42)
     .replace(/[、。,.!?！？]$/, "") || "Generated Video";
@@ -301,6 +305,19 @@ function splitPromptSegments(prompt: string): string[] {
 function rewriteSegmentAsCopy(segment: string): string | undefined {
   const sanitized = sanitizeCopy(segment);
   if (!sanitized || isProductionDirective(sanitized)) return undefined;
+
+  const rewritten = sanitized
+    .replace(/(?:の)?(?:プロモ動画|告知動画|動画|映像)(?:を|に|で)?.*$/i, "")
+    .replace(/(?:を)?(?:作りたい|生成したい|動画にしたい|見せたい).*$/i, "")
+    .replace(/最後に.*$/i, "")
+    .trim();
+
+  return sanitizeCopy(rewritten || sanitized);
+}
+
+function rewriteSegmentAsTitle(segment: string): string | undefined {
+  const sanitized = sanitizeCopy(segment);
+  if (!sanitized) return undefined;
 
   const rewritten = sanitized
     .replace(/(?:の)?(?:プロモ動画|告知動画|動画|映像)(?:を|に|で)?.*$/i, "")

@@ -1,4 +1,4 @@
-export const MIN_NODE_VERSION = "24.17.0";
+export const MIN_NODE_VERSION = "24.18.0";
 
 export type NodeVersionCheck = {
   ok: boolean;

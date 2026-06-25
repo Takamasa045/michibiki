@@ -9,15 +9,15 @@ import {
 
 describe("node version support", () => {
   it("accepts Node versions at or above the Michibiki minimum", () => {
-    expect(isNodeVersionSupported("24.17.0")).toBe(true);
-    expect(isNodeVersionSupported("24.17.1")).toBe(true);
+    expect(isNodeVersionSupported("24.18.0")).toBe(true);
+    expect(isNodeVersionSupported("24.18.1")).toBe(true);
     expect(isNodeVersionSupported("25.0.0")).toBe(true);
   });
 
   it("rejects Node versions below the Michibiki minimum", () => {
     expect(isNodeVersionSupported("v22.22.3")).toBe(false);
     expect(isNodeVersionSupported("v22.17.0")).toBe(false);
-    expect(isNodeVersionSupported("24.16.9")).toBe(false);
+    expect(isNodeVersionSupported("24.17.9")).toBe(false);
     expect(isNodeVersionSupported("24.0.0")).toBe(false);
   });
 
@@ -30,7 +30,7 @@ describe("node version support", () => {
       required: `>=${MIN_NODE_VERSION}`
     });
     expect(formatUnsupportedNodeVersion(check, "generate")).toContain(
-      'Michibiki command "generate" requires Node.js >=24.17.0'
+      'Michibiki command "generate" requires Node.js >=24.18.0'
     );
     expect(formatUnsupportedNodeVersion(check)).toContain("current: v22.22.3");
   });

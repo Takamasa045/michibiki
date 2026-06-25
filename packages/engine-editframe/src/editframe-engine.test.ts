@@ -78,6 +78,12 @@ describe("Editframe engine", () => {
     await expect(
       fs.readFile(path.join(project.rootPath, "preview.html"), "utf8")
     ).resolves.toContain("videoRouterFrame");
+    await expect(
+      fs.readFile(path.join(project.rootPath, "preview.html"), "utf8")
+    ).resolves.toContain("timeline status");
+    await expect(
+      fs.readFile(path.join(project.rootPath, "preview.html"), "utf8")
+    ).resolves.not.toContain("Vlog素材を編集して字幕付きショート動画を作りたい");
     expect(existsSync(path.join(tempDir, "project", "project.json"))).toBe(true);
   });
 });

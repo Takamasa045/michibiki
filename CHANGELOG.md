@@ -4,6 +4,23 @@ All notable changes to Michibiki will be documented in this file.
 
 This project follows semantic versioning for public releases.
 
+## [0.1.10](https://github.com/Takamasa045/michibiki/compare/v0.1.9...v0.1.10) (2026-06-25)
+
+
+### Features
+
+* polish CLI decision output and generated preview UX
+
+
+### Bug Fixes
+
+* align setup and doctor Node.js requirements with package engines
+
+
+### Documentation
+
+* add in-README language summaries and refresh release gate commands
+
 ## [0.1.9](https://github.com/Takamasa045/michibiki/compare/v0.1.8...v0.1.9) (2026-06-21)
 
 

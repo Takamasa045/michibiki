@@ -28,7 +28,7 @@ pnpm build
 pnpm test
 ```
 
-Requisitos: Node.js 20+, pnpm 9+, ffmpeg (para renderizado MP4 de HyperFrames / Editframe), Chromium / Chrome (detectado automáticamente por `michibiki doctor`).
+Requisitos: Node.js 24.18+, pnpm 11.9+, ffmpeg (para renderizado MP4 de HyperFrames / Editframe), Chromium / Chrome (detectado automáticamente por `michibiki doctor`).
 
 ## Comandos básicos
 

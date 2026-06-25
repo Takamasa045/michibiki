@@ -386,6 +386,7 @@ function roundSeconds(value: number): number {
 }
 
 function buildPreviewHtml(spec: VideoSpec, timeline: EditframeTimeline): string {
+  const previewCopy = buildPreviewCopy(spec, timeline);
   const clips = timeline.clips
     .map(
       (clip) => `<li>
@@ -403,19 +404,44 @@ function buildPreviewHtml(spec: VideoSpec, timeline: EditframeTimeline): string 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${escapeHtml(spec.title)} Timeline</title>
   <style>
-    :root { color-scheme: dark; }
+    :root {
+      color-scheme: dark;
+      --bg: #0f1117;
+      --panel: #171b23;
+      --fg: #f7f0e6;
+      --muted: #aeb8c2;
+      --accent: #7dd3fc;
+      --sharp: #fbbf24;
+      --rule: rgba(247, 240, 230, 0.14);
+    }
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: Inter, system-ui, sans-serif; background: #111; color: #f7f7f7; }
+    body {
+      margin: 0;
+      font-family: "Avenir Next", "Hiragino Sans", "Yu Gothic", ui-sans-serif, system-ui, sans-serif;
+      background: #090b10;
+      color: var(--fg);
+    }
     .stage {
       position: relative;
       width: min(100vw, ${spec.format.width}px);
       aspect-ratio: ${spec.format.width} / ${spec.format.height};
       min-height: min(100vh, ${spec.format.height}px);
       overflow: hidden;
+      container-type: inline-size;
       background:
+        linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(255,255,255,0.035) 1px, transparent 1px),
         linear-gradient(135deg, rgba(125, 211, 252, 0.22), transparent 36%),
-        linear-gradient(315deg, rgba(244, 114, 182, 0.22), transparent 40%),
-        #111827;
+        linear-gradient(315deg, rgba(251, 191, 36, 0.18), transparent 40%),
+        var(--bg);
+      background-size: 72px 72px, 72px 72px, auto, auto, auto;
+    }
+    .stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(115deg, transparent 0 40%, rgba(247, 240, 230, 0.1) 41%, transparent 52% 100%);
+      pointer-events: none;
     }
     .stage-content {
       position: absolute;
@@ -425,9 +451,39 @@ function buildPreviewHtml(spec: VideoSpec, timeline: EditframeTimeline): string 
       gap: 18px;
       padding: 7%;
     }
-    .kicker { color: #7dd3fc; font-weight: 800; text-transform: uppercase; }
-    .stage h2 { margin: 0; max-width: 18ch; font-size: clamp(40px, 8vw, 112px); line-height: 0.94; }
-    .stage p { margin: 0; max-width: 64ch; color: #d1d5db; font-size: clamp(16px, 2vw, 28px); line-height: 1.45; }
+    .kicker {
+      color: var(--accent);
+      font-size: clamp(12px, 1.4cqw, 18px);
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .stage h2 {
+      margin: 0;
+      max-width: 18ch;
+      font-size: clamp(40px, 7.8cqw, 112px);
+      line-height: 0.94;
+    }
+    .stage p {
+      margin: 0;
+      max-width: 38ch;
+      color: var(--muted);
+      font-size: clamp(18px, 2.2cqw, 30px);
+      line-height: 1.35;
+      font-weight: 700;
+    }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      max-width: 72ch;
+    }
+    .pill {
+      border: 1px solid var(--rule);
+      padding: 8px 11px;
+      background: rgba(23, 27, 35, 0.74);
+      color: var(--fg);
+      font-size: clamp(12px, 1.25cqw, 17px);
+    }
     .asset-strip {
       position: absolute;
       left: 7%;
@@ -438,25 +494,25 @@ function buildPreviewHtml(spec: VideoSpec, timeline: EditframeTimeline): string 
     }
     .asset-row {
       height: 12px;
-      border: 1px solid rgba(255,255,255,0.18);
+      border: 1px solid var(--rule);
       background: rgba(255,255,255,0.08);
     }
-    .asset-row.active { background: #7dd3fc; box-shadow: 0 0 28px rgba(125,211,252,0.42); }
+    .asset-row.active { background: var(--accent); box-shadow: 0 0 28px rgba(125,211,252,0.42); }
     .playhead {
       position: absolute;
       top: 0;
       bottom: 0;
       width: 2px;
-      background: #fbbf24;
+      background: var(--sharp);
       box-shadow: 0 0 18px rgba(251,191,36,0.85);
     }
     body[data-render="1"] main { display: none; }
     main { width: min(960px, calc(100vw - 32px)); margin: 40px auto; }
     h1 { font-size: 40px; line-height: 1; }
-    .meta { color: #aaa; }
+    .meta { color: var(--muted); }
     ol { display: grid; gap: 12px; padding: 0; list-style: none; }
-    li { border: 1px solid #333; padding: 16px; background: #181818; }
-    span { color: #7dd3fc; margin-left: 8px; }
+    li { border: 1px solid var(--rule); padding: 16px; background: var(--panel); }
+    span { color: var(--accent); margin-left: 8px; }
     p { margin-bottom: 0; color: #ddd; }
   </style>
 </head>
@@ -465,7 +521,10 @@ function buildPreviewHtml(spec: VideoSpec, timeline: EditframeTimeline): string 
     <div class="stage-content">
       <div class="kicker">Editframe Timeline</div>
       <h2 id="active-title">${escapeHtml(spec.title)}</h2>
-      <p id="active-body">${escapeHtml(spec.goal)}</p>
+      <p id="active-body">${escapeHtml(previewCopy.hook)}</p>
+      <div class="pill-row" aria-label="timeline status">
+        ${previewCopy.pills.map((pill) => `<span class="pill">${escapeHtml(pill)}</span>`).join("")}
+      </div>
     </div>
     <div class="asset-strip" id="asset-strip"></div>
     <div class="playhead" id="playhead"></div>
@@ -495,11 +554,11 @@ function buildPreviewHtml(spec: VideoSpec, timeline: EditframeTimeline): string 
         .filter((clip) => seconds >= clip.startSec && seconds <= clip.startSec + clip.durationSec)
         .sort((a, b) => b.layer - a.layer)[0];
       if (active) {
-        title.textContent = active.type.toUpperCase();
+        title.textContent = active.role === "caption" ? "Caption" : active.type.charAt(0).toUpperCase() + active.type.slice(1);
         body.textContent = active.text || active.source || active.id;
       } else {
         title.textContent = timeline.title;
-        body.textContent = "Timeline preview";
+        body.textContent = ${JSON.stringify(previewCopy.hook)};
       }
       for (const { clip, row } of rows) {
         row.classList.toggle("active", seconds >= clip.startSec && seconds <= clip.startSec + clip.durationSec);
@@ -530,6 +589,37 @@ function buildPreviewHtml(spec: VideoSpec, timeline: EditframeTimeline): string 
 </body>
 </html>
 `;
+}
+
+function buildPreviewCopy(
+  spec: VideoSpec,
+  timeline: EditframeTimeline
+): { hook: string; pills: string[] } {
+  const captions = (
+    spec.content.captions ??
+    spec.content.scenes?.map((scene) => scene.text ?? scene.description) ??
+    []
+  )
+    .map((caption) => caption.trim())
+    .filter(Boolean);
+  const visualClipCount = timeline.clips.filter((clip) => clip.type !== "audio")
+    .length;
+  const audioClipCount = timeline.clips.filter((clip) => clip.type === "audio")
+    .length;
+
+  return {
+    hook: truncateCopy(captions[0] ?? spec.content.script?.split("\n")[0] ?? spec.title, 46),
+    pills: [
+      `${spec.format.durationSec}s`,
+      spec.format.aspectRatio,
+      `${visualClipCount} visual clips`,
+      `${audioClipCount} audio clips`
+    ]
+  };
+}
+
+function truncateCopy(value: string, maxLength: number): string {
+  return value.length <= maxLength ? value : `${value.slice(0, maxLength - 1)}…`;
 }
 
 function buildReadme(spec: VideoSpec): string {

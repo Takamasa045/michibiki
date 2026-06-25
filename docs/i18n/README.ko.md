@@ -28,7 +28,7 @@ pnpm build
 pnpm test
 ```
 
-요구 사항: Node.js 20+, pnpm 9+, ffmpeg(HyperFrames / Editframe MP4 렌더링용), Chromium / Chrome (`michibiki doctor` 가 자동 감지).
+요구 사항: Node.js 24.18+, pnpm 11.9+, ffmpeg(HyperFrames / Editframe MP4 렌더링용), Chromium / Chrome (`michibiki doctor` 가 자동 감지).
 
 ## 기본 명령
 

@@ -41,8 +41,8 @@ pnpm test
 pnpm audit --audit-level moderate
 pnpm pack:check
 pnpm michibiki doctor
-pnpm michibiki generate --engine hyperframes --duration 1 --render --prompt "$(cat examples/lp-trailer/prompt.txt)"
-pnpm michibiki generate --engine editframe --duration 1 --asset examples/asset-short/input/clip.mp4 --asset examples/asset-short/input/voice.mp3 --render --prompt "$(cat examples/asset-short/prompt.txt)"
+pnpm michibiki generate --engine hyperframes --duration 1 --render --confirm-render --prompt "$(cat examples/lp-trailer/prompt.txt)"
+pnpm michibiki generate --engine editframe --duration 1 --asset examples/asset-short/input/clip.mp4 --asset examples/asset-short/input/voice.mp3 --render --confirm-render --prompt "$(cat examples/asset-short/prompt.txt)"
 ```
 
 For Remotion, the default `auto` mode uses the external monorepo when it is installed and otherwise generates a standalone official Remotion project:

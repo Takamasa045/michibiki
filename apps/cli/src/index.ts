@@ -335,9 +335,9 @@ Usage:
   michibiki decide --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。縦型..."
   michibiki create --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。縦型..."
   michibiki generate --prompt "雪山のアウトドアイベント告知動画を30秒で作りたい。縦型..."
-  michibiki generate --prompt "..." --render
+  michibiki generate --prompt "..." --render --confirm-render
   michibiki preview --job outputs/projects/<slug>
-  michibiki render --job outputs/projects/<slug>
+  michibiki render --job outputs/projects/<slug> --confirm-render
   michibiki inspect --job outputs/projects/<slug>
   michibiki engines
   michibiki doctor
@@ -408,12 +408,12 @@ function printGenerateSummary(params: {
   console.log("");
   console.log("Generate complete");
   console.log(`Job: ${params.jobDir}`);
-  console.log(`Engine: ${params.engine}`);
+  console.log(`Recommended engine: ${formatRecommendedEngine(params.engineFits, params.engine)}`);
   console.log(`Reason: ${params.reason}`);
   console.log(`Selection guide: ${params.selectionGuide}`);
   console.log("Engine fit:");
-  for (const fit of params.engineFits) {
-    console.log(`- ${fit.engine}: ${fit.fitPercent}%`);
+  for (const fit of sortEngineFits(params.engineFits)) {
+    console.log(`- ${fit.engine}: ${fit.fitPercent}%${fit.engine === params.engine ? " (selected)" : ""}`);
     console.log(`  Why: ${fit.reason}`);
     console.log(`  Best use: ${fit.bestUse}`);
     console.log(`  Features: ${fit.featureHighlights.join("; ")}`);
@@ -440,6 +440,7 @@ function printGenerateSummary(params: {
   if (params.renderOutputPath) {
     console.log(`Output: ${params.renderOutputPath}`);
   }
+  printGenerateNextSteps(params.jobDir);
 }
 
 function printDecisionSummary(params: {
@@ -461,12 +462,12 @@ function printDecisionSummary(params: {
   console.log("No job, project, preview, or render files were created.");
   console.log(`Title: ${params.title}`);
   console.log(`Format: ${params.durationSec}s ${params.aspectRatio}`);
-  console.log(`Engine: ${params.engine}`);
+  console.log(`Recommended engine: ${formatRecommendedEngine(params.engineFits, params.engine)}`);
   console.log(`Reason: ${params.reason}`);
   console.log(`Selection guide: ${params.selectionGuide}`);
   console.log("Engine fit:");
-  for (const fit of params.engineFits) {
-    console.log(`- ${fit.engine}: ${fit.fitPercent}%`);
+  for (const fit of sortEngineFits(params.engineFits)) {
+    console.log(`- ${fit.engine}: ${fit.fitPercent}%${fit.engine === params.engine ? " (selected)" : ""}`);
     console.log(`  Why: ${fit.reason}`);
     console.log(`  Best use: ${fit.bestUse}`);
     console.log(`  Features: ${fit.featureHighlights.join("; ")}`);
@@ -481,6 +482,47 @@ function printDecisionSummary(params: {
     console.log(`Fallback: ${params.fallback}`);
   }
   console.log(`License: ${params.licenseMessage}`);
+  printDecisionNextSteps(params.engine);
+}
+
+function sortEngineFits(engineFits: EngineFit[]): EngineFit[] {
+  return [...engineFits].sort((left, right) => {
+    if (right.fitPercent !== left.fitPercent) {
+      return right.fitPercent - left.fitPercent;
+    }
+    const order: EngineName[] = ["remotion", "hyperframes", "editframe"];
+    return order.indexOf(left.engine) - order.indexOf(right.engine);
+  });
+}
+
+function formatRecommendedEngine(
+  engineFits: EngineFit[],
+  engine: EngineName
+): string {
+  const selected = engineFits.find((fit) => fit.engine === engine);
+  return selected ? `${engine} (${selected.fitPercent}%)` : engine;
+}
+
+function printDecisionNextSteps(engine: EngineName): void {
+  console.log("Next steps:");
+  console.log(
+    `- If this direction is approved: michibiki generate --prompt "..." --engine ${engine}`
+  );
+  console.log(
+    "- After generation: michibiki preview --job outputs/projects/<slug>"
+  );
+  console.log(
+    "- Render only after preview approval: michibiki render --job outputs/projects/<slug> --confirm-render"
+  );
+}
+
+function printGenerateNextSteps(jobDir: string): void {
+  console.log("Next steps:");
+  console.log(`- Review generated files: ${jobDir}`);
+  console.log(`- Preview: michibiki preview --job ${jobDir}`);
+  console.log(
+    `- Render after preview approval: michibiki render --job ${jobDir} --confirm-render`
+  );
 }
 
 function printSwitchHints(hints: SwitchHint[]): void {

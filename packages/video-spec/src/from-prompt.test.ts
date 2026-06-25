@@ -31,6 +31,14 @@ describe("createVideoSpecFromPrompt", () => {
     ]);
   });
 
+  it("keeps fallback titles free of production directives", () => {
+    const spec = createVideoSpecFromPrompt({
+      prompt: "Vlog素材を編集して字幕付きショート動画を作りたい"
+    });
+
+    expect(spec.title).toBe("Vlog素材を編集して字幕付きショート");
+  });
+
   it("reconstructs long requests into concise video copy", () => {
     const prompt = [
       "20秒ハイテンポ 横長 BGM、効果音はあり https://ai-lab0530.peatix.com",

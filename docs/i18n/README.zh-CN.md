@@ -28,7 +28,7 @@ pnpm build
 pnpm test
 ```
 
-环境要求：Node.js 20+、pnpm 9+、ffmpeg（用于 HyperFrames / Editframe 的 MP4 渲染）、Chromium / Chrome（由 `michibiki doctor` 自动检测）。
+环境要求：Node.js 24.18+、pnpm 11.9+、ffmpeg（用于 HyperFrames / Editframe 的 MP4 渲染）、Chromium / Chrome（由 `michibiki doctor` 自动检测）。
 
 ## 基本命令
 
