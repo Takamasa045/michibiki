@@ -73,11 +73,11 @@ importers:
   packages/engine-hyperframes:
     dependencies:
       '@hyperframes/engine':
-        specifier: ^0.7.7
-        version: 0.7.7(typescript@6.0.3)
+        specifier: ^0.7.10
+        version: 0.7.10(typescript@6.0.3)
       '@hyperframes/producer':
-        specifier: ^0.7.7
-        version: 0.7.7(typescript@6.0.3)
+        specifier: ^0.7.10
+        version: 0.7.10(typescript@6.0.3)
       '@michibiki/browser-renderer':
         specifier: workspace:*
         version: link:../browser-renderer
@@ -88,8 +88,8 @@ importers:
         specifier: workspace:*
         version: link:../video-spec
       hyperframes:
-        specifier: ^0.7.7
-        version: 0.7.7
+        specifier: ^0.7.10
+        version: 0.7.10
 
   packages/engine-remotion:
     dependencies:
@@ -356,20 +356,20 @@ packages:
     peerDependencies:
       hono: ^4
 
-  '@hyperframes/core@0.7.7':
-    resolution: {integrity: sha512-5PIB0ghP84C+NrIta4sqAnsb8Droitk2abymBF96dAgTMjIE6vN2fm8/BM2dKRlSvmpcMj2f7CYgG3IGtapGFg==}
+  '@hyperframes/core@0.7.10':
+    resolution: {integrity: sha512-5W5PJjkzl/Ij8ZYpV4ZPgbzLpjMvDextkc+zILAMXU5oyicH0QbA+hyN1EWZ1NCDG6y1wwLx76YcZO7r1h5p8Q==}
     peerDependencies:
       hono: ^4.0.0
     peerDependenciesMeta:
       hono:
         optional: true
 
-  '@hyperframes/engine@0.7.7':
-    resolution: {integrity: sha512-DEzfMCwyqXr/P/fHQUkEMV5duSAFrFvOBSVVu2BszNRLnodVAeuVSfhJcGqaGMkpoEhQdimYT3qpDkjqHj3Njw==}
+  '@hyperframes/engine@0.7.10':
+    resolution: {integrity: sha512-q+D+R19lxDPb+ZgUsFrTGBKERHLEGfAOaEJO5gnE1wBNFJ29NldLMiCFS+vPrkAOkFod2QZEa612j7cNRQ641g==}
     engines: {node: '>=22'}
 
-  '@hyperframes/producer@0.7.7':
-    resolution: {integrity: sha512-hwViX583nh4qNbCXHUld/eXPySHgtSBPA8e/SUcawBFOkMx6wFfeSiRsNhYGV+U1hD6Jard1CwQSjcu8tVLCyQ==}
+  '@hyperframes/producer@0.7.10':
+    resolution: {integrity: sha512-zuROKq3LVZsk2WwDtu9nJ5oWSFvKZ5TDBhHWbmOEB7y/yP6SPQJkpP8NqNefaV5uUsATDvKjDpLnrjX4kmvedQ==}
     engines: {node: '>=22'}
 
   '@img/colour@1.1.0':
@@ -1125,8 +1125,8 @@ packages:
     resolution: {integrity: sha512-vK9P5/iUfdl95AI+JVyUuIcVtd4ofvtrOr3HNtM2yxC9bnMbEdp3x01OhQNnjb8IJYi38VlTE3mBXwcfvywuSw==}
     engines: {node: '>= 14'}
 
-  hyperframes@0.7.7:
-    resolution: {integrity: sha512-hXtu0tF/g4Z2I8fqzYP4OP3O1lJjYBuUFX/QTku224u17UoFCyTRgieXPEtILj+/jvcZsEAm5aT2GtxNe5Z9tA==}
+  hyperframes@0.7.10:
+    resolution: {integrity: sha512-LeZhDcHi1Jkc5bbdiZULs4iob2YYxrQTnTCxcINihFQBv6inYA2xabzUROKArwoq6qt9aIkqBkxFd5VozTGXPw==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -1851,7 +1851,7 @@ snapshots:
     dependencies:
       hono: 4.12.26
 
-  '@hyperframes/core@0.7.7(hono@4.12.26)':
+  '@hyperframes/core@0.7.10(hono@4.12.26)':
     dependencies:
       '@babel/parser': 7.29.7
       '@chenglou/pretext': 0.0.5
@@ -1869,10 +1869,10 @@ snapshots:
     transitivePeerDependencies:
       - canvas
 
-  '@hyperframes/engine@0.7.7(typescript@6.0.3)':
+  '@hyperframes/engine@0.7.10(typescript@6.0.3)':
     dependencies:
       '@hono/node-server': 1.19.14(hono@4.12.26)
-      '@hyperframes/core': 0.7.7(hono@4.12.26)
+      '@hyperframes/core': 0.7.10(hono@4.12.26)
       hono: 4.12.26
       linkedom: 0.18.12
       puppeteer: 24.43.1(typescript@6.0.3)
@@ -1887,7 +1887,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@hyperframes/producer@0.7.7(typescript@6.0.3)':
+  '@hyperframes/producer@0.7.10(typescript@6.0.3)':
     dependencies:
       '@fontsource/archivo-black': 5.2.8
       '@fontsource/eb-garamond': 5.2.7
@@ -1901,8 +1901,8 @@ snapshots:
       '@fontsource/outfit': 5.2.8
       '@fontsource/space-mono': 5.2.9
       '@hono/node-server': 1.19.14(hono@4.12.26)
-      '@hyperframes/core': 0.7.7(hono@4.12.26)
-      '@hyperframes/engine': 0.7.7(typescript@6.0.3)
+      '@hyperframes/core': 0.7.10(hono@4.12.26)
+      '@hyperframes/engine': 0.7.10(typescript@6.0.3)
       hono: 4.12.26
       linkedom: 0.18.12
       postcss: 8.5.15
@@ -2596,7 +2596,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  hyperframes@0.7.7:
+  hyperframes@0.7.10:
     dependencies:
       '@hono/node-server': 1.19.14(hono@4.12.26)
       '@puppeteer/browsers': 2.13.2
