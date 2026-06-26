@@ -47,11 +47,11 @@
     "test": "vitest run --configLoader runner src"
   },
   "dependencies": {
-    "@hyperframes/engine": "^0.7.7",
-    "@hyperframes/producer": "^0.7.7",
+    "@hyperframes/engine": "^0.7.10",
+    "@hyperframes/producer": "^0.7.10",
     "@michibiki/browser-renderer": "workspace:*",
     "@michibiki/compliance": "workspace:*",
     "@michibiki/video-spec": "workspace:*",
-    "hyperframes": "^0.7.7"
+    "hyperframes": "^0.7.10"
   }
 }
