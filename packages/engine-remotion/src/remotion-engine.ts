@@ -42,11 +42,11 @@ type CommandResult = {
 };
 
 // renovate: datasource=npm depName=remotion versioning=npm
-const REMOTION_VERSION = "^4.0.465";
+const REMOTION_VERSION = "^4.0.484";
 // renovate: datasource=npm depName=react versioning=npm
-const REACT_VERSION = "^19.2.6";
+const REACT_VERSION = "^19.2.7";
 // renovate: datasource=npm depName=@types/react versioning=npm
-const REACT_TYPES_VERSION = "^19.2.15";
+const REACT_TYPES_VERSION = "^19.2.17";
 // renovate: datasource=npm depName=@types/react-dom versioning=npm
 const REACT_DOM_TYPES_VERSION = "^19.2.3";
 // renovate: datasource=npm depName=typescript versioning=npm
