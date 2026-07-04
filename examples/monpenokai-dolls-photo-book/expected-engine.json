@@ -1,0 +1,12 @@
+{
+  "engine": "hyperframes",
+  "inputType": "url",
+  "promptFile": "prompt.txt",
+  "requiredDecisionFields": [
+    "engineFits",
+    "selectionGuide",
+    "bestUse",
+    "featureHighlights"
+  ],
+  "reason": "A public web photo book promo that needs browser mockups, DOM/page visuals, card motion, and URL-led page context should route to HyperFrames."
+}
