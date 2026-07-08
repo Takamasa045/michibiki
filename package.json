@@ -41,7 +41,7 @@
     "video-router": "node apps/cli/dist/index.js"
   },
   "devDependencies": {
-    "@types/node": "^25.9.4",
+    "@types/node": "^25.9.5",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"
   }
