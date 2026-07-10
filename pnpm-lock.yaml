@@ -73,11 +73,11 @@ importers:
   packages/engine-hyperframes:
     dependencies:
       '@hyperframes/engine':
-        specifier: ^0.7.48
-        version: 0.7.48(yauzl@2.10.0)
+        specifier: ^0.7.49
+        version: 0.7.49(yauzl@2.10.0)
       '@hyperframes/producer':
-        specifier: ^0.7.48
-        version: 0.7.48(yauzl@2.10.0)
+        specifier: ^0.7.49
+        version: 0.7.49(yauzl@2.10.0)
       '@michibiki/browser-renderer':
         specifier: workspace:*
         version: link:../browser-renderer
@@ -88,8 +88,8 @@ importers:
         specifier: workspace:*
         version: link:../video-spec
       hyperframes:
-        specifier: ^0.7.48
-        version: 0.7.48(yauzl@2.10.0)
+        specifier: ^0.7.49
+        version: 0.7.49(yauzl@2.10.0)
 
   packages/engine-remotion:
     dependencies:
@@ -352,25 +352,25 @@ packages:
     peerDependencies:
       hono: ^4
 
-  '@hyperframes/core@0.7.48':
-    resolution: {integrity: sha512-bttCX9wcC80H90+Ai355VuuJHQgeUUjYZsUGi5CZY4RimrHaEDa98Pj3TnNV3hjJ/ctD6XQSp2+U+Mg1rfRgxw==}
+  '@hyperframes/core@0.7.49':
+    resolution: {integrity: sha512-IGPxTpalX6DmvCGvfmco7dl3a/wFx3xW/iB6eTovoRIXDkfbOTOvbqQ56KT1VP0QR+AKppIL9SMLlnAtvHUQJQ==}
 
-  '@hyperframes/engine@0.7.48':
-    resolution: {integrity: sha512-u7dKmFz/X5ZoICVLHal4XO6gtvG/LgwUTCcmORcb6Imjgm3SFiKHZ/WNulY0A1NoBnIiCNGWOKiG+J5yD9pbSg==}
+  '@hyperframes/engine@0.7.49':
+    resolution: {integrity: sha512-ZNkFmI7tda5gJj8yQ1XIRYL/dDsGUl+sJFhPrpvrKbwtimLuKopLxXIMQEGl6Cvk/RGRLlHkZBNzeQZf8Ap53w==}
     engines: {node: '>=22'}
 
-  '@hyperframes/lint@0.7.48':
-    resolution: {integrity: sha512-j5nE+fMSadw0WAHS0zZ+v5SX7BLkayyDg3gBCoPxFnrLzQaozWS+MQutT6wXaHGSjDgnP/XugqbsVZx4vOmnew==}
+  '@hyperframes/lint@0.7.49':
+    resolution: {integrity: sha512-x++Z6duuMk7Fth58HkaiyWXqLFC1RJS9oUMq9X/BoCRx7Scl6fX2IHOkQPUuLV2p8IZ2NvEY5iVu+imenjHuiA==}
 
-  '@hyperframes/parsers@0.7.48':
-    resolution: {integrity: sha512-wZFgP37YT3ZSfHs5iYGWBf7tFBAtH00SQLOhSyIhOlpMewyz1y3onYs+qLdUcwZ1wUUaShZgfnThCu/zFgj4Zw==}
+  '@hyperframes/parsers@0.7.49':
+    resolution: {integrity: sha512-A92AHulbk3yR/zdwBtdSCAUMKx/pIMyYIYvLHQ0O5kqQG2iNhXuudQ8ByYsaCsGVFA9esR024OvQfru3uL252g==}
 
-  '@hyperframes/producer@0.7.48':
-    resolution: {integrity: sha512-C8JatAFg68PFrRTSxWiTgwOxLUDbd3QszOHUIar/Q7IF7JRUIsUpLBV5cHLTc2pM1BP597wSfRO+vQKQE45jZA==}
+  '@hyperframes/producer@0.7.49':
+    resolution: {integrity: sha512-OnFE78H5FnBiAaNOeJMMTMXR8TRLJh+KJ4jmg7EHrFq/RHhw49R/4wfjExXzP0hbY40NTiGROkmxEzwWem0WOw==}
     engines: {node: '>=22'}
 
-  '@hyperframes/studio-server@0.7.48':
-    resolution: {integrity: sha512-1Ncbu1DY5o2EpAVZphGJd/K7/HyQz6nBF0/PYhIXXWHJ3sG4j2F9/VPan8d3Tt1dAXdGU9sKDXfGeWbeo1UYXw==}
+  '@hyperframes/studio-server@0.7.49':
+    resolution: {integrity: sha512-x0LuERmGlVpHI8+f9hRqYyTfv/CI2nwO16LUC/QB+z+fNn4vBaYZtJt9oJWkrYASYOT/NYQfe2Z/Jq1LbeLajw==}
 
   '@img/colour@1.1.0':
     resolution: {integrity: sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==}
@@ -1121,8 +1121,8 @@ packages:
     resolution: {integrity: sha512-vK9P5/iUfdl95AI+JVyUuIcVtd4ofvtrOr3HNtM2yxC9bnMbEdp3x01OhQNnjb8IJYi38VlTE3mBXwcfvywuSw==}
     engines: {node: '>= 14'}
 
-  hyperframes@0.7.48:
-    resolution: {integrity: sha512-yso5q9pSp+7t9RHdc8PqomRoZNzLGI2xMphVFhAtmx8VO9NEFB5mStDouRktzIbHlbG04iDx2Z/nzhCMWiCSKQ==}
+  hyperframes@0.7.49:
+    resolution: {integrity: sha512-qX9+E+3DeGTXB2cmWXqAMu8Ra9q22QJzC2+kJax90BPl+aYzk1mGwxAm0o+T+Dvc6tmWBawOer8mf3HtMpYlqA==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -1742,12 +1742,12 @@ snapshots:
     dependencies:
       hono: 4.12.27
 
-  '@hyperframes/core@0.7.48':
+  '@hyperframes/core@0.7.49':
     dependencies:
       '@chenglou/pretext': 0.0.5
-      '@hyperframes/lint': 0.7.48
-      '@hyperframes/parsers': 0.7.48
-      '@hyperframes/studio-server': 0.7.48
+      '@hyperframes/lint': 0.7.49
+      '@hyperframes/parsers': 0.7.49
+      '@hyperframes/studio-server': 0.7.49
       bpm-detective: 2.0.5
       linkedom: 0.18.12
       postcss: 8.5.16
@@ -1756,10 +1756,10 @@ snapshots:
     transitivePeerDependencies:
       - canvas
 
-  '@hyperframes/engine@0.7.48(yauzl@2.10.0)':
+  '@hyperframes/engine@0.7.49(yauzl@2.10.0)':
     dependencies:
       '@hono/node-server': 1.19.14(hono@4.12.27)
-      '@hyperframes/core': 0.7.48
+      '@hyperframes/core': 0.7.49
       hono: 4.12.27
       linkedom: 0.18.12
       puppeteer: 25.3.0(yauzl@2.10.0)
@@ -1771,15 +1771,15 @@ snapshots:
       - utf-8-validate
       - yauzl
 
-  '@hyperframes/lint@0.7.48':
+  '@hyperframes/lint@0.7.49':
     dependencies:
-      '@hyperframes/parsers': 0.7.48
+      '@hyperframes/parsers': 0.7.49
       linkedom: 0.18.12
       postcss: 8.5.16
     transitivePeerDependencies:
       - canvas
 
-  '@hyperframes/parsers@0.7.48':
+  '@hyperframes/parsers@0.7.49':
     dependencies:
       '@babel/parser': 7.29.7
       acorn: 8.17.0
@@ -1790,7 +1790,7 @@ snapshots:
     transitivePeerDependencies:
       - canvas
 
-  '@hyperframes/producer@0.7.48(yauzl@2.10.0)':
+  '@hyperframes/producer@0.7.49(yauzl@2.10.0)':
     dependencies:
       '@fontsource/archivo-black': 5.2.8
       '@fontsource/eb-garamond': 5.2.7
@@ -1804,11 +1804,11 @@ snapshots:
       '@fontsource/outfit': 5.2.8
       '@fontsource/space-mono': 5.2.9
       '@hono/node-server': 1.19.14(hono@4.12.27)
-      '@hyperframes/core': 0.7.48
-      '@hyperframes/engine': 0.7.48(yauzl@2.10.0)
-      '@hyperframes/lint': 0.7.48
-      '@hyperframes/parsers': 0.7.48
-      '@hyperframes/studio-server': 0.7.48
+      '@hyperframes/core': 0.7.49
+      '@hyperframes/engine': 0.7.49(yauzl@2.10.0)
+      '@hyperframes/lint': 0.7.49
+      '@hyperframes/parsers': 0.7.49
+      '@hyperframes/studio-server': 0.7.49
       hono: 4.12.27
       linkedom: 0.18.12
       postcss: 8.5.16
@@ -1822,10 +1822,10 @@ snapshots:
       - utf-8-validate
       - yauzl
 
-  '@hyperframes/studio-server@0.7.48':
+  '@hyperframes/studio-server@0.7.49':
     dependencies:
-      '@hyperframes/core': 0.7.48
-      '@hyperframes/parsers': 0.7.48
+      '@hyperframes/core': 0.7.49
+      '@hyperframes/parsers': 0.7.49
       hono: 4.12.27
       linkedom: 0.18.12
       postcss: 8.5.16
@@ -2434,7 +2434,7 @@ snapshots:
       - supports-color
     optional: true
 
-  hyperframes@0.7.48(yauzl@2.10.0):
+  hyperframes@0.7.49(yauzl@2.10.0):
     dependencies:
       '@hono/node-server': 1.19.14(hono@4.12.27)
       '@puppeteer/browsers': 3.0.6(yauzl@2.10.0)
