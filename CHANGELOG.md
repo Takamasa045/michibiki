@@ -4,6 +4,45 @@ All notable changes to Michibiki will be documented in this file.
 
 This project follows semantic versioning for public releases.
 
+## [0.1.11](https://github.com/Takamasa045/michibiki/compare/v0.1.10...v0.1.11) (2026-07-17)
+
+
+### Bug Fixes
+
+* **deps:** update video engines to ^0.7.10 ([#108](https://github.com/Takamasa045/michibiki/issues/108)) ([5ef2002](https://github.com/Takamasa045/michibiki/commit/5ef2002cb074a6d8c3e062942cecb82f82860c7f))
+* **deps:** update video engines to ^0.7.14 ([#109](https://github.com/Takamasa045/michibiki/issues/109)) ([e919ab8](https://github.com/Takamasa045/michibiki/commit/e919ab8a2026bf59386a72bb2b3cf9c33d35b8d1))
+* **deps:** update video engines to ^0.7.17 ([#110](https://github.com/Takamasa045/michibiki/issues/110)) ([819d30e](https://github.com/Takamasa045/michibiki/commit/819d30e17c95f5f0ee45e59a69482a9d29b4a0df))
+* **deps:** update video engines to ^0.7.18 ([#112](https://github.com/Takamasa045/michibiki/issues/112)) ([f77cbac](https://github.com/Takamasa045/michibiki/commit/f77cbac79b060f80f2c72af986a787bac8c2e225))
+* **deps:** update video engines to ^0.7.21 ([#114](https://github.com/Takamasa045/michibiki/issues/114)) ([8c0f4a6](https://github.com/Takamasa045/michibiki/commit/8c0f4a67b75be4cce7cf52d6bb9930453555b305))
+* **deps:** update video engines to ^0.7.22 ([#115](https://github.com/Takamasa045/michibiki/issues/115)) ([fd5743c](https://github.com/Takamasa045/michibiki/commit/fd5743c277a87d9fec365a41a70961cd52e6bd6d))
+* **deps:** update video engines to ^0.7.26 ([#116](https://github.com/Takamasa045/michibiki/issues/116)) ([e86eb1c](https://github.com/Takamasa045/michibiki/commit/e86eb1c2c4dca1e5c722c71f3a8f9ecffd263b85))
+* **deps:** update video engines to ^0.7.31 ([#117](https://github.com/Takamasa045/michibiki/issues/117)) ([067ad7a](https://github.com/Takamasa045/michibiki/commit/067ad7a65bbe0a9e44063556244435edd9b5f90b))
+* **deps:** update video engines to ^0.7.33 ([#119](https://github.com/Takamasa045/michibiki/issues/119)) ([ad2537e](https://github.com/Takamasa045/michibiki/commit/ad2537e56e881dde8fa6554f40619d4159eaca19))
+* **deps:** update video engines to ^0.7.36 ([#122](https://github.com/Takamasa045/michibiki/issues/122)) ([e85d065](https://github.com/Takamasa045/michibiki/commit/e85d065b9e492f118b9b6d9b5c45f0063c6ddf85))
+* **deps:** update video engines to ^0.7.37 ([#124](https://github.com/Takamasa045/michibiki/issues/124)) ([c529e9d](https://github.com/Takamasa045/michibiki/commit/c529e9db281edc9043c18cd2823c63b020d70b28))
+* **deps:** update video engines to ^0.7.39 ([#128](https://github.com/Takamasa045/michibiki/issues/128)) ([e779465](https://github.com/Takamasa045/michibiki/commit/e7794652aee78063803828039a33791f7eb662be))
+* **deps:** update video engines to ^0.7.42 ([#129](https://github.com/Takamasa045/michibiki/issues/129)) ([bfd88ac](https://github.com/Takamasa045/michibiki/commit/bfd88ac31f8628872ce43decd2143d8d99b56e2a))
+* **deps:** update video engines to ^0.7.45 ([#132](https://github.com/Takamasa045/michibiki/issues/132)) ([3ae9cc4](https://github.com/Takamasa045/michibiki/commit/3ae9cc4ab3ac7d49c2481c7b26f45a0ccb19246e))
+* **deps:** update video engines to ^0.7.46 ([#133](https://github.com/Takamasa045/michibiki/issues/133)) ([a7590f0](https://github.com/Takamasa045/michibiki/commit/a7590f01b42789a579bd3f888dc2d543b3a6d42b))
+* **deps:** update video engines to ^0.7.48 ([#135](https://github.com/Takamasa045/michibiki/issues/135)) ([bd7b0a6](https://github.com/Takamasa045/michibiki/commit/bd7b0a65f0d09f081becce1bf1bccbfcb3f9834c))
+* **deps:** update video engines to ^0.7.49 ([#136](https://github.com/Takamasa045/michibiki/issues/136)) ([1ddf637](https://github.com/Takamasa045/michibiki/commit/1ddf6371a799c1c36b06308ef6e5b94d954b345a))
+* **deps:** update video engines to ^0.7.52 ([#137](https://github.com/Takamasa045/michibiki/issues/137)) ([29c427e](https://github.com/Takamasa045/michibiki/commit/29c427eda74657d9d0724a828d057743ca0fdee1))
+* **deps:** update video engines to ^0.7.54 ([#138](https://github.com/Takamasa045/michibiki/issues/138)) ([20a22f4](https://github.com/Takamasa045/michibiki/commit/20a22f4a03565babfb2266d31f00017897ed7f00))
+* **deps:** update video engines to ^0.7.55 ([#141](https://github.com/Takamasa045/michibiki/issues/141)) ([7e57df2](https://github.com/Takamasa045/michibiki/commit/7e57df20f9d8b5211d1f42e9fcef876d0e41bf7b))
+* **deps:** update video engines to ^0.7.56 ([#143](https://github.com/Takamasa045/michibiki/issues/143)) ([be61c73](https://github.com/Takamasa045/michibiki/commit/be61c73f90dd459c4dcd62159d468130df37b9ee))
+* **deps:** update video engines to ^0.7.57 ([#147](https://github.com/Takamasa045/michibiki/issues/147)) ([5b134f0](https://github.com/Takamasa045/michibiki/commit/5b134f0e1854932572e57ea66b11994c177f4e9e))
+* **deps:** update video engines to ^0.7.58 ([#149](https://github.com/Takamasa045/michibiki/issues/149)) ([f9b4dd9](https://github.com/Takamasa045/michibiki/commit/f9b4dd932900e636981d8c9c8ffdad4aae8e0977))
+* **deps:** update video engines to ^0.7.59 ([#150](https://github.com/Takamasa045/michibiki/issues/150)) ([7006792](https://github.com/Takamasa045/michibiki/commit/700679293775fdd756f87765dfb84fc03e198b65))
+* **deps:** update video engines to ^0.7.6 ([#106](https://github.com/Takamasa045/michibiki/issues/106)) ([15075de](https://github.com/Takamasa045/michibiki/commit/15075de09a4a7f78b1dd69b8f4b8428467879efe))
+* **deps:** update video engines to ^0.7.60 ([#152](https://github.com/Takamasa045/michibiki/issues/152)) ([6e3f0b5](https://github.com/Takamasa045/michibiki/commit/6e3f0b53a50f52cd3a7d1931b9ee1938fffab3b4))
+* **deps:** update video engines to ^0.7.61 ([#153](https://github.com/Takamasa045/michibiki/issues/153)) ([22e2457](https://github.com/Takamasa045/michibiki/commit/22e2457ca05d6f50701289940f79be0bf7a49aa8))
+* **deps:** update video engines to ^0.7.7 ([#107](https://github.com/Takamasa045/michibiki/issues/107)) ([a51215a](https://github.com/Takamasa045/michibiki/commit/a51215a2282b3723d39f5c3a5df852574aec977f))
+
+
+### Documentation
+
+* add monpenokai routing example ([99aa8a2](https://github.com/Takamasa045/michibiki/commit/99aa8a2a230ab6d768f0ac91ef5ed7ad3d0df6a7))
+
 ## [0.1.10](https://github.com/Takamasa045/michibiki/compare/v0.1.9...v0.1.10) (2026-06-25)
 
 
