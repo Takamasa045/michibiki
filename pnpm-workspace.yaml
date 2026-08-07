@@ -8,7 +8,7 @@ strictDepBuilds: true
 overrides:
   esbuild: 0.28.1
   protobufjs: 8.7.1
-  ws: 8.21.1
+  ws: 8.21.3
 allowBuilds:
   '@google/genai': false
   esbuild: false
