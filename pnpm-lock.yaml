@@ -6,7 +6,7 @@ settings:
 
 overrides:
   esbuild: 0.28.1
-  protobufjs: 8.7.1
+  protobufjs: 8.8.0
   ws: 8.21.1
 
 importers:
@@ -1352,8 +1352,8 @@ packages:
     engines: {node: '>=14'}
     hasBin: true
 
-  protobufjs@8.7.1:
-    resolution: {integrity: sha512-agdGHrXNTv0IrYscJPDou/PlEJk1c/hBZ9o/B5NH2i/nSPtPqacNxzgwf1CebXxFMjMrZH5sqv9uQuw96aGt/A==}
+  protobufjs@8.8.0:
+    resolution: {integrity: sha512-N3xhQ5yyBx3vQq4gubBfASzYhJGNzeDbjqBpu61g7UVylsN/qyffU96TKWD3GbbLOKF82VGNRNvv1+BFgE31Eg==}
     engines: {node: '>=12.0.0'}
 
   puppeteer-core@25.3.0:
@@ -1764,7 +1764,7 @@ snapshots:
     dependencies:
       google-auth-library: 10.9.0
       p-retry: 4.6.2
-      protobufjs: 8.7.1
+      protobufjs: 8.8.0
       ws: 8.21.1
     transitivePeerDependencies:
       - bufferutil
@@ -2684,7 +2684,7 @@ snapshots:
 
   prettier@3.9.5: {}
 
-  protobufjs@8.7.1:
+  protobufjs@8.8.0:
     dependencies:
       long: 5.3.2
     optional: true
