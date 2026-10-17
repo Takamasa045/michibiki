@@ -232,7 +232,7 @@ Engine behavior, recommendation rules, and agent contracts are documented in:
 
 ## Dependency Automation
 
-GitHub runs Renovate from `.github/workflows/renovate.yml` on weekdays at 07:15 JST, with `renovate.json` limiting updates to before 9am JST. The `video engines` Renovate group keeps HyperFrames, Remotion standalone project runtime constants, React runtime packages, and Editframe packages updated together.
+GitHub runs Renovate from `.github/workflows/renovate.yml` weekly (Monday 07:15 JST). `renovate.json` groups GitHub Actions, non-major npm updates, and the existing `video engines` set, does not automerge, and only opens PRs before 9am JST on Monday. The `video engines` group keeps HyperFrames, Remotion standalone project runtime constants, React runtime packages, and Editframe packages updated together.
 
 Before the scheduled workflow can open pull requests, add a repository secret named `RENOVATE_TOKEN` (a classic PAT with `public_repo` + `workflow` scope for this public repository, or `repo` if it becomes private; a GitHub App installation token with equivalent permissions also works). Run the `Renovate` workflow manually once after setting the secret to confirm it can create/update dependency PRs.
 
@@ -357,7 +357,7 @@ pnpm organize --clean-jobs # outputs/jobs と outputs/projects 配下の再生�
 
 ### 依存更新の自動化
 
-GitHub では `.github/workflows/renovate.yml` により、平日 07:15 JST に Renovate を実行します。`renovate.json` の `video engines` グループで、HyperFrames、Remotion standalone 生成時の runtime 定数、React runtime、Editframe 関連 package をまとめて更新 PR にします。
+GitHub では `.github/workflows/renovate.yml` により、毎週月曜 07:15 JST に Renovate を実行します。`renovate.json` で GitHub Actions・npm の non-major・既存の `video engines` をグループ化し、automerge はしません。`video engines` グループで、HyperFrames、Remotion standalone 生成時の runtime 定数、React runtime、Editframe 関連 package をまとめて更新 PR にします。
 
 実行には repository secret `RENOVATE_TOKEN` が必要です。この public repo では classic PAT に `public_repo` と `workflow` scope を付けて登録します（private 化する場合は `repo` scope）。GitHub App installation token を使う場合も、Contents / Pull requests / Issues / Workflows の書き込み権限を与えてください。設定後に `Renovate` workflow を一度手動実行し、PR を作成/更新できることを確認してください。
 

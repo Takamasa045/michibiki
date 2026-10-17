@@ -7,12 +7,40 @@
     ":maintainLockFilesWeekly"
   ],
   "timezone": "Asia/Tokyo",
+  "schedule": ["before 9am on monday"],
   "rangeStrategy": "bump",
-  "automerge": true,
-  "automergeType": "pr",
-  "platformAutomerge": false,
-  "automergeStrategy": "squash",
+  "automerge": false,
   "packageRules": [
+    {
+      "description": "Group GitHub Actions updates into one weekly PR.",
+      "matchManagers": ["github-actions"],
+      "groupName": "github-actions",
+      "groupSlug": "github-actions"
+    },
+    {
+      "description": "Group non-major npm updates outside the video-engine set.",
+      "matchDatasources": ["npm"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "excludePackageNames": [
+        "hyperframes",
+        "@hyperframes/engine",
+        "@hyperframes/producer",
+        "remotion",
+        "@remotion/cli",
+        "@remotion/renderer",
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom",
+        "@editframe/api",
+        "@editframe/cli",
+        "@editframe/create",
+        "@editframe/elements",
+        "@editframe/react"
+      ],
+      "groupName": "npm non-major",
+      "groupSlug": "npm-non-major"
+    },
     {
       "description": "Keep video engine packages and generated project runtime versions updated together.",
       "matchDatasources": ["npm"],
