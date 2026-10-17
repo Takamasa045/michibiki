@@ -38,7 +38,7 @@ Run these before creating an MVP GitHub Release:
 pnpm install
 pnpm build
 pnpm test
-pnpm audit --audit-level moderate
+pnpm audit --audit-level high
 pnpm pack:check
 pnpm michibiki doctor
 pnpm michibiki generate --engine hyperframes --duration 1 --render --confirm-render --prompt "$(cat examples/lp-trailer/prompt.txt)"

@@ -34,7 +34,7 @@
     "test": "vitest run --configLoader runner",
     "typecheck": "pnpm build",
     "pack:check": "node scripts/pack-check.mjs",
-    "release:check": "pnpm build && pnpm test && pnpm audit --audit-level moderate && pnpm pack:check",
+    "release:check": "pnpm build && pnpm test && pnpm audit --audit-level high && pnpm pack:check",
     "clean": "node scripts/clean-dist.mjs",
     "organize": "node scripts/organize-outputs.mjs",
     "michibiki": "node apps/cli/dist/index.js",
@@ -43,6 +43,6 @@
   "devDependencies": {
     "@types/node": "^25.9.5",
     "typescript": "^7.0.2",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.12"
   }
 }

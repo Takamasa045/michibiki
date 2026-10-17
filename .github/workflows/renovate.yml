@@ -3,15 +3,15 @@ name: Renovate
 on:
   workflow_dispatch:
   schedule:
-    # Run often so fast-moving video engines are picked up close to publish time.
-    - cron: "15 */3 * * *"
+    # Monday 07:15 JST. Pair with renovate.json weekly grouping and no automerge.
+    - cron: "15 22 * * 0"
 
 permissions:
   contents: read
 
 concurrency:
   group: renovate
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   renovate:
